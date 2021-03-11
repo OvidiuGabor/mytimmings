@@ -13,7 +13,10 @@ namespace mytimmings.Utilities
         public static string getConnectionString()
         {
             string connstring = System.Configuration.ConfigurationManager.ConnectionStrings["DBModel"].ConnectionString;
-            return connstring;
+            //Decrypt the connection String
+            string  decryptedString = PasswordProtect.Decrypt.DecryptText(connstring, true);
+
+            return decryptedString;
         }
 
         #region Methods for Portal

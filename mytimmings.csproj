@@ -550,6 +550,10 @@
       <Project>{0950d43d-10b3-469a-975b-e54339f9c849}</Project>
       <Name>DBContext</Name>
     </ProjectReference>
+    <ProjectReference Include="PasswordProtect\PasswordProtect.csproj">
+      <Project>{137b8a70-2eeb-4742-a6a4-e729ccf77a51}</Project>
+      <Name>PasswordProtect</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

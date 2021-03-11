@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -11,6 +13,8 @@ namespace mytimmings.Controllers
     {
 
         public DBContext.DBModel dbmodel = new DBContext.DBModel();
+        //public DBContext.DBModel dbmodel = null;
+
         public ActionResult Index()
         {
             Session["errorMessage"] = null;
@@ -19,6 +23,7 @@ namespace mytimmings.Controllers
             {
                 Session["errorMessage"] = error.errorMessage;
             }
+
 
             return View();
         }
@@ -125,6 +130,6 @@ namespace mytimmings.Controllers
             Session["User"] = null;
         }
         #endregion
-
+      
     }
 }

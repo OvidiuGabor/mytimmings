@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mytimmings", "mytimmings.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBContext", "DBContext\DBContext.csproj", "{0950D43D-10B3-469A-975B-E54339F9C849}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PasswordProtect", "PasswordProtect\PasswordProtect.csproj", "{137B8A70-2EEB-4742-A6A4-E729CCF77A51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{0950D43D-10B3-469A-975B-E54339F9C849}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0950D43D-10B3-469A-975B-E54339F9C849}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0950D43D-10B3-469A-975B-E54339F9C849}.Release|Any CPU.Build.0 = Release|Any CPU
+		{137B8A70-2EEB-4742-A6A4-E729CCF77A51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{137B8A70-2EEB-4742-A6A4-E729CCF77A51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{137B8A70-2EEB-4742-A6A4-E729CCF77A51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{137B8A70-2EEB-4742-A6A4-E729CCF77A51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
