@@ -163,11 +163,12 @@
 
                 info.event.setExtendedProp("id", count)
                 info.event.setExtendedProp("comments", "")
+                info.event.setExtendedProp("project", "")
             },
             eventClick: function (info) {
                 var eventObj = info.event
                 $('#modal').modal('show')
-                SetModalInformation(eventObj.startStr, eventObj.endStr, eventObj.extendedProps.comments, eventObj.extendedProps.id)
+                SetModalInformation(eventObj.startStr, eventObj.endStr, eventObj.extendedProps.comments, eventObj.extendedProps.id, eventObj.extendedProps.project)
             }
         });
 
@@ -180,12 +181,13 @@
 
     });
 
-    function SetModalInformation(startdate, enddate, comments, id) {
+    function SetModalInformation(startdate, enddate, comments, id, project) {
         var modal = document.getElementById("modal");
         var startDate = modal.querySelector('[id=startDate]')
         var endDate = modal.querySelector('[id=endDate]')
         var commentsHtml = modal.querySelector('[id=comments]')
         var eventId = modal.querySelector('[id=eventId]')
+        var projectId = modal.querySelector('[id=project]')
 
 
         //Set time restriction for the dates input
@@ -209,10 +211,11 @@
         endDate.value = formatStrigDate(enddate)
         commentsHtml.value = comments
         eventId.value = id
+        projectId.value = project
     }
 
     function formatStrigDate(datestr) {
-        
+
         var convertedStr = "";
         //if the date received is null or empty string, then we get the current date!
         if (datestr) {
@@ -242,6 +245,58 @@
     function uploadCalendar() {
         //get list of events
         var eventsList = externalCalendar.getEvents();
+        var eventsArray = [];
+
+        //in order to send the calendar to the controller, we need to capture all the events, and send them withing an array.
+        //we will make an individual object for each event, then add it to the list of events/
+        //With Ajax we will send this array to the controller, where it will be processed!
+
+
+        if (eventsList.length > 0) {
+            for (var i = 0; i < eventsList.length; i++) {
+                var currentEvent = eventsList[i]
+                let evetobj = {
+                    StartTime: currentEvent.startStr,
+                    EndTime: currentEvent.endStr,
+                    Status: currentEvent.title,
+                    Comments: currentEvent.extendedProps.comments,
+                    ProjectId: 1
+                }
+
+                eventsArray.push(evetobj)
+            }
+            console.log(eventsArray)
+
+            if (eventsArray.length > 0) {
+                data = JSON.stringify({ "data": eventsArray })
+                @*$.ajax({
+                    dataType: 'json',
+                    type: "POST",
+                    url: "@Url.Action("UpdateRecords", "Portal")",
+                    data: data,
+                    traditional: true,
+                    success: function (result) {
+                        console.log(result)
+                    },
+                    error: function (result) {
+                        alert("Error occured!")
+                    }
+
+                })*@
+                $.post("@Url.Action("UpdateRecords", "Portal")", { data: eventsArray }, function (data) {
+                    console.log(data)
+                })
+
+            }
+            else {
+                //set error meesage that something happen, and refresh the page
+                alert("Something happen! Please try again!")
+            }
+
+        } else {
+            alert("There is no event into the calendar!")
+        }
+
 
     }
 

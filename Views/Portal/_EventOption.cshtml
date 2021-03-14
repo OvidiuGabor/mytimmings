@@ -18,10 +18,17 @@
                     <label for="endDate">Event End Date Time</label>
                 </div>
                 <div>
+                    <select name="project" id="project">
+                        <option value="1">Apidesign</option>
+                        <option value="1">myTimmings</option>
+                    </select>
+                    <label for="project">Project</label>
+                </div>
+                <div>
                     <textarea name="comments" id="comments"></textarea>
                     <label for="comments">Event End Date Time</label>
                 </div>
-                <input type="hidden" name="eventId" value=""  id="eventId"/>
+                <input type="hidden" name="eventId" value="" id="eventId" />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="saveChanges()">Save changes</button>
@@ -41,19 +48,21 @@
         var endDate = modal.querySelector('[id=endDate]').value
         var commentsHtml = modal.querySelector('[id=comments]').value
         var eventID = modal.querySelector('[id=eventId]').value
+        var projectid = modal.querySelector('[id=project]').value
 
 
         //Get the events list from the calendar
         var eventsList = externalCalendar.getEvents()
         var isOK = checkInput(eventsList, eventID)
         if (isOK) {
-              //loop through each event and find the one with current id
+            //loop through each event and find the one with current id
             for (var i = 0; i < eventsList.length; i++) {
                 let currentEvent = eventsList[i]
 
                 if (currentEvent.extendedProps.id == eventID) {
                     currentEvent.setDates(startDate, endDate)
                     currentEvent.setExtendedProp("comments", commentsHtml)
+                    currentEvent.setExtendedProp("project", projectid)
                 }
             };
             externalCalendar.render()
@@ -69,7 +78,7 @@
             let currentEvent = eventsList[i]
 
             if (currentEvent.extendedProps.id == eventID) {
-               currentEvent.remove()
+                currentEvent.remove()
             }
         };
         $('#modal').modal('hide')
@@ -133,7 +142,7 @@
         }
 
         //Return true if all the checks are passed
-        return true 
+        return true
     }
 
 </script>

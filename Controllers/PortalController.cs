@@ -514,6 +514,21 @@ namespace mytimmings.Controllers
             return View();
         }
 
+
+
+
+        public JsonResult UpdateRecords( List<Models.Portal.Event> data)
+        {
+            if(data.Count < 1)
+                return Json(new { success = false, message = "No records Received!" }, JsonRequestBehavior.AllowGet);
+
+
+
+            return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+        }
+
+
+
         #endregion
 
 

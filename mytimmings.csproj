@@ -136,6 +136,7 @@
     <Compile Include="Models\Portal\CalendarRecord.cs" />
     <Compile Include="Models\Portal\DayRecord.cs" />
     <Compile Include="Models\Portal\DayOverview.cs" />
+    <Compile Include="Models\Portal\Event.cs" />
     <Compile Include="Models\Portal\Portal.cs" />
     <Compile Include="Models\Security\LoginModel.cs" />
     <Compile Include="Models\Security\User.cs" />
