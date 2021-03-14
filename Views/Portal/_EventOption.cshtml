@@ -10,23 +10,130 @@
             <div class="modal-body">
                 <p>Modal body text goes here.</p>
                 <div>
-                    <input type="datetime" name="startDate" value="" id="startDate" />
+                    <input type="datetime-local" name="startDate" value="" id="startDate" min="" max="" />
                     <label for="startDate">Event Start Date Time</label>
                 </div>
                 <div>
-                    <input type="datetime" name="endDate" value="" id="startDate" />
+                    <input type="datetime-local" name="endDate" value="" id="endDate" min="" max="" />
                     <label for="endDate">Event End Date Time</label>
                 </div>
                 <div>
                     <textarea name="comments" id="comments"></textarea>
                     <label for="comments">Event End Date Time</label>
                 </div>
+                <input type="hidden" name="eventId" value=""  id="eventId"/>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Save changes</button>
-                <button type="button" class="btn btn-primary">Delete</button>
+                <button type="button" class="btn btn-primary" onclick="saveChanges()">Save changes</button>
+                <button type="button" class="btn btn-danger" onclick="deleteEvent()">Delete</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    //Function for when the user save an event to the calendar
+    function saveChanges() {
+        //get input values from HTML
+        var modal = document.getElementById("modal");
+        var startDate = modal.querySelector('[id=startDate]').value
+        var endDate = modal.querySelector('[id=endDate]').value
+        var commentsHtml = modal.querySelector('[id=comments]').value
+        var eventID = modal.querySelector('[id=eventId]').value
+
+
+        //Get the events list from the calendar
+        var eventsList = externalCalendar.getEvents()
+        var isOK = checkInput(eventsList, eventID)
+        if (isOK) {
+              //loop through each event and find the one with current id
+            for (var i = 0; i < eventsList.length; i++) {
+                let currentEvent = eventsList[i]
+
+                if (currentEvent.extendedProps.id == eventID) {
+                    currentEvent.setDates(startDate, endDate)
+                    currentEvent.setExtendedProp("comments", commentsHtml)
+                }
+            };
+            externalCalendar.render()
+            $('#modal').modal('hide')
+
+        }
+    }
+    //Function for when the user deletes an event from the calendar
+    function deleteEvent() {
+        var eventID = modal.querySelector('[id=eventId]').value
+        var eventsList = externalCalendar.getEvents()
+        for (var i = 0; i < eventsList.length; i++) {
+            let currentEvent = eventsList[i]
+
+            if (currentEvent.extendedProps.id == eventID) {
+               currentEvent.remove()
+            }
+        };
+        $('#modal').modal('hide')
+    }
+    //before we save the information, we need to check that the dates
+    //Start date cannot be greater then the end Date
+    //End Date cannot be lower then the start date
+    //both dates should be for the current day only
+    //remove any special characters from the commets, like "tab", appostrophe, commas...
+    function checkInput(eventsList, evid) {
+        console.log(evid)
+        var modal = document.getElementById("modal");
+        var startDate = modal.querySelector('[id=startDate]').value
+        var endDate = modal.querySelector('[id=endDate]').value
+
+        //Check for start Date to not null or empty
+        if (startDate == null || startDate == "") {
+            alert("Event Start Date cannot be empty!")
+            return false
+        }
+        //Check for end Date to not null or empty
+        if (endDate == null || endDate == "") {
+            alert("Event End Date cannot be empty!")
+            return false
+        }
+
+        //Convert the strings received from the input, to dates, in order to compare them!
+        var EventStartDate = new Date(startDate)
+        var EventEndDate = new Date(endDate)
+
+        //Check if start date is later then End date
+        if (EventStartDate > EventEndDate) {
+            alert("Event Start Date cannot be later then Event End Date!")
+            return false;
+        }
+
+        //check if the date is not overlaping other date from the calendar
+        //Lopp through the list of events, then convert the start and end dates for the events, then we compare it to our event
+        //our events start cannot be lower then a previous event end date
+        //our event end time cannot be later then the next event start time
+        if (eventsList.length > 0) {
+            for (var i = 0; i < eventsList.length; i++) {
+                var event = eventsList[i];
+                var eventId = event.extendedProps.id
+                //if the event id from the list is smaller then the edited event, this means that the event is before current one
+                //in this case we need to check for the end date of the prev event to not be lower then the current event
+                if (eventId < evid) {
+                    if (event.end > EventStartDate) {
+                        alert("Overlaping End Time for the " + event.title + "!")
+                        return false
+                    }
+                } else if (eventId > evid) {
+                    if (event.start < EventEndDate) {
+                        alert("Overlaping Start Time for the " + event.title + "!")
+                        return false
+                    }
+                }
+
+
+            }
+        }
+
+        //Return true if all the checks are passed
+        return true 
+    }
+
+</script>

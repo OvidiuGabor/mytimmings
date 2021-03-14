@@ -11,12 +11,13 @@
 <style>
     #external-events {
         position: fixed;
-        margin-top: 60px;
+        margin-top: 68px;
         z-index: 2;
         width: 150px;
         padding: 0 10px;
         border: 1px solid #ccc;
         background: #eee;
+        margin-left: 5px
     }
 
         #external-events .fc-event {
@@ -38,6 +39,12 @@
     .calendar-container{
         height: 100%
     }
+    .save-btn{
+        position: fixed;
+        margin-top: 25em;
+        text-align: center;
+        margin-left: 15px;
+    }
 </style>
 
 
@@ -50,6 +57,7 @@
         <div id="external-events">
             <p>
                 <strong>Events</strong>
+
                 <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
                     <div class='fc-event-main'>Busy</div>
                 </div>
@@ -65,7 +73,15 @@
             </p>
         </div>
 
-
+        <div class="save-btn">
+            <div>
+                <button type="button" class="btn btn-primary" onclick="uploadCalendar()">Save changes</button>
+            </div>
+            <div style="margin-top:15px">
+                <button type="button" class="btn btn-danger" onclick="clearCalendar()">Clear Calendar</button>
+            </div>
+         
+        </div>
         <div class="calendar-container" style="margin-left:150px">
             <div id="calendar" style="margin: 15px">
 
@@ -147,17 +163,11 @@
 
                 info.event.setExtendedProp("id", count)
                 info.event.setExtendedProp("comments", "")
-                console.log(info)
             },
             eventClick: function (info) {
                 var eventObj = info.event
-                //console.log(eventObj)
-                //console.log(eventObj.title)
-                //console.log(eventObj.start)
-                //console.log(eventObj.end)
-                
                 $('#modal').modal('show')
-                SetModalInformation(eventObj.start, eventObj.end, "aa")
+                SetModalInformation(eventObj.startStr, eventObj.endStr, eventObj.extendedProps.comments, eventObj.extendedProps.id)
             }
         });
 
@@ -170,18 +180,74 @@
 
     });
 
-
-
-
-    function SetModalInformation(startdate, endDate, comments) {
+    function SetModalInformation(startdate, enddate, comments, id) {
         var modal = document.getElementById("modal");
-        console.log(modal)
         var startDate = modal.querySelector('[id=startDate]')
+        var endDate = modal.querySelector('[id=endDate]')
+        var commentsHtml = modal.querySelector('[id=comments]')
+        var eventId = modal.querySelector('[id=eventId]')
+
+
+        //Set time restriction for the dates input
+        var currentDate = new Date();
+        var month = (currentDate.getUTCMonth() < 10) ? "0" + currentDate.getUTCMonth() : currentDate.getUTCMonth()
+        var day = (currentDate.getUTCDate() < 10) ? "0" + currentDate.getUTCDate() : currentDate.getUTCDate()
+
+        var dateRestrictionMin = currentDate.getUTCFullYear() + "-" + month + "-" + day + "T00:00";
+        var dateRestrictionMax = currentDate.getUTCFullYear() + "-" + month + "-" + day + "T23:00";
+
+        setAttrbutetoHTML(startDate, "min", dateRestrictionMin)
+        setAttrbutetoHTML(startDate, "max", dateRestrictionMax)
+
+        setAttrbutetoHTML(endDate, "min", dateRestrictionMin)
+        setAttrbutetoHTML(endDate, "max", dateRestrictionMax)
+
 
         //Set the fields to related information
+        startDate.value = formatStrigDate(startdate)
 
-        startDate.value = startdate
-        console.log(externalCalendar.getEvents())
+        endDate.value = formatStrigDate(enddate)
+        commentsHtml.value = comments
+        eventId.value = id
+    }
+
+    function formatStrigDate(datestr) {
+        
+        var convertedStr = "";
+        //if the date received is null or empty string, then we get the current date!
+        if (datestr) {
+            var len = datestr.length;
+            convertedStr = datestr.substring(0, (len - 9));
+        } else {
+            var currentDate = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString();
+            var len = currentDate.length;
+            convertedStr = currentDate.substring(0, (len - 8));
+        }
+
+        return convertedStr
+    }
+
+    function setAttrbutetoHTML(htmltag, attribute, value) {
+
+        if (htmltag != null) {
+            htmltag.setAttribute(attribute, value)
+        }
+        else {
+            //Throw and error?
+        }
+
+    }
+
+    //Function for uploading all the events from the calendar
+    function uploadCalendar() {
+        //get list of events
+        var eventsList = externalCalendar.getEvents();
+
+    }
+
+    //function for deleting all the events from the calendar
+    function clearCalendar() {
+
     }
 
 </script>
