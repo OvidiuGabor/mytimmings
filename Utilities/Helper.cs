@@ -135,6 +135,21 @@ namespace mytimmings.Utilities
             return colorList;
         }
 
+        //This method will convert thwe datestring (yyyy-mm-ddThh:mm) into a date format
+        public static DateTime CalculateDateFromString(string date)
+        {
+            if (String.IsNullOrEmpty(date))
+                throw new ArgumentNullException("String Date is null!");
+            try
+            {
+                DateTime convertedDate = DateTime.ParseExact(date.Substring(0, (date.Length - 6)), "yyyy-MM-ddTHH:mm:ss", null);
+                return convertToUTC(convertedDate);
+            }
+            catch (Exception ex)
+            {
 
+                throw ex;
+            }
+        }
     }
 }

@@ -519,12 +519,62 @@ namespace mytimmings.Controllers
 
         public JsonResult UpdateRecords( List<Models.Portal.Event> data)
         {
-            if(data.Count < 1)
+            bool errorsFound = false;
+            if(data.Count < 1 || data == null)
                 return Json(new { success = false, message = "No records Received!" }, JsonRequestBehavior.AllowGet);
 
+            //get user from session!
+            Models.Security.User user = GetUserSession();
+            if (user == null)
+                return Json(new { success = false, message = "Session Expired" }, JsonRequestBehavior.AllowGet);
+
+            //create a list where we will store the recrods for updating the database!
+            List<DBContext.Main_Data> records = new List<DBContext.Main_Data>();
+            List<Models.Portal.Event> eventsErrored = new List<Models.Portal.Event>();
+         
+            foreach(var item in data)
+            {
+                //if we encounter eny error while we are trying to process the events from the view, those events get storred into an errored array, and we send it back to the user to check them
+                //do now allow saving if there are any errors into the data!
+                try
+                {
+                    var record = new Models.Portal.DayRecord(item, user);
+                    var recordFordb = Models.Portal.DayRecord.InsertNewRecord(record);
+                    records.Add(recordFordb);
+                }
+                catch (Exception)
+                {
+                    eventsErrored.Add(item);
+                   
+                }
+
+            }
+            //if we didnt find any errors, then we try to save the data
+            //else if there are errors we return the errored listback to the user!
+            if (!errorsFound)
+            {
+                try
+                {
+                    db.Main_Data.AddRange(records);
+                    db.SaveChanges();
+
+                    return Json(new { success = true, message = "Records Saved!" }, JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = ex }, JsonRequestBehavior.AllowGet);
+
+                }
+
+            }
+            else
+            {
+                return Json(new { success = false, message = eventsErrored }, JsonRequestBehavior.AllowGet);
+            }
 
 
-            return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+
+            
         }
 
 

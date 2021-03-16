@@ -35,7 +35,17 @@ namespace mytimmings.Models.Portal
             currentDate = Utilities.Helper.convertToUTC(DateTime.Now);
         }
 
-
+        public DayRecord(Models.Portal.Event ev, Models.Security.User user)
+        {
+            userid = user.ID;
+            currentDate = Utilities.Helper.convertToUTC(DateTime.Now);
+            status = ev.Status;
+            projectId = ev.ProjectId.ToString();
+            isRunning = false;
+            comments = ev.Comments;
+            startDate = Utilities.Helper.CalculateDateFromString(ev.StartTime);
+            endDate = Utilities.Helper.CalculateDateFromString(ev.EndTime);
+        }
 
         public static DayRecord CreateReocrd(DBContext.Main_Data data)
         {
@@ -55,7 +65,6 @@ namespace mytimmings.Models.Portal
 
             };
         }
-
 
         public static DBContext.Main_Data InsertNewRecord (DayRecord record)
         {
@@ -106,9 +115,6 @@ namespace mytimmings.Models.Portal
             return recordsList;
 
         }
-
-
-
         private static int calculateTotalTime(DateTime startDate, DateTime endDate)
         {
             int totalTime = 0;
