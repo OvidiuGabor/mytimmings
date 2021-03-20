@@ -214,7 +214,7 @@ namespace mytimmings.Controllers
                             statusError = "Please select a status.";
                         }
 
-                        return Json(new { result = "Error", projectError, statusError }, JsonRequestBehavior.AllowGet);
+                        return Json(new { result = "Error", message = projectError +  " " + statusError }, JsonRequestBehavior.AllowGet);
                     }
                 }
                 else
@@ -521,12 +521,12 @@ namespace mytimmings.Controllers
         {
             bool errorsFound = false;
             if(data.Count < 1 || data == null)
-                return Json(new { success = false, message = "No records Received!" }, JsonRequestBehavior.AllowGet);
+                return Json(new { result = "Error", message = "No records Received!" }, JsonRequestBehavior.AllowGet);
 
             //get user from session!
             Models.Security.User user = GetUserSession();
             if (user == null)
-                return Json(new { success = false, message = "Session Expired" }, JsonRequestBehavior.AllowGet);
+                return Json(new { result = "Error", message = "Session Expired" }, JsonRequestBehavior.AllowGet);
 
             //create a list where we will store the recrods for updating the database!
             List<DBContext.Main_Data> records = new List<DBContext.Main_Data>();
@@ -558,26 +558,22 @@ namespace mytimmings.Controllers
                     db.Main_Data.AddRange(records);
                     db.SaveChanges();
 
-                    return Json(new { success = true, message = "Records Saved!" }, JsonRequestBehavior.AllowGet);
+                    return Json(new { result = "Success", message = "Records Saved!" }, JsonRequestBehavior.AllowGet);
                 }
                 catch (Exception ex)
                 {
-                    return Json(new { success = false, message = ex }, JsonRequestBehavior.AllowGet);
+                    return Json(new { result = "Error", message = ex }, JsonRequestBehavior.AllowGet);
 
                 }
 
             }
             else
             {
-                return Json(new { success = false, message = eventsErrored }, JsonRequestBehavior.AllowGet);
+                return Json(new { result = "Error", message = eventsErrored }, JsonRequestBehavior.AllowGet);
             }
 
 
-
-            
         }
-
-
 
         #endregion
 

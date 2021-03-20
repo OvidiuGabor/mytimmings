@@ -236,7 +236,8 @@
             htmltag.setAttribute(attribute, value)
         }
         else {
-            //Throw and error?
+            const notifier = new Notifier();
+            notifier.error("Something Happen!", "ERROR")
         }
 
     }
@@ -250,8 +251,6 @@
         //in order to send the calendar to the controller, we need to capture all the events, and send them withing an array.
         //we will make an individual object for each event, then add it to the list of events/
         //With Ajax we will send this array to the controller, where it will be processed!
-
-
         if (eventsList.length > 0) {
             for (var i = 0; i < eventsList.length; i++) {
                 var currentEvent = eventsList[i]
@@ -269,22 +268,15 @@
 
             if (eventsArray.length > 0) {
                 data = JSON.stringify({ "data": eventsArray })
-                @*$.ajax({
-                    dataType: 'json',
-                    type: "POST",
-                    url: "@Url.Action("UpdateRecords", "Portal")",
-                    data: data,
-                    traditional: true,
-                    success: function (result) {
-                        console.log(result)
-                    },
-                    error: function (result) {
-                        alert("Error occured!")
-                    }
+                $.post("@Url.Action("UpdateRecords", "Portal")", { data: eventsArray }, function (result) {
+                    const notifier = new Notifier();
 
-                })*@
-                $.post("@Url.Action("UpdateRecords", "Portal")", { data: eventsArray }, function (data) {
-                    console.log(data)
+                    if (result.result == "Success") {
+                        notifier.success(result.message, "Success")
+                        setTimeout(function () { location.reload(); }, 3000)
+                    } else if (result.result == "Error") {
+                        notifier.error(result.message, "ERROR")
+                    }
                 })
 
             }
@@ -296,8 +288,6 @@
         } else {
             alert("There is no event into the calendar!")
         }
-
-
     }
 
     //function for deleting all the events from the calendar

@@ -9,7 +9,7 @@
 
       
     <div class="main-body-container w3-main">
-        @Html.Partial("_Notification")
+        @*@Html.Partial("_Notification")*@
         <div class="portal-menu-top-btn">
             <input type="button" class="btn btn-primary" value="Start Clock" name="StartTime" onclick="StartClock()" />
 
@@ -208,7 +208,7 @@
                 function CreateTimer() {
                     var startTime = new Date(Number(lastElement.startDate.replace(/\D/g, '')));
                     //convert from utc to local time
-                    //startTime.setMinutes(startTime.getMinutes() - startTime.getTimezoneOffset())           
+                    //startTime.setMinutes(startTime.getMinutes() - startTime.getTimezoneOffset())
                     //Convert it to the miliseconds
                     var milisecondsSoFar = startTime.getTime()
                     var currentDate = new Date().getTime();
@@ -272,7 +272,7 @@
 
             //This function genereates the status bar, based on the result that is received from the controller
             // It is taking everyrow and creates a new block in the total time tracker
-            
+
 
             //Create the Start Clock and End Clock Function, that will handle the 2 buttons for start and end of the day
             function StartClock() {
@@ -293,51 +293,15 @@
                 }
 
                 $.post("@Url.Action("StartClock", "Portal")", obj, function (result) {
-                    showAllertMessage(result)
-                    //if (result.result == "Error") {
-                    //    //var buttonforallert = '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
-                    //    //buttonforallert +=          ' <span aria-hidden="true">&times;</span>'
-                    //    //buttonforallert +=             '</button>'
-                    //    $('.alert').addClass("alert-danger")
-                    //    $('.alert').addClass("show")
 
-                    //    //based on the error that we receive, need to change the message
+                    const notifier = new Notifier();
 
-                    //    if (result.message != null) {
-                    //        $(".alert").html("<strong>ERROR: </strong>" + result.message)
-                    //    } else {
-                    //        $(".alert").html("<strong>ERROR: </strong>" + result.projectError + " " + result.statusError)
-                    //    }
-
-                      
-
-                    //    $('.alert').alert()
-
-
-                    //    setTimeout(function () {
-                    //        $('.alert').removeClass("show")
-                    //        $('.alert').addClass("hide")
-
-                    //    }, 5000)
-
-                    //} else {
-                    //    if (result.result == "Success") {
-                    //        $('.alert').addClass("alert-success")
-                    //        $('.alert').addClass("show")
-                    //        if (result.message != null) {
-                    //            $(".alert").html(result.message)
-                    //        }
-                    //        $('.alert').alert()
-
-
-                    //        setTimeout(function () {
-                    //            $('.alert').removeClass("show")
-                    //            $('.alert').addClass("hide")
-
-                    //        }, 5000)
-                    //    }
-                    //    location.reload();
-                    //}
+                    if (result.result == "Success") {
+                        notifier.success(result.message, "Success")
+                        setTimeout(function () { location.reload(); }, 3000)
+                    } else if (result.result == "Error") {
+                        notifier.error(result.message, "ERROR")
+                    }
 
                 })
             }
@@ -345,52 +309,15 @@
             function StopClock() {
                 $.post("@Url.Action("StopClock", "Portal")", null, function (result) {
 
-                    showAllertMessage(result)
-                      //if (result.result == "Error") {
-                      //    //var buttonforallert = '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
-                      //    //buttonforallert +=          ' <span aria-hidden="true">&times;</span>'
-                      //    //buttonforallert +=             '</button>'
-                      //    $('.alert').addClass("alert-danger")
-                      //    $('.alert').addClass("show")
+                    const notifier = new Notifier();
 
-                      //    //based on the error that we receive, need to change the message
+                    if (result.result == "Success") {
+                        notifier.success(result.message, "Success")
+                        setTimeout(function () { location.reload(); }, 3000)
+                    } else if (result.result == "Error") {
+                        notifier.error(result.message, "ERROR")
+                    }
 
-                      //    if (result.message != null) {
-                      //        $(".alert").html("<strong>ERROR: </strong>" + result.message)
-                      //    } else {
-                      //        $(".alert").html("<strong>ERROR: </strong>" + result.projectError + " " + result.statusError)
-                      //    }
-
-
-
-                      //    $('.alert').alert()
-
-
-                      //    setTimeout(function () {
-                      //        $('.alert').removeClass("show")
-                      //        $('.alert').addClass("hide")
-
-                      //    }, 5000)
-
-                      //} else {
-                      //    if (result.result == "Success") {
-                      //        $('.alert').addClass("alert-success")
-                      //        $('.alert').addClass("show")
-                      //        if (result.message != null) {
-                      //            $(".alert").html(result.message)
-                      //        }
-                      //        $('.alert').alert()
-
-
-                      //        setTimeout(function () {
-                      //            $('.alert').removeClass("show")
-                      //            $('.alert').addClass("hide")
-
-                      //        }, 5000)
-                      //    }
-                      //    location.reload();
-                      //}
-                     
                 })
             }
 
@@ -413,42 +340,30 @@
 
                 $.post("@Url.Action("UpdateStatus", "Portal")", obj, function (result) {
 
+                    const notifier = new Notifier();
 
-                    showAllertMessage(result)
-
-
-                    //if (result.result == "Error") {
-                    //    //var buttonforallert = '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
-                    //    //buttonforallert +=          ' <span aria-hidden="true">&times;</span>'
-                    //    //buttonforallert +=             '</button>'
-                    //    $('.alert').addClass("alert-danger")
-                    //    $('.alert').addClass("show")
-                    //    $(".alert").html("<strong>ERROR: </strong>" + result.projectError + " " + result.statusError)
-                        
-                    //    $('.alert').alert()
-
-
-                    //    setTimeout(function () {
-                    //        $('.alert').removeClass("show")
-                    //        $('.alert').addClass("hide")
-
-                    //    }, 5000)
-
-                    //} else {
-                    //    location.reload();
-                    //}
-                   
+                    if (result.result == "Success") {
+                        notifier.success(result.message, "Success")
+                        setTimeout(function () { location.reload(); }, 3000)
+                    } else if(result.result == "Error") {
+                        notifier.error(result.message,  "ERROR")
+                    }
+                    
+                    
 
                 })
 
-                console.log(obj)
-            }
+        }
+
         </script>
+
+
+
     }
     else
     {
         <script>
-        window.location.href = "@Url.Action("Index","Home")";
+         window.location.href = "@Url.Action("Index","Home")";
         </script>
     }
 }

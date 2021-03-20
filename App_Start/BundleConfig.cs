@@ -25,19 +25,25 @@ namespace mytimmings
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                        "~/Content/Stylesheet/Index.css",
-                      "~/Content/site.css"));
+                      "~/Content/site.css",
+                      "~/Content/toastr.css"));
 
             bundles.Add(new StyleBundle("~/Portal/css").Include(
                     "~/Content/Stylesheet/Portal.css"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(
-          "~/Scripts/jquery-ui-{version}.js"));
+                     "~/Scripts/jquery-ui-{version}.js"));
             //css  
             bundles.Add(new StyleBundle("~/Content/cssjqryUi").Include(
                    "~/Content/themes/base/datepicker.css"));
 
             bundles.Add(new ScriptBundle("~/Scripts/script").Include(
-         "~/Scripts/script.js"));
+                    "~/Scripts/script.js",
+                    "~/Scripts/Notification.js"
+                    ));
+            //Toaster JS
+            bundles.Add(new ScriptBundle("~/Scripts/toastr").Include(
+                    "~/Scripts/toastr.js"));
         }
     }
 }
