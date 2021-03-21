@@ -90,7 +90,44 @@ namespace mytimmings.Controllers
 
 
                         //Get the projects that the user is assigned
-                        
+                        List<DBContext.User_Assigned_Project> assignedProjects = dbmodel.User_Assigned_Projects.Where(x => x.UserID == userModel.ID && x.Active == true).ToList();
+                        if(assignedProjects.Count > 0)
+                        {
+                            foreach(var project in assignedProjects)
+                            {
+                                userSettings.AddProject((int)project.ProjectId, project.ProjectName);
+                            }
+                        }
+                        else
+                        {
+                            userSettings.AddProject(1, "No Project");
+                        }
+
+                        //Check if the user has started the clock today and if it is ended;
+                        List<DBContext.Main_Data> todayRecords = dbmodel.Main_Data.Where(x => x.userID == user.ID && x.CurrentDate.Year == DateTime.Now.Year && x.CurrentDate.Month == DateTime.Now.Month && x.CurrentDate.Day == DateTime.Now.Day).ToList();
+                        if(todayRecords.Count == 0 || todayRecords == null)
+                        {
+                            userSettings.SetDayStatus(true);
+                        }
+                        else
+                        {
+                            foreach(var item in todayRecords)
+                            {
+                                if (item.Current_Status == "End Day")
+                                {
+                                    userSettings.SetDayStatus(false);
+                                    break;
+                                }
+                                else
+                                {
+                                    userSettings.SetDayStatus(true);
+                                }
+                               
+                            }
+                            
+                        }
+
+
 
                         SetUserSession(userModel, userSettings, vm.timezone);
 

@@ -18,8 +18,14 @@
                     <label for="endDate">Event End Date Time</label>
                 </div>
                 <div>
-                    <select name="project" id="project">
-                    </select>
+                    @*<select name="project" id="project">
+                    </select>*@
+                    @{ 
+                        var settings = (mytimmings.Models.Security.UserSettings)Session["UserSettings"];
+
+                        @Html.DropDownListFor(x =>settings.ProjectsAssigned, new SelectList(settings.ProjectsAssigned, "Key", "Value"));
+                    }
+
                     <label for="project">Project</label>
                 </div>
                 <div>
@@ -46,7 +52,7 @@
         var endDate = modal.querySelector('[id=endDate]').value
         var commentsHtml = modal.querySelector('[id=comments]').value
         var eventID = modal.querySelector('[id=eventId]').value
-        var projectid = modal.querySelector('[id=project]').value
+        var projectid = modal.querySelector('[id=settings_ProjectsAssigned]').value
 
 
         //Get the events list from the calendar

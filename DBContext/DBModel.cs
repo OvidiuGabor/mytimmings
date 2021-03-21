@@ -22,6 +22,7 @@ namespace DBContext
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<Params> Params { get; set; }
         public virtual DbSet<User_Settings> User_Settings { get; set; }
+        public virtual DbSet<User_Assigned_Project> User_Assigned_Projects { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -46,8 +47,12 @@ namespace DBContext
                .HasPrecision(18, 0);
 
             modelBuilder.Entity<Params>()
-            .Property(e => e.Id)
-            .HasPrecision(18, 0);
+                .Property(e => e.Id)
+                .HasPrecision(18, 0);
+
+            modelBuilder.Entity<User_Assigned_Project>()
+                .Property(e => e.Id)
+                .HasPrecision(18, 0);
         }
 
         private static string GetConnectionString(string connectionStringName)

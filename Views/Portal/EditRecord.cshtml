@@ -57,11 +57,18 @@
         <div id="external-events">
             <p>
                 <strong>Events</strong>
+                @{
+                    var events = TempData["status"] as Dictionary<string, string>;
 
-                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
-                    <div class='fc-event-main'>Busy</div>
-                </div>
-                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
+                    foreach (var item in events)
+                    {
+                        <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event' style="background-color:@item.Value; border-color: @item.Value">
+                            <div class='fc-event-main'>@item.Key</div>
+                        </div>
+                    }
+                }
+
+                @*<div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
                     <div class='fc-event-main'>Meeting</div>
                 </div>
                 <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
@@ -69,7 +76,7 @@
                 </div>
                 <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
                     <div class='fc-event-main'>Idle</div>
-                </div>
+                </div>*@
             </p>
         </div>
 
@@ -179,7 +186,7 @@
                 //When an event is received into the calendar, set the ID as an ExtendProperty.
                 //It is the only way i found so that i can set an identifier to the event.
                 //SetProp(id, 4) -> it is not working.
-
+                info.event.setProp("color", info.draggedEl.style.backgroundColor)
                 info.event.setExtendedProp("id", count)
                 info.event.setExtendedProp("comments", "")
                 info.event.setExtendedProp("project", "")
@@ -187,7 +194,6 @@
             eventClick: function (info) {
                 var eventObj = info.event
                 $('#modal').modal('show')
-                console.log(eventObj)
                 SetModalInformation(eventObj.startStr, eventObj.endStr, eventObj.extendedProps.comments, eventObj.extendedProps.id, eventObj.extendedProps.project)
             },
             events: eventsFromController
@@ -208,7 +214,7 @@
         var endDate = modal.querySelector('[id=endDate]')
         var commentsHtml = modal.querySelector('[id=comments]')
         var eventId = modal.querySelector('[id=eventId]')
-        var projectId = modal.querySelector('[id=project]')
+        var projectId = modal.querySelector('[id=settings_ProjectsAssigned]')
 
 
         //Set time restriction for the dates input
@@ -285,7 +291,6 @@
 
                 eventsArray.push(evetobj)
             }
-            console.log(eventsArray)
 
             if (eventsArray.length > 0) {
                 data = JSON.stringify({ "data": eventsArray })
@@ -313,6 +318,28 @@
 
     //function for deleting all the events from the calendar
     function clearCalendar() {
+        //get list of events
+        var userConfirm = confirm("Are you sure? There is no way back from this.\nALL RECORDS WILL BE DELETED!")
+        if (userConfirm == true) {
+            var eventsList = externalCalendar.getEvents();
+            if (eventsList.length > 0) {
+                for (var i = 0; i < eventsList.length; i++) {
+                    let currentEvent = eventsList[i];
+                    currentEvent.remove();
+                }
+
+                  $.post("@Url.Action("ClearEvents", "Portal")", {}, function (result) {
+                    const notifier = new Notifier();
+
+                    if (result.result == "Success") {
+                        notifier.success(result.message, "Success")
+                        setTimeout(function () { location.reload(); }, 3000)
+                    } else if (result.result == "Error") {
+                        notifier.error(result.message, "ERROR")
+                    }
+                })
+            }
+        }
 
     }
 

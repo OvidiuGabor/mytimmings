@@ -136,26 +136,36 @@ namespace mytimmings.Controllers
 
                 //Select first the last record and update the End time with the current datetime
                 //need to do this to make sure all records for today has been ended
+                try
+                {
+                    DBContext.Main_Data lastData = currentRecords.OrderByDescending(x => x.Status_Start_Time).FirstOrDefault();
+                    lastData.Status_End_Time = currentDate;
+                    lastData.IsRunning = false;
+                    db.SaveChanges();
 
-                DBContext.Main_Data lastData = currentRecords.OrderByDescending(x => x.Status_Start_Time).FirstOrDefault();
-                lastData.Status_End_Time = currentDate;
-                lastData.IsRunning = false;
-                db.SaveChanges();
 
 
+                    //we need to select all records for today, and mark them as isrunning = false
+                    //Add an record that say the day has been eneded
+                    Models.Portal.DayRecord finalRecord = Models.Portal.DayRecord.CreateModel(lastData.userID, lastData.ProjectID.ToString(), "End Day", "");
+                    finalRecord.endDate = DateTime.Now;
 
-                //we need to select all records for today, and mark them as isrunning = false
-                //Add an record that say the day has been eneded
-                Models.Portal.DayRecord finalRecord = Models.Portal.DayRecord.CreateModel(lastData.userID, lastData.ProjectID.ToString(), "End Day", "");
-                finalRecord.endDate = DateTime.Now;
-
-                DBContext.Main_Data finalRecordDB = Models.Portal.DayRecord.InsertNewRecord(finalRecord);
-                finalRecordDB.IsRunning = false;
-                db.Main_Data.Add(finalRecordDB);
-                db.SaveChanges();
-
+                    DBContext.Main_Data finalRecordDB = Models.Portal.DayRecord.InsertNewRecord(finalRecord);
+                    finalRecordDB.IsRunning = false;
+                    db.Main_Data.Add(finalRecordDB);
+                    db.SaveChanges();
+                }
+                catch (Exception)
+                {
+                    return Json(new { result = "Errir", message = "Something Happen!" }, JsonRequestBehavior.AllowGet);
+                }
+               
 
             }
+            //update the user Settings with the isDayopen to False
+            Models.Security.UserSettings userSettings = GetUserSettingsSession();
+            userSettings.SetDayStatus(false);
+            SetUserSettingsSession(userSettings);
 
             return Json(new { result = "Success", message = "Stop Clock!" }, JsonRequestBehavior.AllowGet);
         }
@@ -340,7 +350,10 @@ namespace mytimmings.Controllers
                 Dictionary<string, string> colorCoding = Utilities.Helper.getColorCoding(user);
 
                 //Get user data
-                List<DBContext.Main_Data> data = db.Main_Data.Where(x => x.userID == user.ID && x.CurrentDate.Year == currentDate.Year && x.CurrentDate.Month == currentDate.Month && x.CurrentDate.Day == currentDate.Day).OrderBy(x => x.Status_Start_Time).ToList();
+                List<DBContext.Main_Data> data = db.Main_Data.Where(x => x.userID == user.ID
+                                            && x.CurrentDate.Year == currentDate.Year && x.CurrentDate.Month == currentDate.Month && x.CurrentDate.Day == currentDate.Day
+                                            && x.Current_Status != "End Day")
+                                            .OrderBy(x => x.Status_Start_Time).ToList();
                 if (data != null)
                 {
                     foreach (var item in data)
@@ -348,16 +361,27 @@ namespace mytimmings.Controllers
 
                         var record = new Models.Portal.CalendarRecord(item, UserTimeZone, colorCoding);
 
-                        if (item.Current_Status == "End Day")
-                        {
-                            record.setEndDayInfo(data.Where(x => x.Status_Start_Time.Year == item.Status_Start_Time.Year && x.Status_Start_Time.Month == item.Status_Start_Time.Month && x.Status_Start_Time.Day == item.Status_Start_Time.Day).ToList());
-                        }
+                        //if (item.Current_Status == "End Day")
+                        //{
+                        //    record.setEndDayInfo(data.Where(x => x.Status_Start_Time.Year == item.Status_Start_Time.Year && x.Status_Start_Time.Month == item.Status_Start_Time.Month && x.Status_Start_Time.Day == item.Status_Start_Time.Day).ToList());
+                        //}
 
                         records.Add(record);
                     }
                 }
 
+                //Get the Status from the Params table
+                Dictionary<string, string> statuses = new Dictionary<string, string>();
 
+                List<string> statusFromDb = db.Params.Where(x => x.Identifier == "Status" && x.Company == user.Company).Select(x => x.Param1).ToList();
+                foreach(var item in statusFromDb)
+                {
+                    var color = db.Params.Where(x => x.Identifier == "ColorCoding" && x.Param1 == item && x.Company == user.Company).Select(x => x.Param2).FirstOrDefault();
+                    statuses.Add(item, color);
+                }
+
+
+                TempData["status"] = statuses;
                 return View(records);
             }
             else
@@ -367,173 +391,173 @@ namespace mytimmings.Controllers
             
         }
 
-        public ActionResult SaveRecord(Models.Portal.DayRecord recordFromTheView)
-        {
-            if (recordFromTheView != null)
-            {
-                bool startTimeOK = true;
-                bool endTimeOK = true;
-                var dayRecord = new Models.Portal.DayRecord();
-                List<Models.Portal.DayRecord> recordsList = dayRecord.getAllRecordsForCurrentDay(recordFromTheView);
-                DateTime currentDate = DateTime.UtcNow;
-                Models.Security.UserSettings userSettings = Session["UserSettings"] as Models.Security.UserSettings;
+        //public ActionResult SaveRecord(Models.Portal.DayRecord recordFromTheView)
+        //{
+        //    if (recordFromTheView != null)
+        //    {
+        //        bool startTimeOK = true;
+        //        bool endTimeOK = true;
+        //        var dayRecord = new Models.Portal.DayRecord();
+        //        List<Models.Portal.DayRecord> recordsList = dayRecord.getAllRecordsForCurrentDay(recordFromTheView);
+        //        DateTime currentDate = DateTime.UtcNow;
+        //        Models.Security.UserSettings userSettings = Session["UserSettings"] as Models.Security.UserSettings;
 
-                //Format the dates received to UTC time zone
-                recordFromTheView.startDate = Utilities.Helper.convertToUTC(recordFromTheView.startDate);
-                if(recordFromTheView.endDate != null)
-                    recordFromTheView.endDate = Utilities.Helper.convertToUTC(recordFromTheView.endDate.Value);
+        //        //Format the dates received to UTC time zone
+        //        recordFromTheView.startDate = Utilities.Helper.convertToUTC(recordFromTheView.startDate);
+        //        if(recordFromTheView.endDate != null)
+        //            recordFromTheView.endDate = Utilities.Helper.convertToUTC(recordFromTheView.endDate.Value);
 
-                //Check if all the data exists, if not return error
-                if (recordFromTheView.startDate != null)
-                {
+        //        //Check if all the data exists, if not return error
+        //        if (recordFromTheView.startDate != null)
+        //        {
 
-                    if (recordFromTheView.startDate > currentDate)
-                        ModelState.AddModelError("startDate", "Cannot add a time in the future!");
-                }
-                else
-                {
-                    ModelState.AddModelError("startDate", "The date cannot be Empty");
-                }
+        //            if (recordFromTheView.startDate > currentDate)
+        //                ModelState.AddModelError("startDate", "Cannot add a time in the future!");
+        //        }
+        //        else
+        //        {
+        //            ModelState.AddModelError("startDate", "The date cannot be Empty");
+        //        }
                 
 
 
-                if (ModelState.IsValid)
-                {
-                    //check first if there are any records before of after this record
-                    //if there is a record before: 
-                    //if there is previous record, then modify the end time of that record to mach the start time of this record
-                    //if there is next record and mofidy the end time, then modity also the start time of the next record, to match this time.
-                    //do not allow, if the previous or next record is not finished(doesn't have end time)!!!
+        //        if (ModelState.IsValid)
+        //        {
+        //            //check first if there are any records before of after this record
+        //            //if there is a record before: 
+        //            //if there is previous record, then modify the end time of that record to mach the start time of this record
+        //            //if there is next record and mofidy the end time, then modity also the start time of the next record, to match this time.
+        //            //do not allow, if the previous or next record is not finished(doesn't have end time)!!!
 
-                    //get following record
+        //            //get following record
 
-                    var recordFromtheDb = db.Main_Data.Where(x => x.ID == recordFromTheView.id).FirstOrDefault();
-                    // check if start time has been modify
-                    if (DateTime.Equals(Utilities.Helper.removeMiliseconds(recordFromtheDb.Status_Start_Time), recordFromTheView.startDate) == false)
-                    {
+        //            var recordFromtheDb = db.Main_Data.Where(x => x.ID == recordFromTheView.id).FirstOrDefault();
+        //            // check if start time has been modify
+        //            if (DateTime.Equals(Utilities.Helper.removeMiliseconds(recordFromtheDb.Status_Start_Time), recordFromTheView.startDate) == false)
+        //            {
 
-                        //Get previous record
-                        var previousRecord = recordsList.Where(x => x.id < recordFromTheView.id).FirstOrDefault();
-                        if (previousRecord != null)
-                        {
-                            //get the record fromt he DB
-                            DBContext.Main_Data prevRecordDB = db.Main_Data.Where(x => x.ID == previousRecord.id).FirstOrDefault();
+        //                //Get previous record
+        //                var previousRecord = recordsList.Where(x => x.id < recordFromTheView.id).FirstOrDefault();
+        //                if (previousRecord != null)
+        //                {
+        //                    //get the record fromt he DB
+        //                    DBContext.Main_Data prevRecordDB = db.Main_Data.Where(x => x.ID == previousRecord.id).FirstOrDefault();
 
-                            if(prevRecordDB.Status_Start_Time >= recordFromTheView.startDate)
-                            {
-                                //Add error saying that the record cannot be modify, because the end time, is higher then the next item end time!!
+        //                    if(prevRecordDB.Status_Start_Time >= recordFromTheView.startDate)
+        //                    {
+        //                        //Add error saying that the record cannot be modify, because the end time, is higher then the next item end time!!
 
-                                startTimeOK = false;
-                            }
-                            else
-                            {
+        //                        startTimeOK = false;
+        //                    }
+        //                    else
+        //                    {
                                
-                                prevRecordDB.Status_End_Time = recordFromTheView.startDate;
-                                //db.SaveChanges();
-                                //add nottidications
-                                recordFromtheDb.Status_Start_Time = recordFromTheView.startDate;
+        //                        prevRecordDB.Status_End_Time = recordFromTheView.startDate;
+        //                        //db.SaveChanges();
+        //                        //add nottidications
+        //                        recordFromtheDb.Status_Start_Time = recordFromTheView.startDate;
 
 
-                                startTimeOK = true;
+        //                        startTimeOK = true;
 
-                            }
-                        }
-                        else
-                        {
+        //                    }
+        //                }
+        //                else
+        //                {
                             
-                            recordFromtheDb.Status_Start_Time = recordFromTheView.startDate;
-                            startTimeOK = true;
-                        }
+        //                    recordFromtheDb.Status_Start_Time = recordFromTheView.startDate;
+        //                    startTimeOK = true;
+        //                }
 
-                        Models.Portal.DayRecord newDay = Models.Portal.DayRecord.CreateReocrd(recordFromtheDb);
-                        recordsList.RemoveAll(x =>x.id == recordFromTheView.id);
-                        recordsList.Add(newDay);
-                        //Check Here if the new total time will be higher then the user max allowed time, and decline the changes if it is higher!
-                        bool checkTotalTime = Utilities.Helper.isTotalTimeHigherThenMaxTime(recordsList, (userSettings.TotalTime * 3600));
-                        if (checkTotalTime)
-                            startTimeOK = true;
-                        else
-                            startTimeOK = false;
-                    }
+        //                Models.Portal.DayRecord newDay = Models.Portal.DayRecord.CreateReocrd(recordFromtheDb);
+        //                recordsList.RemoveAll(x =>x.id == recordFromTheView.id);
+        //                recordsList.Add(newDay);
+        //                //Check Here if the new total time will be higher then the user max allowed time, and decline the changes if it is higher!
+        //                bool checkTotalTime = Utilities.Helper.isTotalTimeHigherThenMaxTime(recordsList, (userSettings.TotalTime * 3600));
+        //                if (checkTotalTime)
+        //                    startTimeOK = true;
+        //                else
+        //                    startTimeOK = false;
+        //            }
 
-                    // check if End time has been modify
-                    if (DateTime.Equals(Utilities.Helper.removeMiliseconds(recordFromtheDb.Status_End_Time.Value), recordFromTheView.endDate) == false)
-                    {
+        //            // check if End time has been modify
+        //            if (DateTime.Equals(Utilities.Helper.removeMiliseconds(recordFromtheDb.Status_End_Time.Value), recordFromTheView.endDate) == false)
+        //            {
 
-                        //Get Next record
-                        var followRecord = recordsList.Where(x => x.id > recordFromTheView.id).FirstOrDefault();
-                        //Check Here if the new total time will be higher then the user max allowed time, and decline the changes if it is higher!
-
-
+        //                //Get Next record
+        //                var followRecord = recordsList.Where(x => x.id > recordFromTheView.id).FirstOrDefault();
+        //                //Check Here if the new total time will be higher then the user max allowed time, and decline the changes if it is higher!
 
 
-                        if (followRecord != null)
-                        {
-                            DBContext.Main_Data followRecordFromDb = db.Main_Data.Where(x => x.ID == followRecord.id ).FirstOrDefault();
-                            if (followRecordFromDb.Status_End_Time == null)
-                            {
-                                //Cannot cahnge the End Time because you have an activity that is not closed!
-                                endTimeOK = false;
-                            }
-                            else if(followRecordFromDb.Status_End_Time > recordFromTheView.endDate)
-                            {
+
+
+        //                if (followRecord != null)
+        //                {
+        //                    DBContext.Main_Data followRecordFromDb = db.Main_Data.Where(x => x.ID == followRecord.id ).FirstOrDefault();
+        //                    if (followRecordFromDb.Status_End_Time == null)
+        //                    {
+        //                        //Cannot cahnge the End Time because you have an activity that is not closed!
+        //                        endTimeOK = false;
+        //                    }
+        //                    else if(followRecordFromDb.Status_End_Time > recordFromTheView.endDate)
+        //                    {
                               
-                                followRecordFromDb.Status_Start_Time = recordFromTheView.endDate.Value;
-                                recordFromtheDb.Status_End_Time = recordFromTheView.endDate;
-                                //db.SaveChanges();
-                                //add notifications
-                                endTimeOK = true;
+        //                        followRecordFromDb.Status_Start_Time = recordFromTheView.endDate.Value;
+        //                        recordFromtheDb.Status_End_Time = recordFromTheView.endDate;
+        //                        //db.SaveChanges();
+        //                        //add notifications
+        //                        endTimeOK = true;
 
-                            }
-                            else
-                            {
-                                //Add error message saying that the end time cannot be changed, because the next activity end time is lower. and will make record invalid
-                                endTimeOK = false;
-                            }
+        //                    }
+        //                    else
+        //                    {
+        //                        //Add error message saying that the end time cannot be changed, because the next activity end time is lower. and will make record invalid
+        //                        endTimeOK = false;
+        //                    }
 
-                        }
-                        else
-                        {
-                            recordFromtheDb.Status_End_Time = recordFromTheView.endDate;
-                            endTimeOK = true;
-                        }
+        //                }
+        //                else
+        //                {
+        //                    recordFromtheDb.Status_End_Time = recordFromTheView.endDate;
+        //                    endTimeOK = true;
+        //                }
 
-                        Models.Portal.DayRecord newDay = Models.Portal.DayRecord.CreateReocrd(recordFromtheDb);
-                        recordsList.RemoveAll(x =>x.id == recordFromTheView.id);
-                        recordsList.Add(newDay);
-                        //Check Here if the new total time will be higher then the user max allowed time, and decline the changes if it is higher!
-                        bool checkTotalTime = Utilities.Helper.isTotalTimeHigherThenMaxTime(recordsList, (userSettings.TotalTime * 3600));
-                        if (checkTotalTime)
-                            endTimeOK = true;
-                        else
-                            endTimeOK = false;
+        //                Models.Portal.DayRecord newDay = Models.Portal.DayRecord.CreateReocrd(recordFromtheDb);
+        //                recordsList.RemoveAll(x =>x.id == recordFromTheView.id);
+        //                recordsList.Add(newDay);
+        //                //Check Here if the new total time will be higher then the user max allowed time, and decline the changes if it is higher!
+        //                bool checkTotalTime = Utilities.Helper.isTotalTimeHigherThenMaxTime(recordsList, (userSettings.TotalTime * 3600));
+        //                if (checkTotalTime)
+        //                    endTimeOK = true;
+        //                else
+        //                    endTimeOK = false;
 
-                    }
-
-
-                    if (endTimeOK && startTimeOK)
-                    {
+        //            }
 
 
-                        db.SaveChanges();
-                        recordsList = dayRecord.getAllRecordsForCurrentDay(recordFromTheView);
-                    }
+        //            if (endTimeOK && startTimeOK)
+        //            {
 
-                    return RedirectToAction("EditRecord", new RouteValueDictionary(new {controller = "Portal", action = "EditRecord", id = recordFromTheView.id.ToString() }));
-                }
-                else
-                {
-                    return View(recordsList);
-                }
 
-            }
-            else
-            {
-                //Redirect To Error page
-            }
+        //                db.SaveChanges();
+        //                recordsList = dayRecord.getAllRecordsForCurrentDay(recordFromTheView);
+        //            }
 
-            return View();
-        }
+        //            return RedirectToAction("EditRecord", new RouteValueDictionary(new {controller = "Portal", action = "EditRecord", id = recordFromTheView.id.ToString() }));
+        //        }
+        //        else
+        //        {
+        //            return View(recordsList);
+        //        }
+
+        //    }
+        //    else
+        //    {
+        //        //Redirect To Error page
+        //    }
+
+        //    return View();
+        //}
 
         public JsonResult UpdateRecords( List<Models.Portal.Event> data)
         {
@@ -554,17 +578,27 @@ namespace mytimmings.Controllers
             {
                 //if we encounter eny error while we are trying to process the events from the view, those events get storred into an errored array, and we send it back to the user to check them
                 //do now allow saving if there are any errors into the data!
-                try
+                #region Exclude record that doesant have the correct status
+                var statusExist = db.Params.Where(x => x.Identifier == "Status" && x.Company == user.Company && x.Param1 == item.Status && x.Param2 == "True").FirstOrDefault();
+                if(statusExist != null)
                 {
-                    var record = new Models.Portal.DayRecord(item, user);
-                    var recordFordb = Models.Portal.DayRecord.InsertNewRecord(record);
-                    records.Add(recordFordb);
+                    try
+                    {
+                        var record = new Models.Portal.DayRecord(item, user);
+                        var recordFordb = Models.Portal.DayRecord.InsertNewRecord(record);
+                        records.Add(recordFordb);
+                    }
+                    catch (Exception)
+                    {
+                        eventsErrored.Add(item);
+                        errorsFound = true;
+
+
+                    }
                 }
-                catch (Exception)
-                {
-                    eventsErrored.Add(item);
-                   
-                }
+
+                #endregion
+               
 
             }
             //if we didnt find any errors, then we try to save the data
@@ -573,6 +607,12 @@ namespace mytimmings.Controllers
             {
                 try
                 {
+                    //First delete all data for the day
+                    //then add the new records
+                    List<DBContext.Main_Data> todayRecords = db.Main_Data.Where(x => x.userID == user.ID && x.CurrentDate.Year == DateTime.Now.Year && x.CurrentDate.Month == DateTime.Now.Month && x.CurrentDate.Day == DateTime.Now.Day
+                                        && x.Current_Status != "End Day").ToList();
+                    db.Main_Data.RemoveRange(todayRecords);
+
                     db.Main_Data.AddRange(records);
                     db.SaveChanges();
 
@@ -592,7 +632,27 @@ namespace mytimmings.Controllers
 
 
         }
+        //This Action will delete all records from the DB for the current day!
+        //if the user click clear calendar, there is no way back, all records will be deleted!
+        public JsonResult ClearEvents()
+        {
+            DateTime currentDate = DateTime.Now;
+            List<DBContext.Main_Data> currentDayRecords = db.Main_Data.Where(x => x.CurrentDate.Year == currentDate.Year && x.CurrentDate.Month == currentDate.Month && x.CurrentDate.Day == currentDate.Day).ToList();
+            if(currentDayRecords.Count  == 0)
+                return Json(new { result = "Error", message = "No Record Found!" }, JsonRequestBehavior.AllowGet);
 
+            try
+            {
+                db.Main_Data.RemoveRange(currentDayRecords);
+                db.SaveChanges();
+                return Json(new { result = "Success", message = "Day Updated!" }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception)
+            {
+
+                return Json(new { result = "Error", message = "Something Happen! Try Again!" }, JsonRequestBehavior.AllowGet);
+            }
+        }
         #endregion
 
 
@@ -639,10 +699,17 @@ namespace mytimmings.Controllers
             return View(records);
         }
 
-
         public Models.Security.User GetUserSession()
         {
             return Session["User"] as Models.Security.User;
+        }
+        public Models.Security.UserSettings GetUserSettingsSession()
+        {
+            return Session["UserSettings"] as Models.Security.UserSettings;
+        }
+        private void SetUserSettingsSession( Models.Security.UserSettings settings)
+        {
+            Session["UserSettings"] = settings;
         }
     }
 }

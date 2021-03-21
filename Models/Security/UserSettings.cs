@@ -11,6 +11,10 @@ namespace mytimmings.Models.Security
         public int ShiftTime { get; private set; }
         public int BreakTime { get; private set; }
         public int TotalTime { get; private set; }
+        //This Property will keep track of the user status, if he ended the day or not
+        //true -> day is not closed or not started
+        //false -> day is closed
+        public bool isDayOpen { get; set; }
 
         public Dictionary<int, string> ProjectsAssigned = new Dictionary<int, string>();
 
@@ -35,6 +39,12 @@ namespace mytimmings.Models.Security
                 throw new ArgumentNullException("Argument projectName cannot be null or empty");
 
             ProjectsAssigned.Add(projectId, projectName);
+
+        }
+
+        public void SetDayStatus(bool status)
+        {
+            isDayOpen = status;
 
         }
 
