@@ -87,6 +87,11 @@ namespace mytimmings.Controllers
                         //Get the settings for the useer
                         Models.Security.UserSettings userSettings = new Models.Security.UserSettings(dbmodel.User_Settings.Where(x => x.ID == user.ID).FirstOrDefault());
                         Models.Security.User userModel = Models.Security.User.CreateUser(user);
+
+
+                        //Get the projects that the user is assigned
+                        
+
                         SetUserSession(userModel, userSettings, vm.timezone);
 
                         return RedirectToAction("Index", "Portal");

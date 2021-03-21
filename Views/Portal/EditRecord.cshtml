@@ -1,4 +1,4 @@
-﻿@model IEnumerable<mytimmings.Models.Portal.DayRecord>
+﻿@model IEnumerable<mytimmings.Models.Portal.CalendarRecord>
 
 
 
@@ -104,7 +104,26 @@
         var containerEl = document.getElementById('external-events');
         var calendarEl = document.getElementById('calendar');
 
-        var eventsList = [];
+        var eventsFromController = [];
+        var records = @Html.Raw(Json.Encode(Model));
+        for (var i = 0; i < records.length; i++) {
+            eventsFromController.push({
+                title: records[i].Title,
+                start: records[i].Start,
+                end: records[i].End,
+                allDay: records[i].AllDay,
+                overlap: false,
+                color: records[i].Color,
+                display: "block",
+                extendedProps: {
+                    id: i,
+                    comments: records[i].Comment,
+                    project: records[i].ProjectId
+                }
+
+
+            })
+        }
 
         new Draggable(containerEl, {
             itemSelector: '.fc-event',
@@ -168,8 +187,10 @@
             eventClick: function (info) {
                 var eventObj = info.event
                 $('#modal').modal('show')
+                console.log(eventObj)
                 SetModalInformation(eventObj.startStr, eventObj.endStr, eventObj.extendedProps.comments, eventObj.extendedProps.id, eventObj.extendedProps.project)
-            }
+            },
+            events: eventsFromController
         });
 
         calendar.render();

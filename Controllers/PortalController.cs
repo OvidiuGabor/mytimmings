@@ -88,7 +88,7 @@ namespace mytimmings.Controllers
                         statusError = "Please select a status.";
                     }
 
-                    return Json(new { result = "Error", projectError, statusError }, JsonRequestBehavior.AllowGet);
+                    return Json(new { result = "Error", message = projectError + " "  + statusError }, JsonRequestBehavior.AllowGet);
                 }
                 else
                 {
@@ -331,13 +331,34 @@ namespace mytimmings.Controllers
         {
             if (Session["User"] != null)
             {
-                Models.Security.User user = Session["User"] as Models.Security.User;
-                var day = new Models.Portal.DayRecord();
-                day.userid = user.ID;
-               
-                List<Models.Portal.DayRecord> recordsList = day.getAllRecordsForCurrentDay(day);
+                List<Models.Portal.CalendarRecord> records = new List<Models.Portal.CalendarRecord>();
 
-                return View(recordsList.Where(x =>x.status != "End Day"));
+                Models.Security.User user = GetUserSession();
+                //Get user Time Zone
+                string UserTimeZone = Session["TimeZone"].ToString();
+                DateTime currentDate = DateTime.Now;
+                Dictionary<string, string> colorCoding = Utilities.Helper.getColorCoding(user);
+
+                //Get user data
+                List<DBContext.Main_Data> data = db.Main_Data.Where(x => x.userID == user.ID && x.CurrentDate.Year == currentDate.Year && x.CurrentDate.Month == currentDate.Month && x.CurrentDate.Day == currentDate.Day).OrderBy(x => x.Status_Start_Time).ToList();
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+
+                        var record = new Models.Portal.CalendarRecord(item, UserTimeZone, colorCoding);
+
+                        if (item.Current_Status == "End Day")
+                        {
+                            record.setEndDayInfo(data.Where(x => x.Status_Start_Time.Year == item.Status_Start_Time.Year && x.Status_Start_Time.Month == item.Status_Start_Time.Month && x.Status_Start_Time.Day == item.Status_Start_Time.Day).ToList());
+                        }
+
+                        records.Add(record);
+                    }
+                }
+
+
+                return View(records);
             }
             else
             {
@@ -514,9 +535,6 @@ namespace mytimmings.Controllers
             return View();
         }
 
-
-
-
         public JsonResult UpdateRecords( List<Models.Portal.Event> data)
         {
             bool errorsFound = false;
@@ -576,7 +594,6 @@ namespace mytimmings.Controllers
         }
 
         #endregion
-
 
 
         public ActionResult History()

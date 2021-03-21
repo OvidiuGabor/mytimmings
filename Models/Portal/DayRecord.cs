@@ -20,6 +20,7 @@ namespace mytimmings.Models.Portal
         public string projectId { get; set; }
         public string projectName { get; set; }
         public bool isRunning { get; set; }
+
         [StringLength(1000)]
         public string comments { get; set; }
 
@@ -104,7 +105,7 @@ namespace mytimmings.Models.Portal
             {
                 foreach (var item in recordsListDB)
                 {
-                    Models.Portal.DayRecord createRecord = Models.Portal.DayRecord.CreateReocrd(item);
+                    Models.Portal.DayRecord createRecord = CreateReocrd(item);
                     recordsList.Add(createRecord);
                 }
             }

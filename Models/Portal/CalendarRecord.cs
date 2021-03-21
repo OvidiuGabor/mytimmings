@@ -13,12 +13,10 @@ namespace mytimmings.Models.Portal
         public bool AllDay { get; set; }
         public bool Overlap { get; set; }
         public string Color { get; set; }
+        public string Comment { get; set; }
+        public int ProjectId { get; set; }
 
         private Dictionary<string, string> ColorCoding { get; set; }
-
-        
-
-
         public CalendarRecord(DBContext.Main_Data record, string timezone, Dictionary<string, string> colorCoding)
         {
             if (record == null)
@@ -36,6 +34,9 @@ namespace mytimmings.Models.Portal
 
             ColorCoding = colorCoding;
             Color = getEventColor();
+            Comment = record.Comments;
+            ProjectId = (int)record.ProjectID;
+             
         }
 
         private string ConvertDataToString(DateTime? value)
@@ -80,6 +81,7 @@ namespace mytimmings.Models.Portal
             return color;
 
         }
+
 
 
         public void setEndDayInfo(List<DBContext.Main_Data> todayRecords)

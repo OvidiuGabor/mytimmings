@@ -12,6 +12,8 @@ namespace mytimmings.Models.Security
         public int BreakTime { get; private set; }
         public int TotalTime { get; private set; }
 
+        public Dictionary<int, string> ProjectsAssigned = new Dictionary<int, string>();
+
         public UserSettings()
         {
 
@@ -24,7 +26,17 @@ namespace mytimmings.Models.Security
             TotalTime = Convert.ToInt32(setting.TotalTime);
         }
 
+        public void AddProject(int projectId, string projectName)
+        {
+            if (projectId == 0)
+                throw new ArgumentNullException("Argument projectId cannot be equal to 0.");
 
+            if (String.IsNullOrEmpty(projectName))
+                throw new ArgumentNullException("Argument projectName cannot be null or empty");
+
+            ProjectsAssigned.Add(projectId, projectName);
+
+        }
 
     }
 }
