@@ -129,15 +129,19 @@
     <Compile Include="Controllers\ErrorHandlerController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PortalController.cs" />
+    <Compile Include="Controllers\RequestController.cs" />
     <Compile Include="ErrorManagement\LoginError.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Notification\Notification.cs" />
     <Compile Include="Models\Portal\CalendarRecord.cs" />
     <Compile Include="Models\Portal\DayRecord.cs" />
     <Compile Include="Models\Portal\DayOverview.cs" />
     <Compile Include="Models\Portal\Event.cs" />
     <Compile Include="Models\Portal\Portal.cs" />
+    <Compile Include="Models\Request\Request.cs" />
+    <Compile Include="Models\Request\RequestContainerForView.cs" />
     <Compile Include="Models\Security\LoginModel.cs" />
     <Compile Include="Models\Security\User.cs" />
     <Compile Include="Models\Security\UserSettings.cs" />
@@ -539,6 +543,7 @@
     <Content Include="Views\Portal\History.cshtml" />
     <Content Include="Views\Portal\zzzEditRecord - Copy.cshtml" />
     <Content Include="Views\Portal\_EventOption.cshtml" />
+    <Content Include="Views\Request\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
