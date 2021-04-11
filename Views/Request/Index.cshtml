@@ -3,35 +3,89 @@
 @{
     ViewBag.Title = "Leave Requests";
 }
+<style>
 
-@using (Html.BeginForm()) 
-{
-    @Html.AntiForgeryToken()
-    
-<div class="form-horizontal">
-    <hr />
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-    <div class="form-group">
-        @Html.LabelFor(model => model.ManagerName, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.ManagerName, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.ManagerName, "", new { @class = "text-danger" })
-        </div>
+    .left-side-info {
+        display: inline-block;
+        width: 30%;
+    }
+    .right-side-info{
+        display: inline-block;
+    }
+    .leave-info {
+        border-collapse: collapse;
+        border: 1px solid deepskyblue;
+        width: 100%;
+        background: linear-gradient( 180deg, rgb(241 241 241) 0%, rgba(230,252,255,1) 100%);
+    }
+</style>
+
+
+<div class="main-body-container w3-main">
+
+    <div class="left-side-info">
+        <table class="leave-info">
+            <caption style="">Leave Balance</caption>
+            <tbody>
+                <tr>
+                    <td>Vacation days remaning</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Medical Leave used</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Other types of leave used</td>
+                    <td></td>
+                </tr>
+                <tr style="font-size: 10px;">
+                    <td>For a detail list of your leaves status, please access the <strong>Leave Status</strong> page.</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="employee-info">
+
+        </table>
     </div>
-    <div class="form-group">
-        @Html.LabelFor(model => model.request.Type, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DropDownListFor(model => model.request.Type, new SelectList(Model.LeaveList, "Value", "Text"), new { @class = "form-control"})
-            @Html.ValidationMessageFor(model => model.request.Type, "", new { @class = "text-danger" })
-        </div>
+
+
+    <div class="right-side-info">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ManagerName, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.ManagerName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.ManagerName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.request.Type, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.request.Type, new SelectList(Model.LeaveList, "Value", "Text"), new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.request.Type, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Create" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 
+  
 
 
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Create" class="btn btn-default" />
-        </div>
-    </div>
 </div>
-}
+
+

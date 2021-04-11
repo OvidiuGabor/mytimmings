@@ -29,3 +29,8 @@ textarea {
     opacity: 0.5;
     text-decoration: none;
 }
+caption{
+    caption-side: top;
+    text-align: center;
+    padding: 0;
+}
