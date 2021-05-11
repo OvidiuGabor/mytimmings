@@ -57,9 +57,9 @@ namespace mytimmings.Controllers
                         if(user != null)
                         {
                             //Get the settings for the useer
-                            Models.Security.UserSettings userSettings = new Models.Security.UserSettings(dbmodel.User_Settings.Where(x => x.ID == user.ID).FirstOrDefault());
+                           // Models.Security.UserSettings userSettings = new Models.Security.UserSettings(dbmodel.User_Settings.Where(x => x.ID == user.ID).FirstOrDefault());
                             Models.Security.User userModel = Models.Security.User.CreateUser(user);
-                            SetUserSession(userModel, userSettings, vm.timezone);
+                            SetUserSession(userModel, vm.timezone);
 
                             return RedirectToAction("Index", "Portal");
                         }
@@ -85,7 +85,7 @@ namespace mytimmings.Controllers
                     if (user != null)
                     {
                         //Get the settings for the useer
-                        Models.Security.UserSettings userSettings = new Models.Security.UserSettings(dbmodel.User_Settings.Where(x => x.ID == user.ID).FirstOrDefault());
+                        //Models.Security.UserSettings userSettings = new Models.Security.UserSettings(dbmodel.User_Settings.Where(x => x.ID == user.ID).FirstOrDefault());
                         Models.Security.User userModel = Models.Security.User.CreateUser(user);
 
 
@@ -95,19 +95,19 @@ namespace mytimmings.Controllers
                         {
                             foreach(var project in assignedProjects)
                             {
-                                userSettings.AddProject((int)project.ProjectId, project.ProjectName);
+                                //userSettings.AddProject((int)project.ProjectId, project.ProjectName);
                             }
                         }
                         else
                         {
-                            userSettings.AddProject(1, "No Project");
+                            //userSettings.AddProject(1, "No Project");
                         }
 
                         //Check if the user has started the clock today and if it is ended;
                         List<DBContext.Main_Data> todayRecords = dbmodel.Main_Data.Where(x => x.userID == user.ID && x.CurrentDate.Year == DateTime.Now.Year && x.CurrentDate.Month == DateTime.Now.Month && x.CurrentDate.Day == DateTime.Now.Day).ToList();
                         if(todayRecords.Count == 0 || todayRecords == null)
                         {
-                            userSettings.SetDayStatus(true);
+                           // userSettings.SetDayStatus(true);
                         }
                         else
                         {
@@ -115,12 +115,12 @@ namespace mytimmings.Controllers
                             {
                                 if (item.Current_Status == "End Day")
                                 {
-                                    userSettings.SetDayStatus(false);
+                                   // userSettings.SetDayStatus(false);
                                     break;
                                 }
                                 else
                                 {
-                                    userSettings.SetDayStatus(true);
+                                   // userSettings.SetDayStatus(true);
                                 }
                                
                             }
@@ -129,7 +129,7 @@ namespace mytimmings.Controllers
 
 
 
-                        SetUserSession(userModel, userSettings, vm.timezone);
+                        SetUserSession(userModel, vm.timezone);
 
                         return RedirectToAction("Index", "Portal");
                     }
@@ -155,11 +155,10 @@ namespace mytimmings.Controllers
             return View();
         }
         #region Set Session Variables
-        private void SetUserSession(Models.Security.User user, Models.Security.UserSettings settings, string timeZone)
+        private void SetUserSession(Models.Security.User user, string timeZone)
         {
             Session["User"] = user;
             Session["DisplayName"] = user.FirstName;
-            Session["UserSettings"] = settings;
             Session["TimeZone"] = timeZone;
         }
         public  Models.Security.User GetUserSession()

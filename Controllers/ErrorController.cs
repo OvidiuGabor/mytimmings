@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace mytimmings.Controllers
 {
-    public class ErrorHandlerController : Controller
+    public class ErrorController : Controller
     {
         // GET: ErrorHandler
         public ActionResult Index()

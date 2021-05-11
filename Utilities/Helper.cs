@@ -81,24 +81,6 @@ namespace mytimmings.Utilities
 
         }
 
-        public static bool isTotalTimeHigherThenMaxTime(List<Models.Portal.DayRecord> records, int maxTime)
-        {
-            int currentTime = 0;
-            if (records.Count() < 1)
-                throw new ArgumentOutOfRangeException("There should be at lease one record!");
-
-            foreach(var record in records)
-            {
-                currentTime += record.totalTime;
-            }
-
-            if (currentTime > maxTime)
-                return false;
-            else
-                return true;
-
-        }
-
         #endregion
 
         public static DateTime convertToUTC(DateTime dateTimeToConvert)

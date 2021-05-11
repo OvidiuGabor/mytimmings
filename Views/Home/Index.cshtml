@@ -1,4 +1,5 @@
-﻿<div class="form-container">
+﻿
+<div class="form-container">
     <div class="information-box-form">
         <p>Please login using your email address or the personal login id that has been provided to you.</p>
         <p>If you dont have an account created, Please contact your <strong>Supervisor</strong> in order to have one created.</p>
@@ -29,13 +30,8 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-
         var offset = new Date().getTimezoneOffset();
-
-        console.log(offset);
-
-       document.getElementById("timezone").value = offset
-
+        document.getElementById("timezone").value = offset
 
     })
 </script>
