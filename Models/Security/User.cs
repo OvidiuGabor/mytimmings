@@ -25,8 +25,6 @@ namespace mytimmings.Models.Security
         public bool isAdmin { get; set; }
         public bool isDeveloper { get; set; }
 
-        public bool isLogion { get; set; }
-        public bool islogout { get; set; }
         #endregion
 
         #region Define user methods

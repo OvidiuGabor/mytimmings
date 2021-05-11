@@ -26,9 +26,9 @@
 <body class="w3-light-grey">
 
     @{
-        var user = Session["User"] as mytimmings.Models.Security.User;
+        var auth = Session["AuthState"] as mytimmings.Models.Security.AuthState;
 
-        if (user !=null && user.isLogion)
+        if (auth !=null && auth.IsUserLogged())
         {
             <!-- Top container -->
             <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">

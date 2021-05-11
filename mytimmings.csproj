@@ -134,6 +134,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Notification\Notification.cs" />
+    <Compile Include="Models\Portal\Overview.cs" />
+    <Compile Include="Models\Security\AuthState.cs" />
     <Compile Include="Models\Security\LoginModel.cs" />
     <Compile Include="Models\Security\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
