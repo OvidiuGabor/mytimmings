@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Companies_Assigned_Items.cs" />
     <Compile Include="Company.cs" />
     <Compile Include="DBModel.cs" />
     <Compile Include="Main_Data.cs" />
@@ -62,6 +63,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="User.cs" />
     <Compile Include="User_Assigned_Project.cs" />
+    <Compile Include="User_Leaves_Status.cs" />
+    <Compile Include="User_Login_Logout.cs" />
     <Compile Include="User_Settings.cs" />
   </ItemGroup>
   <ItemGroup>

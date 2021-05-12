@@ -28,7 +28,6 @@ namespace DBContext
         [Column(TypeName = "numeric")]
         public decimal? ProjectID { get; set; }
 
-        public bool IsRunning { get; set; }
         [StringLength(1000)]
         public string Comments { get; set; }
     }

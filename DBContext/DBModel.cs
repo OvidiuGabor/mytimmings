@@ -23,6 +23,9 @@ namespace DBContext
         public virtual DbSet<Params> Params { get; set; }
         public virtual DbSet<User_Settings> User_Settings { get; set; }
         public virtual DbSet<User_Assigned_Project> User_Assigned_Projects { get; set; }
+        public virtual DbSet<Companies_Assigned_Items> Companies_Assigned_Items { get; set; }
+        public virtual DbSet<User_Leaves_Status> User_Leaves_Status { get; set; }
+        public virtual DbSet<User_Login_Logout> User_Login_Logout { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -51,6 +54,34 @@ namespace DBContext
                 .HasPrecision(18, 0);
 
             modelBuilder.Entity<User_Assigned_Project>()
+                .Property(e => e.Id)
+                .HasPrecision(18, 0);
+
+            modelBuilder.Entity<Companies_Assigned_Items>()
+               .Property(e => e.Id)
+               .HasPrecision(18, 0);
+
+            modelBuilder.Entity<User_Leaves_Status>()
+                .Property(e => e.Id)
+                .HasPrecision(18, 0);
+
+            modelBuilder.Entity<User_Leaves_Status>()
+                .Property(e => e.Year)
+                .HasPrecision(18, 0);
+
+            modelBuilder.Entity<User_Leaves_Status>()
+                .Property(e => e.Entitled)
+                .HasPrecision(18, 0);
+
+            modelBuilder.Entity<User_Leaves_Status>()
+                .Property(e => e.Accrued)
+                .HasPrecision(18, 0);
+
+            modelBuilder.Entity<User_Leaves_Status>()
+                .Property(e => e.Carried_Over)
+                .HasPrecision(18, 0);
+
+            modelBuilder.Entity<User_Login_Logout>()
                 .Property(e => e.Id)
                 .HasPrecision(18, 0);
         }

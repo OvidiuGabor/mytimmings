@@ -81,6 +81,89 @@ namespace mytimmings.Utilities
 
         }
 
+        public static Dictionary<string, List<string>> getStatusTypes(string companyId)
+        {
+            Dictionary<string, List<string>> statuses = new Dictionary<string, List<string>>();
+            var companyItem = db.Companies_Assigned_Items.Where(x => x.Company_ID == companyId).FirstOrDefault();
+
+            if(companyItem != null)
+            {
+                List<string> temp = new List<string>();
+                temp = (convertStringtoList(companyItem.Productive_Actions, ';'));
+                statuses.Add("Productive", temp);
+                temp = (convertStringtoList(companyItem.Non_Productive_Actions, ';'));
+                statuses.Add("Non Productive", temp);
+                temp = (convertStringtoList(companyItem.Other, ';'));
+                statuses.Add("Other", temp);
+
+            }
+            else
+            {
+
+                var dbList = db.Params.Where(x => x.Identifier == "Action" && x.Active == true).ToList();
+                foreach(var item in dbList)
+                {
+                    if(item.Param2 == "Productive")
+                        if (statuses.ContainsKey("Productive"))
+                        {
+                            statuses["Productive"].Add(item.Param1);
+                        }
+                        else
+                        {
+                            statuses.Add("Productive", new List<string> { item.Param1 });
+                        }
+                    if (item.Param2 == "Non Productive")
+                        if (statuses.ContainsKey("Non Productive"))
+                        {
+                            statuses["Non Productive"].Add(item.Param1);
+                        }
+                        else
+                        {
+                            statuses.Add("Non Productive", new List<string> { item.Param1 });
+                        }
+                    if (item.Param2 == "Other")
+                        if (statuses.ContainsKey("Other"))
+                        {
+                            statuses["Other"].Add(item.Param1);
+                        }
+                        else
+                        {
+                            statuses.Add("Other", new List<string> { item.Param1 });
+                        }
+
+                }
+            }
+
+            return statuses;
+          
+        }
+
+
+        public static string getCompanyId(string userID)
+        {
+            if (String.IsNullOrEmpty(userID))
+                throw new ArgumentNullException("String cannot be null or Empty.");
+
+            return db.Users.Where(x => x.ID == userID).Select(x => x.Company).FirstOrDefault();
+        }
+
+        public static List<string> convertStringtoList(string stringToconvert, char delimiter) 
+        {
+            List<string> newList = new List<string>();
+
+            if (String.IsNullOrEmpty(stringToconvert) || Char.IsWhiteSpace(delimiter))
+                return newList;
+
+
+            string[] newString = stringToconvert.Split(delimiter);
+            newList = newString.ToList();
+
+
+
+            return newList;
+        
+        
+        }
         #endregion
 
         public static DateTime convertToUTC(DateTime dateTimeToConvert)

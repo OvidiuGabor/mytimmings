@@ -61,7 +61,7 @@ namespace mytimmings.Controllers
                             userState.LogIn();
                             SetUserSession(userModel, userState);
 
-                            return RedirectToAction("Index", "Portal");
+                            return RedirectToAction("Overview", "Portal");
                         }
                         else
                         {
@@ -92,7 +92,7 @@ namespace mytimmings.Controllers
 
                         SetUserSession(userModel, userState);
 
-                        return RedirectToAction("Index", "Portal");
+                        return RedirectToAction("Overview", "Portal");
                     }
                     else
                     {
