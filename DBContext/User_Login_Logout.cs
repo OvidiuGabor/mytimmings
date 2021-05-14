@@ -19,8 +19,8 @@ namespace DBContext
         [Column(TypeName = "date")]
         public DateTime? Date { get; set; }
 
-        public TimeSpan? LoginTime { get; set; }
+        public DateTime? LoginTime { get; set; }
 
-        public TimeSpan? LogoutTime { get; set; }
+        public DateTime? LogoutTime { get; set; }
     }
 }

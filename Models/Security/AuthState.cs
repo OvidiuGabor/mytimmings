@@ -13,10 +13,12 @@ namespace mytimmings.Models.Security
 
         public string TimeZone { get; set; }
 
+        public UserSettings UserSettings = new UserSettings();
         public AuthState(User user, string timezone)
         {
             User = user;
             TimeZone = timezone;
+            GetUserSettings();
         }
 
 
@@ -39,6 +41,14 @@ namespace mytimmings.Models.Security
 
 
             return false;
+        }
+
+        private void GetUserSettings()
+        {
+            DBContext.DBModel db = new DBContext.DBModel();
+            var settings = db.User_Settings.Find(User.ID);
+            if (settings != null)
+                UserSettings = new UserSettings(settings);
         }
     }
 }

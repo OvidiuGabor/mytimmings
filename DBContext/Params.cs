@@ -22,7 +22,5 @@ namespace DBContext
         [StringLength(50)]
         public string Param3 { get; set; }
         public bool Active { get; set; }
-        [StringLength(10)]
-        public string Company { get; set; }
     }
 }

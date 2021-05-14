@@ -48,7 +48,7 @@ namespace mytimmings.Models.Portal
                 if (status.Type == "Other")
                     Other += status.Duration;
 
-                TotalTime = status.Duration;
+                TotalTime += status.Duration;
             }
 
 

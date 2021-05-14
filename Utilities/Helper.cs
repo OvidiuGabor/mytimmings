@@ -20,16 +20,16 @@ namespace mytimmings.Utilities
         }
 
         #region Methods for Portal
-        public static List<SelectListItem> getProjectList() {
+        public static List<SelectListItem> getProjectList(string userID) {
 
             List<SelectListItem> projectList = new List<SelectListItem>();
 
-            List<DBContext.Project> projectsListdb = db.Projects.Where(x => x.isActive == true).ToList(); 
+            List<DBContext.User_Assigned_Project> projectsListdb = db.User_Assigned_Projects.Where(x => x.Active == true && x.UserID == userID).ToList(); 
             if(projectsListdb != null)
             {
                 SelectListItem defaultItem = new SelectListItem
                 {
-                    Text = "Please Select a Project",
+                    Text = "Choose Project",
                     Value = "0"
 
                 };
@@ -39,44 +39,45 @@ namespace mytimmings.Utilities
                 {
                     SelectListItem lstItem = new SelectListItem
                     {
-                        Text = item.Name,
+                        Text = item.ProjectName,
                         Value = item.Id.ToString()
 
                     };
                     projectList.Add(lstItem);
                 }
-            }
+            } 
             return projectList;
             
         }
 
-        public static List<SelectListItem> getStatuslist()
+        public static List<SelectListItem> getStatuslist(string companyId)
         {
 
             List<SelectListItem> statusList = new List<SelectListItem>();
-
-            List<DBContext.Params> paramsListdb = db.Params.Where(x => x.Identifier == "Status" && x.Param2 == "True").ToList();
-            if (paramsListdb != null)
+            SelectListItem defaultItem = new SelectListItem
             {
-                SelectListItem defaultItem = new SelectListItem
-                {
-                    Text = "Please Select a Status",
-                    Value = "0"
+                Text = "Choose Status",
+                Value = "0"
 
-                };
-                statusList.Add(defaultItem);
-
-                foreach (var item in paramsListdb)
+            };
+            Dictionary<string, List<string>> statuses = getStatusTypes(companyId);
+            foreach(var item in statuses)
+            {
+                if(item.Value.Count > 0)
                 {
-                    SelectListItem lstItem = new SelectListItem
+                    foreach(string el in item.Value)
                     {
-                        Text = item.Param1,
-                        Value = item.Param1
-
-                    };
-                    statusList.Add(lstItem);
+                        statusList.Add(new SelectListItem { 
+                            Text = el,
+                            Value = el
+                        });
+                    }
                 }
             }
+
+
+            statusList.Add(defaultItem);
+
             return statusList;
 
         }
@@ -187,7 +188,7 @@ namespace mytimmings.Utilities
         {
             Dictionary<string, string> colorList = new Dictionary<string, string>();
 
-            List<DBContext.Params> colorsDb = db.Params.Where(x => x.Identifier == "ColorCoding" & x.Active == true & x.Company == user.Company).Distinct().ToList();
+            List<DBContext.Params> colorsDb = db.Params.Where(x => x.Identifier == "ColorCoding" & x.Active == true).Distinct().ToList();
 
             foreach(var item in colorsDb)
             {

@@ -12,12 +12,12 @@
         [Key]
         [StringLength(10)]
         public string ID { get; set; }
-        [Column(TypeName = "numeric")]
-        public decimal ShiftTime { get; set; }
-        [Column(TypeName = "numeric")]
-        public decimal BreakTime { get; set; }
-        [Column(TypeName = "numeric")]
-        public decimal TotalTime { get; set; }
+
+        public TimeSpan? ShiftTime { get; set; }
+
+        public TimeSpan? BreakTime { get; set; }
+
+        public TimeSpan? TotalTime { get; set; }
 
     }
 }

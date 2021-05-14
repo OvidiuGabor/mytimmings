@@ -136,10 +136,12 @@
     <Compile Include="Models\Notification\Notification.cs" />
     <Compile Include="Models\Portal\Overview.cs" />
     <Compile Include="Models\Portal\Status.cs" />
+    <Compile Include="Models\Portal\TimeTracker.cs" />
     <Compile Include="Models\Portal\WorkingHours.cs" />
     <Compile Include="Models\Security\AuthState.cs" />
     <Compile Include="Models\Security\LoginModel.cs" />
     <Compile Include="Models\Security\User.cs" />
+    <Compile Include="Models\Security\UserSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\Notification.cs" />
     <Compile Include="Utilities\Helper.cs" />
