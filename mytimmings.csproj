@@ -47,19 +47,32 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AdvancedStringBuilder, Version=0.1.0.0, Culture=neutral, PublicKeyToken=e818a2fc08933ddb, processorArchitecture=MSIL">
+      <HintPath>packages\AdvancedStringBuilder.0.1.0\lib\net45\AdvancedStringBuilder.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="JavaScriptEngineSwitcher.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=c608b2a8cc9e4472, processorArchitecture=MSIL">
+      <HintPath>packages\JavaScriptEngineSwitcher.Core.3.1.0\lib\net45\JavaScriptEngineSwitcher.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="JSPool, Version=4.0.0.0, Culture=neutral, PublicKeyToken=2fc7775f73072640, processorArchitecture=MSIL">
+      <HintPath>packages\JSPool.4.0.0\lib\net45\JSPool.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=3.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -110,8 +123,8 @@
       <Private>True</Private>
       <HintPath>packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="WebActivatorEx, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
+      <HintPath>packages\WebActivatorEx.2.2.0\lib\net40\WebActivatorEx.dll</HintPath>
     </Reference>
     <Reference Include="WebGrease">
       <Private>True</Private>
@@ -134,8 +147,11 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Notification\Notification.cs" />
+    <Compile Include="Models\Portal\Leave.cs" />
+    <Compile Include="Models\Portal\LeaveStatus.cs" />
     <Compile Include="Models\Portal\Overview.cs" />
-    <Compile Include="Models\Portal\Status.cs" />
+    <Compile Include="Models\Portal\Action.cs" />
+    <Compile Include="Models\Portal\PartialStatus.cs" />
     <Compile Include="Models\Portal\TimeTracker.cs" />
     <Compile Include="Models\Portal\WorkingHours.cs" />
     <Compile Include="Models\Security\AuthState.cs" />
@@ -157,8 +173,13 @@
     <Content Include="Content\fullcalendar.min.css" />
     <Content Include="Content\fullcalendar.print.css" />
     <Content Include="Content\fullcalendar.print.min.css" />
+    <Content Include="Content\Stylesheet\MediaQueries.css" />
     <Content Include="Content\Stylesheet\Portal.css" />
     <Content Include="Content\Stylesheet\Index.css" />
+    <Content Include="Content\SVG\icon-idle-hours.svg" />
+    <Content Include="Content\SVG\icon-pro-hours.svg" />
+    <Content Include="Content\SVG\icon-total-hours.svg" />
+    <Content Include="Content\SVG\Bar-tracker.svg" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />
     <Content Include="Content\themes\base\autocomplete.css" />
@@ -319,6 +340,24 @@
     <Content Include="fullcalendar\README.md" />
     <Content Include="Content\toastr.scss" />
     <Content Include="Content\toastr.less" />
+    <Content Include="Fonts\Poppins-Black.ttf" />
+    <Content Include="Fonts\Poppins-BlackItalic.ttf" />
+    <Content Include="Fonts\Poppins-Bold.ttf" />
+    <Content Include="Fonts\Poppins-BoldItalic.ttf" />
+    <Content Include="Fonts\Poppins-ExtraBold.ttf" />
+    <Content Include="Fonts\Poppins-ExtraBoldItalic.ttf" />
+    <Content Include="Fonts\Poppins-ExtraLight.ttf" />
+    <Content Include="Fonts\Poppins-ExtraLightItalic.ttf" />
+    <Content Include="Fonts\Poppins-Italic.ttf" />
+    <Content Include="Fonts\Poppins-Light.ttf" />
+    <Content Include="Fonts\Poppins-LightItalic.ttf" />
+    <Content Include="Fonts\Poppins-Medium.ttf" />
+    <Content Include="Fonts\Poppins-MediumItalic.ttf" />
+    <Content Include="Fonts\Poppins-Regular.ttf" />
+    <Content Include="Fonts\Poppins-SemiBold.ttf" />
+    <Content Include="Fonts\Poppins-SemiBoldItalic.ttf" />
+    <Content Include="Fonts\Poppins-Thin.ttf" />
+    <Content Include="Fonts\Poppins-ThinItalic.ttf" />
     <None Include="Properties\PublishProfiles\FTPProfile.pubxml" />
     <Content Include="Readme.txt" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -531,12 +570,12 @@
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\ErrorHandler\Index.cshtml" />
+    <Content Include="Views\Portal\Overview.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Interfaces\" />
     <Folder Include="Utilities\AuthState\" />
-    <Folder Include="Views\Portal\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

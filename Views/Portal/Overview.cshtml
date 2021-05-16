@@ -1,0 +1,151 @@
+﻿@model mytimmings.Models.Portal.Overview
+<link href="~/Content/Stylesheet/Portal.css" rel="stylesheet" />
+@{
+    ViewBag.Title = "Overview";
+}
+<div class="container w3-main">
+    <div class="page-tile width-and-center">
+        <h1>My Dashboard</h1>
+        <hr />
+    </div>
+    <div class="width-and-center" style="text-align:left; margin-top: 25px ">
+        <h3>My Stats</h3>
+    </div>
+    <div class="top-cards-container card-columns width-and-center">
+
+        <div class="card bg-white card-shadow">
+            <div class="card-body text-left">
+                <div style="display: inline-block">
+                    <h2 class="card-text">Total Hours</h2>
+                    <p class="card-text">@Math.Round(Model.WorkingHours.TotalTime.TotalHours, 2) Hrs</p>
+                </div>
+                <div style="display: inline-block; float: right;">
+                    <img src="~/Content/SVG/icon-total-hours.svg" class="card-img" />
+                </div>
+            </div>
+
+        </div>
+        <div class="card bg-white card-shadow">
+            <div class="card-body text-left">
+                <div style="display: inline-block">
+                    <h2 class="card-text">Productive Hours</h2>
+                    <p class="card-text">@Math.Round(Model.WorkingHours.Productive.TotalHours, 2) Hrs</p>
+                </div>
+                <div style="display: inline-block; float: right;">
+                    <img src="~/Content/SVG/icon-pro-hours.svg" class="card-img" />
+                </div>
+            </div>
+
+        </div>
+        <div class="card bg-white card-shadow">
+            <div class="card-body text-left">
+                <div style="display: inline-block">
+                    <h2 class="card-text">Non Productive Hours</h2>
+                    <p class="card-text">@Math.Round(Model.WorkingHours.NonProductive.TotalHours, 2) Hrs</p>
+                </div>
+                <div style="display: inline-block; float: right;">
+                    <img src="~/Content/SVG/icon-idle-hours.svg" class="card-img" />
+                </div>
+            </div>
+
+        </div>
+        <div class="card bg-white card-shadow">
+            <div class="card-body text-left">
+                <div style="display: inline-block">
+                    <h2 class="card-text">Non Productive Hours</h2>
+                    <p class="card-text">@Math.Round(Model.WorkingHours.NonProductive.TotalHours, 2) Hrs</p>
+                </div>
+                <div style="display: inline-block; float: right;">
+                    <img src="~/Content/SVG/icon-total-hours.svg" class="card-img" />
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="middle-part-container width-and-center card-columns" style="column-count: 2 !important">
+
+        <div class="card bg-white card-shadow" style="width: 151.5%">
+            <div class="card-body text-left" style="padding-left: 70px; padding-right: 70px;">
+                <div style="display: inline-block">
+                    <h2 class="card-text">Today Progress</h2>
+                </div>
+                <div class="trackbar" id="time-trackbar">
+                    <div class="track-button" id="track-pointer">
+                        <p id="time-keeper">00:00</p>
+                        <img src="~/Content/SVG/Bar-tracker.svg" style="height: 60px;"/>
+                    </div>
+                    <div id="track-line" class="track-line" data-maxTime="@Model.TimeTracker.MaxFinishTime"></div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="card bg-white card-shadow" style="width: 48.5%; float: right">
+            <div class="card-body text-center">
+                <div style="display: inline-block">
+                    <h2 class="card-text">Actions</h2>
+                </div>
+
+               
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="bottom-cards-container width-and-center">
+
+    </div>
+
+</div>
+
+
+<script>
+    class TimeTracker{
+       
+        constructor(obj) {
+            //this.startTime = ConvertJsonToDate(obj.StartTime).getSeconds();
+            this.startTime = new Date(2021, 4, 16, 12, 0, 0)
+            this.currentTime = new Date(2021, 4, 16, 15, 25, 0)
+            this.endTime = new Date(2021, 4, 17, 2, 50, 0)
+            this.trackBar = document.getElementById("time-trackbar").querySelector("#track-pointer");
+            this.position = 0;
+
+        }
+
+        CalculatePosition() {
+            this.SetCurrentTime();
+            var TotalDistance = Math.abs((this.startTime - this.endTime) / 1000)
+            var distanceSoFar = Math.abs((this.startTime - this.currentTime) / 1000)
+            this.position = (distanceSoFar / TotalDistance) * 100
+            this.trackBar.style.left = this.position + "%";
+
+            console.log(this.startTime + " / " + this.currentTime + " / "+  this.endTime)
+
+        }
+
+        SetCurrentTime() {
+            this.currentTime = new Date();
+        }
+
+
+    }
+
+    function ConvertJsonToDate(jsonDatetoConvert) {
+        return new Date(Number(jsonDatetoConvert.replace(/\D/g, '')));
+    }
+
+
+    var obj = @Html.Raw(Json.Encode(Model.TimeTracker));
+    console.log(obj)
+    var timeTracker = new TimeTracker(obj);
+    setInterval(() => timeTracker.CalculatePosition(), 1000)
+
+
+    console.log(timeTracker)
+
+</script>

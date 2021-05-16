@@ -13,10 +13,10 @@ namespace mytimmings.Models.Portal
         public TimeSpan NonProductive { get; set; }
         public TimeSpan Other { get; set; }
 
-        private readonly List<Status> StatusesList = new List<Status>();
+        private readonly List<Action> StatusesList = new List<Action>();
 
 
-        public WorkingHours(List<Status> statuses)
+        public WorkingHours(List<Action> statuses)
         {
             if (statuses.Count < 1)
                 throw new ArgumentOutOfRangeException("The list must have at least 1 element.");

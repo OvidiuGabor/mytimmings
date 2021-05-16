@@ -57,6 +57,8 @@
     <Compile Include="Companies_Assigned_Items.cs" />
     <Compile Include="Company.cs" />
     <Compile Include="DBModel.cs" />
+    <Compile Include="Leave.cs" />
+    <Compile Include="Leave_Requests.cs" />
     <Compile Include="Main_Data.cs" />
     <Compile Include="Params.cs" />
     <Compile Include="Project.cs" />

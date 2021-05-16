@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="62" viewBox="0 0 32 62">
+  <g id="Group_396" data-name="Group 396" transform="translate(-43)">
+    <g id="Light_Slider_ΩElements_2._Knobs" data-name="Light 🌕/ Slider/ΩElements/2. Knobs" transform="translate(53 50)">
+      <circle id="Nobs" cx="6" cy="6" r="6" fill="#6200ee"/>
+    </g>
+    <g id="Light_Slider_ΩElements_3._Value_Indicator" data-name="Light 🌕/ Slider/ΩElements/3. Value Indicator" transform="translate(43)">
+      <path id="_Color" data-name="🎨 Color" d="M27.32,27.31C25.03,29.6,17,35.811,17,43v3c0,3.05,2.54,5.056,3.24,5.756a6,6,0,1,1-8.49,0C12.46,51.06,15,49.054,15,46V43c0-7.19-8.03-13.4-10.32-15.691a16,16,0,1,1,22.64,0Z" fill="#f93939"/>
+    </g>
+  </g>
+</svg>

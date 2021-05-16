@@ -7,17 +7,17 @@ using System.Web;
 
 namespace mytimmings.Models.Portal
 {
-    class TimeTracker
+    public class TimeTracker
     {
         //this will hold the current time passed since the clock in has been pressed!
         public TimeSpan CurrentTimePointer { get; set; }
-        public DateTime StartTime { get; set; } //thjis will hold the start time of the clock
+        public DateTime? StartTime { get; set; } //this will hold the start time of the clock
         public DateTime? EndTime { get; set; }
         public DateTime MaxFinishTime { get; set; } //this will hold the max duration, based on the user settings
 
             
-        private Models.Security.UserSettings UserSettings = new Security.UserSettings();
-
+        public Security.UserSettings UserSettings = new Security.UserSettings();
+        public Security.User User { get; set; }
         public TimeTracker()
         {
 
@@ -30,47 +30,60 @@ namespace mytimmings.Models.Portal
             CurrentTimePointer = CalculateCurrentTimePointer();
         }
 
-        public TimeTracker(DBContext.User_Login_Logout db, Models.Security.AuthState userState)
+        public TimeTracker(DBContext.User_Login_Logout db, Models.Security.AuthState userState, Security.User user)
+        {
+            if (db == null)
+                throw new ArgumentNullException("Db Object cannot be null");
+
+            StartTime = db.LoginTime;
+            EndTime = db.LogoutTime;
+            UserSettings = userState.UserSettings;
+            User = user;
+            MaxFinishTime = CalculateMaxDuration();
+            CurrentTimePointer = CalculateCurrentTimePointer();
+            PerformTimeCheck();
+        }
+
+        public TimeTracker(DBContext.User_Login_Logout db)
         {
             if (db == null)
                 throw new ArgumentNullException("Db Object cannot be null");
 
             StartTime = db.LoginTime.Value;
             EndTime = db.LogoutTime;
-            UserSettings = userState.UserSettings;
-            MaxFinishTime = CalculateMaxDuration();
-            CurrentTimePointer = CalculateCurrentTimePointer();
         }
-
         private DateTime CalculateMaxDuration()
         {
             TimeSpan defaultTime = new TimeSpan(9, 0, 0);
             //if the user doenst have the seetings configurated or missing, then we set it to default of 9H?
             if (UserSettings.TotalTime.Ticks == 0)
-                return StartTime.Add(defaultTime);
+                return StartTime.Value.Add(defaultTime);
 
-            return StartTime.Add(UserSettings.TotalTime);
+            if (StartTime == null)
+                return DateTime.UtcNow.Add(UserSettings.TotalTime);
+
+            return StartTime.Value.Add(UserSettings.TotalTime);
 
         }
 
         private TimeSpan CalculateCurrentTimePointer()
         {
             DateTime currentTime = DateTime.UtcNow;
-            if (StartTime.Ticks == 0)
+            if (StartTime == null)
                 return new TimeSpan(0, 0, 0); //since there is no start time, then we return 0 time.
 
             if (EndTime.HasValue)
             {
-                if (EndTime.Value.Ticks > StartTime.Ticks)
-                    return EndTime.Value - StartTime;
+                if (EndTime.Value.Ticks > StartTime.Value.Ticks)
+                    return EndTime.Value - StartTime.Value;
                 else
-                    if (currentTime.Ticks > StartTime.Ticks)
-                        return currentTime - StartTime;
+                    if (currentTime.Ticks > StartTime.Value.Ticks)
+                        return currentTime - StartTime.Value;
             }
             else
             {
-                if (currentTime.Ticks > StartTime.Ticks)
-                    return (currentTime - StartTime);
+                if (currentTime.Ticks > StartTime.Value.Ticks)
+                    return (currentTime - StartTime.Value);
             }
                     
 
@@ -78,7 +91,49 @@ namespace mytimmings.Models.Portal
 
         }
 
+        //perform some check in order to determine if the previous day has logout or not, then reset the start time to 0;
+        private void PerformTimeCheck()
+        {
+            DBContext.DBModel db = new DBContext.DBModel();
+            TimeSpan additionalhours = new TimeSpan(0,0,0);
+            DateTime currentTime = DateTime.UtcNow;
+            var companyPartialRequests = db.Companies_Assigned_Items.Where(x => x.Company_ID == User.Company).Select(x => x.Partial).FirstOrDefault();
+            //List of items to check
+            List<string> partialItems = new List<string>();
+            if (!String.IsNullOrEmpty(companyPartialRequests))
+                partialItems = Utilities.Helper.convertStringtoList(companyPartialRequests, ';');
 
+            //if there is no end time
+            if(EndTime == null && StartTime != null)
+            {
+                //need to check if there is overtime/recovery/partial day/or any other request requested
+                //get the company available request
+                    if (partialItems.Count > 0)
+                    {
+                        var additional = db.Main_Data.Where(x => x.Status_Start_Time.CompareTo(StartTime.Value) >= 0 && partialItems.Contains(x.Current_Status)).ToList();
+                        foreach (var item in additional)
+                        {
+                            additionalhours += item.Status_End_Time.Value - item.Status_End_Time.Value;
+                        }
+                    }
+
+                if (additionalhours.TotalMinutes > 0)
+                {
+                    MaxFinishTime.Add(additionalhours);
+                }
+
+                //reset everything to 0
+                if((MaxFinishTime - StartTime.Value).Minutes < CurrentTimePointer.Minutes)
+                {
+                    StartTime = null;
+                    EndTime = null;
+                    CurrentTimePointer = new TimeSpan(0, 0, 0);
+                    MaxFinishTime = CalculateMaxDuration();
+                }
+
+            }
+
+        }
 
     }
 }

@@ -6,32 +6,34 @@ using System.Web.Mvc;
 
 namespace mytimmings.Models.Portal
 {
-    class Overview
-    {
-        public List<Status> Statuses { get; set; }
+      public class Overview
+      {
+        public List<Action> Statuses { get; set; }
 
         public WorkingHours WorkingHours { get; set; }
         //List of the actions that have been performed today 
-        public List<Status> TodayActions{ get; set; }
+        public List<Action> TodayActions{ get; set; }
+        public List<LeaveStatus> LeaveStatus { get; set; }
 
         public TimeTracker TimeTracker = new TimeTracker();
+
         public List<TimeTracker> DailyLogins = new List<TimeTracker>(); //This will be a list that will be used for Daily Logins Widged
 
+        public List<SelectListItem> ActionsDropDown = new List<SelectListItem>(); //Dropdown for Action
 
-        public List<SelectListItem> StatusDropDown = new List<SelectListItem>();
+        public List<SelectListItem> ProjectDropDown = new List<SelectListItem>(); //project Dropdown
 
-        public List<SelectListItem> ProjectDropDown = new List<SelectListItem>();
-
-
-
-        public Overview(List<Status> statuses, TimeTracker timeTracker, List<TimeTracker> logins, Models.Security.User user)
+        public Overview(List<Action> statuses, TimeTracker timeTracker, List<TimeTracker> logins, List<LeaveStatus> leaveStatuses, Models.Security.User user)
         {
             TimeTracker = timeTracker;
             Statuses = statuses;
-            GenerateWorkinghours();
-            StatusDropDown = Utilities.Helper.getStatuslist(user.Company);
+            LeaveStatus = leaveStatuses;
+            ActionsDropDown = Utilities.Helper.getStatuslist(user.Company);
             ProjectDropDown = Utilities.Helper.getProjectList(user.ID);
             DailyLogins = logins;
+            GetTodayActions(user.ID);
+            GenerateWorkinghours();
+
         }
 
 
@@ -39,6 +41,29 @@ namespace mytimmings.Models.Portal
         {
             WorkingHours = new WorkingHours(Statuses);
             WorkingHours.CalculateHours();
+        }
+
+        private void GetTodayActions(string userId)
+        {
+            DBContext.DBModel db = new DBContext.DBModel();
+            if(TimeTracker.StartTime != null && TimeTracker.StartTime.Value.Ticks > 0)
+            {
+                if (Statuses.Count > 0)
+                {
+                    TodayActions = Statuses.Where(x => x.StartTime >= TimeTracker.StartTime).ToList();
+
+                }
+                else
+                {
+                    var dbData = db.Main_Data.Where(x => x.userID == userId && x.Status_Start_Time.CompareTo(TimeTracker.StartTime) >= 0).ToList();
+                    foreach(var item in dbData)
+                    {
+                        TodayActions.Add(new Action(item));
+                    }
+                }
+            }
+
+           
         }
 
     }

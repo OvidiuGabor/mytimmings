@@ -7,11 +7,7 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        html, body, h1, h2, h3, h4, h5 p {
-            font-family: "Raleway", sans-serif !important
-        }
-    </style>
+    <link href="~/Content/Stylesheet/MediaQueries.css" rel="stylesheet" />
     <title>Titlemytimmings.com</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
@@ -19,11 +15,10 @@
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/Scripts/toastr")
     @Scripts.Render("~/Scripts/script")
-    @Styles.Render("~/Portal/css")
 
 
 </head>
-<body class="w3-light-grey">
+<body>
 
     @{
         var auth = Session["AuthState"] as mytimmings.Models.Security.AuthState;

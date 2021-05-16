@@ -5,7 +5,7 @@ using System.Web;
 
 namespace mytimmings.Models.Portal
 {
-    public class Status
+    public class Action
     {
         public string Name { get; set; }
         public DateTime StartTime { get; set; }
@@ -13,15 +13,16 @@ namespace mytimmings.Models.Portal
         public TimeSpan Duration { get; set; }
         public String Comment { get; set; }
         public string Type { get; set; }
+        public int ProjectId { get; set; }
 
         private readonly string UserId;
 
-        public Status()
+        public Action()
         {
 
         }
 
-        public Status(DBContext.Main_Data data)
+        public Action(DBContext.Main_Data data)
         {
             if (data == null)
                 throw new ArgumentNullException("Db Object cannot be null");
@@ -30,18 +31,19 @@ namespace mytimmings.Models.Portal
             StartTime = data.Status_Start_Time;
             EndTime = data.Status_End_Time;
             Comment = Comment;
+            ProjectId = (int)data.ProjectID;
             Duration = CalculateDuration(StartTime, EndTime);
             UserId = data.userID;
             Type = GetType(data.Current_Status);
           
         }
 
-        public static List<Status> CreateFromDbList( List<DBContext.Main_Data> lst)
+        public static List<Action> CreateFromDbList( List<DBContext.Main_Data> lst)
         {
-            List<Status> result = new List<Status>();
+            List<Action> result = new List<Action>();
             foreach(var item in lst)
             {
-                result.Add(new Status(item));
+                result.Add(new Action(item));
             }
             return result;
         }

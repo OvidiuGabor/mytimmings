@@ -26,6 +26,8 @@ namespace DBContext
         public virtual DbSet<Companies_Assigned_Items> Companies_Assigned_Items { get; set; }
         public virtual DbSet<User_Leaves_Status> User_Leaves_Status { get; set; }
         public virtual DbSet<User_Login_Logout> User_Login_Logout { get; set; }
+        public virtual DbSet<Leave_Requests> Leave_Requests { get; set; }
+        public virtual DbSet<Leave> Leaves { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -84,7 +86,24 @@ namespace DBContext
             modelBuilder.Entity<User_Login_Logout>()
                 .Property(e => e.Id)
                 .HasPrecision(18, 0);
-        }
+
+            modelBuilder.Entity<Leave_Requests>()
+                .Property(e => e.Id)
+                .HasPrecision(18, 0);
+
+            modelBuilder.Entity<Leave>()
+                .Property(e => e.Id)
+                .HasPrecision(18, 0);
+
+            modelBuilder.Entity<Leave>()
+                .Property(e => e.RequestId)
+                .HasPrecision(18, 0);
+        
+
+
+
+
+    }
 
         private static string GetConnectionString(string connectionStringName)
         {

@@ -28,9 +28,6 @@ namespace mytimmings
                       "~/Content/site.css",
                       "~/Content/toastr.css"));
 
-            bundles.Add(new StyleBundle("~/Portal/css").Include(
-                    "~/Content/Stylesheet/Portal.css"));
-
             bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(
                      "~/Scripts/jquery-ui-{version}.js"));
             //css  

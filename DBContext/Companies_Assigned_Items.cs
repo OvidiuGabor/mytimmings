@@ -26,5 +26,8 @@ namespace DBContext
 
         [StringLength(500)]
         public string Leaves_Types { get; set; }
+
+        [StringLength(500)]
+        public string Partial { get; set; }
     }
 }
