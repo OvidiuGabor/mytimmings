@@ -58,8 +58,8 @@ namespace mytimmings.Utilities
             {
                 Text = "Choose Status",
                 Value = "0"
-
             };
+            statusList.Add(defaultItem);
             Dictionary<string, List<string>> statuses = getStatusTypes(companyId);
             foreach(var item in statuses)
             {
@@ -67,16 +67,18 @@ namespace mytimmings.Utilities
                 {
                     foreach(string el in item.Value)
                     {
-                        statusList.Add(new SelectListItem { 
+                        statusList.Add(new SelectListItem
+                        {
                             Text = el,
-                            Value = el
+                            Value = el,
+                           
                         });
                     }
                 }
             }
 
 
-            statusList.Add(defaultItem);
+            
 
             return statusList;
 

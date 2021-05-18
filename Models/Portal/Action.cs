@@ -31,7 +31,7 @@ namespace mytimmings.Models.Portal
             StartTime = data.Status_Start_Time;
             EndTime = data.Status_End_Time;
             Comment = Comment;
-            ProjectId = (int)data.ProjectID;
+            ProjectId = data.ProjectID.HasValue ? (int)data.ProjectID.Value : 0;
             Duration = CalculateDuration(StartTime, EndTime);
             UserId = data.userID;
             Type = GetType(data.Current_Status);

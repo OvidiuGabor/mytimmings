@@ -19,6 +19,8 @@ namespace mytimmings.Models.Portal
 
         public List<TimeTracker> DailyLogins = new List<TimeTracker>(); //This will be a list that will be used for Daily Logins Widged
 
+        public string ActionName { get;set; }
+        public string ProjectId { get; set; }
         public List<SelectListItem> ActionsDropDown = new List<SelectListItem>(); //Dropdown for Action
 
         public List<SelectListItem> ProjectDropDown = new List<SelectListItem>(); //project Dropdown

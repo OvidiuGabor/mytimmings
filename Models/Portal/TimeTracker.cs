@@ -123,7 +123,9 @@ namespace mytimmings.Models.Portal
                 }
 
                 //reset everything to 0
-                if((MaxFinishTime - StartTime.Value).Minutes < CurrentTimePointer.Minutes)
+                TimeSpan datediff = MaxFinishTime - StartTime.Value;
+
+                if (datediff.TotalMinutes < CurrentTimePointer.Minutes)
                 {
                     StartTime = null;
                     EndTime = null;

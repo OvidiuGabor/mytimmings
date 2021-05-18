@@ -147,6 +147,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Notification\Notification.cs" />
+    <Compile Include="Models\Portal\Helpers\JsonObj.cs" />
     <Compile Include="Models\Portal\Leave.cs" />
     <Compile Include="Models\Portal\LeaveStatus.cs" />
     <Compile Include="Models\Portal\Overview.cs" />

@@ -50,8 +50,9 @@
 
 #time-keeper {
     position: absolute;
-    font-size: 8px;
+    font-size: 9px;
     color: white;
     top: 10px;
     left: 4px;
+    font-weight:  bold
 }

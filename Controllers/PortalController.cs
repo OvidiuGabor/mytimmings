@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -97,5 +99,75 @@ namespace mytimmings.Controllers
 
             return View(overviewModel);
         }
+
+
+
+
+
+
+
+
+        [HttpPost]
+        public ActionResult CheckIn(Models.Portal.Action data)
+        {
+            //Get the date in UTC Format;
+            DateTime CurrentTime = DateTime.UtcNow;
+
+            //get user from the sessiopn
+            Models.Security.User user = GetUserFromSession();
+            if (user != null)
+            {
+                //IF the user didnt select any status and any project then we create a record inm login table and another one in main data with Available as default
+
+                //Check if the user has already Clock in for today and return error
+                //
+
+
+
+                if (data.ProjectId == 0 && data.Type == "0" && data.Comment == null)
+                {
+                    DBContext.User_Login_Logout login = new DBContext.User_Login_Logout
+                    {
+                        UserId = user.ID,
+                        Date = CurrentTime,
+                        LoginTime = CurrentTime,
+                    };
+                    db.User_Login_Logout.Add(login);
+
+                    DBContext.Main_Data mainData = new DBContext.Main_Data
+                    {
+                        userID = user.ID,
+                        CurrentDate = CurrentTime,
+                        Status_Start_Time = CurrentTime,
+                        ProjectID = 0,
+                        Current_Status = "Available"
+                    };
+
+
+                    db.Main_Data.Add(mainData);
+
+                    db.SaveChanges();
+                }
+
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+
+
+
+
+            return RedirectToAction("Overview");
+        }
+
+
+
+        private Models.Security.User GetUserFromSession()
+        {
+            return (Models.Security.User)Session["User"];
+        }
+
     }
 }

@@ -80,6 +80,22 @@
                     </div>
                     <div id="track-line" class="track-line" data-maxTime="@Model.TimeTracker.MaxFinishTime"></div>
                 </div>
+
+                <div class="main-form">
+                    <div class="left-buttons">
+                        <button type="button" class="btn btn-primary" id="checkIn-btn" onclick="CheckIn()">Check in</button>
+                        <button type="button" class="btn btn-primary" id="checkOut-btn">Check Out</button>
+
+                        @Html.DropDownListFor(model => model.ActionName, Model.ActionsDropDown, new { @class = "form-control" })
+
+                        @Html.DropDownListFor(model => model.ProjectId, Model.ProjectDropDown, new { @class = "form-control" })
+
+                    </div>
+                    <div class="right-text-box">
+
+                    </div>
+                </div>
+
             </div>
 
 
@@ -106,12 +122,12 @@
 
 <script>
     class TimeTracker{
-       
+
         constructor(obj) {
             //this.startTime = ConvertJsonToDate(obj.StartTime).getSeconds();
-            this.startTime = new Date(2021, 4, 16, 12, 0, 0)
-            this.currentTime = new Date(2021, 4, 16, 15, 25, 0)
-            this.endTime = new Date(2021, 4, 17, 2, 50, 0)
+            this.startTime = ConvertJsonToDate(obj.StartTime)
+            this.currentTime = this.SetCurrentTime()
+            this.endTime = ConvertJsonToDate(obj.EndTime)
             this.trackBar = document.getElementById("time-trackbar").querySelector("#track-pointer");
             this.position = 0;
 
@@ -119,33 +135,91 @@
 
         CalculatePosition() {
             this.SetCurrentTime();
-            var TotalDistance = Math.abs((this.startTime - this.endTime) / 1000)
-            var distanceSoFar = Math.abs((this.startTime - this.currentTime) / 1000)
-            this.position = (distanceSoFar / TotalDistance) * 100
-            this.trackBar.style.left = this.position + "%";
-
-            console.log(this.startTime + " / " + this.currentTime + " / "+  this.endTime)
-
+            if (this.startTime != null) {
+                var TotalDistance = Math.abs((this.startTime - this.endTime) / 1000)
+                var distanceSoFar = Math.abs((this.startTime - this.currentTime) / 1000)
+                this.position = (distanceSoFar / TotalDistance) * 100
+                this.trackBar.style.left = this.position + "%";
+            }
+            this.ShowTimeToHtml();
         }
-
         SetCurrentTime() {
             this.currentTime = new Date();
         }
 
 
+        ShowTimeToHtml() {
+
+            var html = document.getElementById("track-pointer");
+            var p = html.getElementsByTagName("p")[0];
+            var elapsedTime = (Math.abs(this.startTime - this.currentTime) / 1000) / 3600 //get total hours and minutes
+            var h = this.float2int(elapsedTime) //get hours
+            var m = this.float2int((elapsedTime % 1) * 60) // get minutes
+
+            var formatedTime = this.checkTime(h) + ":" + this.checkTime(m);
+            p.innerHTML = formatedTime;
+        }
+
+        checkTime(time) {
+            if (time < 10) {
+                return "0" + time;
+            }
+            return time
+        }
+        float2int(value) {
+            return ~~value; //this one returns the whole number from a floating number (2.45885 -> 2)
+        }
     }
 
     function ConvertJsonToDate(jsonDatetoConvert) {
-        return new Date(Number(jsonDatetoConvert.replace(/\D/g, '')));
+        if (jsonDatetoConvert != null) {
+
+            //Since the date received from the server is in UTC Format, we need to convert it to local timezone.
+            //ge the time zone offset
+            var timeZone = new Date().getTimezoneOffset() * 60000;
+
+            var convertedDate = new Date(new Date(Number(jsonDatetoConvert.replace(/\D/g, ''))).getTime() - timeZone);
+
+            return convertedDate;
+        }
+        return null;
     }
 
 
     var obj = @Html.Raw(Json.Encode(Model.TimeTracker));
-    console.log(obj)
     var timeTracker = new TimeTracker(obj);
-    setInterval(() => timeTracker.CalculatePosition(), 1000)
+    console.log(obj)
+    if (obj.StartTime != null) {
+        setInterval(() => timeTracker.CalculatePosition(), 1000)
+    }
 
 
-    console.log(timeTracker)
 
+    function CheckIn() {
+
+        var obj = {
+            Type: "",
+            ProjectId: 0
+        }
+
+        obj.Type = document.getElementById("ActionName").value;
+        obj.ProjectId = document.getElementById("ProjectId").value
+        var data = JSON.stringify(obj);
+        //var data = "aaaaa";
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '@Url.Action("CheckIn", "Portal")',
+            dataType: 'json',
+            data: data,
+            success: function (result) {
+
+            },
+            error: function (result) {
+
+            }
+        })
+
+
+    }
 </script>
