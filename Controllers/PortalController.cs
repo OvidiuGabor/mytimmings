@@ -117,37 +117,61 @@ namespace mytimmings.Controllers
             Models.Security.User user = GetUserFromSession();
             if (user != null)
             {
-                //IF the user didnt select any status and any project then we create a record inm login table and another one in main data with Available as default
+                //IF the user didnt select any status and any project then we create a record in login table and another one in main data with Available as default
 
                 //Check if the user has already Clock in for today and return error
-                //
+                var checkRecord = db.User_Login_Logout.Where(x => x.Date.Value.Day == CurrentTime.Day && x.Date.Value.Month == CurrentTime.Month && x.Date.Value.Year == CurrentTime.Year).FirstOrDefault();
+                if(checkRecord != null){
+                    return Json(new { result = false, message = "Already Clocked In for today!" }, JsonRequestBehavior.AllowGet);
+                }
 
 
 
-                if (data.ProjectId == 0 && data.Type == "0" && data.Comment == null)
+                //Create a login object
+                DBContext.User_Login_Logout login = new DBContext.User_Login_Logout
                 {
-                    DBContext.User_Login_Logout login = new DBContext.User_Login_Logout
-                    {
-                        UserId = user.ID,
-                        Date = CurrentTime,
-                        LoginTime = CurrentTime,
-                    };
-                    db.User_Login_Logout.Add(login);
-
-                    DBContext.Main_Data mainData = new DBContext.Main_Data
-                    {
-                        userID = user.ID,
-                        CurrentDate = CurrentTime,
-                        Status_Start_Time = CurrentTime,
-                        ProjectID = 0,
-                        Current_Status = "Available"
-                    };
+                    UserId = user.ID,
+                    Date = CurrentTime,
+                    LoginTime = CurrentTime,
+                };
+                db.User_Login_Logout.Add(login);
 
 
+                //create a main data record with projectID as 0 and Status as Available as default!;
+                DBContext.Main_Data mainData = new DBContext.Main_Data
+                {
+                    userID = user.ID,
+                    CurrentDate = CurrentTime,
+                    Status_Start_Time = CurrentTime,
+                    ProjectID = 0,
+                    Current_Status = "Available",
+                    Comments = data.Comment
+                    
+                };
+
+
+                if (data.ProjectId >= 0)
+                    mainData.ProjectID = data.ProjectId;
+                
+                if (data.Type != "0")
+                    mainData.Current_Status = data.Type;
+
+
+                if(data.Type != "0" && data.ProjectId ==0)
+                    return Json(new { result = false, message = "Need to select a project!" }, JsonRequestBehavior.AllowGet);
+
+                try
+                {
                     db.Main_Data.Add(mainData);
-
                     db.SaveChanges();
                 }
+                catch (Exception ex)
+                {
+                    //Log the exception
+
+                    return Json(new { result = false, message = "Something happen! Please try again!" }, JsonRequestBehavior.AllowGet);
+                }
+
 
             }
             else
@@ -155,11 +179,27 @@ namespace mytimmings.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            return RedirectToAction("Overview", "Portal");
+        }
 
 
 
+        public JsonResult ChangeStatus(Models.Portal.Action data)
+        {
 
-            return RedirectToAction("Overview");
+            return Json(new { result = false, message = "Already Clocked In for today!" }, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult ChangeProject(Models.Portal.Action data)
+        {
+
+            return Json(new { result = false, message = "Already Clocked In for today!" }, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult ClockOut(Models.Portal.Action data)
+        {
+
+            return Json(new { result = false, message = "Already Clocked In for today!" }, JsonRequestBehavior.AllowGet);
         }
 
 

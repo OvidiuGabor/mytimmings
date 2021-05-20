@@ -83,16 +83,23 @@
 
                 <div class="main-form">
                     <div class="left-buttons">
-                        <button type="button" class="btn btn-primary" id="checkIn-btn" onclick="CheckIn()">Check in</button>
-                        <button type="button" class="btn btn-primary" id="checkOut-btn">Check Out</button>
+                        <div>
+                            <button type="button" class="btn btn-primary main-form-btn" id="checkIn-btn" onclick="CheckIn()" style="background-color: #4a7dff; border-color: #4a7dff">Check in</button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-primary main-form-btn" id="checkOut-btn" style="background-color: #f93939; border-color:  #f93939">Check Out</button>
+                        </div>
+                        
 
-                        @Html.DropDownListFor(model => model.ActionName, Model.ActionsDropDown, new { @class = "form-control" })
+                        @Html.DropDownListFor(model => model.ActionName, Model.ActionsDropDown, new { @class = "form-control main-form-btn" })
 
-                        @Html.DropDownListFor(model => model.ProjectId, Model.ProjectDropDown, new { @class = "form-control" })
+                        @Html.DropDownListFor(model => model.ProjectId, Model.ProjectDropDown, new { @class = "form-control main-form-btn" })
 
                     </div>
                     <div class="right-text-box">
-
+                        <div class="textarea-placeholder">
+                            <textarea rows="8" cols="91" placeholder="Type Comment..."></textarea>
+                        </div>
                     </div>
                 </div>
 
@@ -100,12 +107,26 @@
 
 
         </div>
-        <div class="card bg-white card-shadow" style="width: 48.5%; float: right">
+        <div class="card bg-white card-shadow right-middle-card">
             <div class="card-body text-center">
-                <div style="display: inline-block">
+                <div>
                     <h2 class="card-text">Actions</h2>
                 </div>
 
+                @{
+                    if(Model.TodayActions.Count > 0)
+                    {
+                        foreach(var item in Model.TodayActions)
+                        {
+                            
+                            string st = item.StartTime.ToLocalTime().ToString("HH:mm");
+                                <div class="card-list-item">
+                                    <div class="left-item">@item.Name</div>
+                                    <div class="right-item">@st</div>
+                                </div>
+                        }
+                    }
+                }
                
             </div>
 
@@ -113,8 +134,77 @@
     </div>
 
 
-    <div class="bottom-cards-container width-and-center">
+    <div class="bottom-cards-container width-and-center card-columns">
+        <div class="card bg-white card-shadow" style="height: 210px;">
+            <div class="card-body text-center">
+                <div>
+                    <h2 class="card-text">Leave Credits</h2>
+                </div>
 
+                @{
+                    if (Model.LeaveStatus.Count > 0)
+                    {
+                        foreach (var item in Model.LeaveStatus)
+                        {
+
+                            <div class="card-list-item">
+                                <div class="left-item">@item.Type</div>
+                                <div class="right-item">@item.DaysRemaining D</div>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+
+        </div>
+        <div class="card bg-white card-shadow" style="height: 210px;">
+            <div class="card-body text-center" style="height: 210px; overflow-y:auto ">
+                <div>
+                    <h2 class="card-text">Daily Logins</h2>
+                </div>
+
+                @{
+                    if (Model.LeaveStatus.Count > 0)
+                    {
+                        foreach (var item in Model.DailyLogins)
+                        {
+
+                            var date = item.StartTime.Value.ToString("dd.MM.yyyy");
+                            var time = item.StartTime.Value.ToLocalTime().ToString("HH:mm");
+                                <div class="card-list-item">
+                                    <div class="left-item">@date</div>
+                                    <div class="right-item">@time</div>
+                                </div>
+                        }
+                    }
+                }
+            </div>
+
+        </div>
+        <div class="card bg-white card-shadow" style="height: 210px;">
+            <div class="card-body text-left">
+                <div style="display: inline-block">
+                    <h2 class="card-text">Non Productive Hours</h2>
+                    <p class="card-text">@Math.Round(Model.WorkingHours.NonProductive.TotalHours, 2) Hrs</p>
+                </div>
+                <div style="display: inline-block; float: right;">
+                    <img src="~/Content/SVG/icon-idle-hours.svg" class="card-img" />
+                </div>
+            </div>
+
+        </div>
+        <div class="card bg-white card-shadow" style="height: 210px;">
+            <div class="card-body text-left">
+                <div style="display: inline-block">
+                    <h2 class="card-text">Non Productive Hours</h2>
+                    <p class="card-text">@Math.Round(Model.WorkingHours.NonProductive.TotalHours, 2) Hrs</p>
+                </div>
+                <div style="display: inline-block; float: right;">
+                    <img src="~/Content/SVG/icon-total-hours.svg" class="card-img" />
+                </div>
+            </div>
+
+        </div>
     </div>
 
 </div>
@@ -188,7 +278,6 @@
 
     var obj = @Html.Raw(Json.Encode(Model.TimeTracker));
     var timeTracker = new TimeTracker(obj);
-    console.log(obj)
     if (obj.StartTime != null) {
         setInterval(() => timeTracker.CalculatePosition(), 1000)
     }
@@ -213,13 +302,18 @@
             dataType: 'json',
             data: data,
             success: function (result) {
-
+                var notif = new Notifier();
+                notif.error(result.message, "Error");
+                console.log(result)
             },
             error: function (result) {
-
+                console.log(result)
             }
         })
 
 
     }
+
+
+
 </script>
