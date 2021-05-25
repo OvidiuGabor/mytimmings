@@ -113,7 +113,8 @@ namespace mytimmings.Models.Portal
                         var additional = db.Main_Data.Where(x => x.Status_Start_Time.CompareTo(StartTime.Value) >= 0 && partialItems.Contains(x.Current_Status)).ToList();
                         foreach (var item in additional)
                         {
-                            additionalhours += item.Status_End_Time.Value - item.Status_End_Time.Value;
+                            if(item.Status_End_Time != null)
+                                additionalhours += item.Status_End_Time.Value - item.Status_Start_Time;
                         }
                     }
 

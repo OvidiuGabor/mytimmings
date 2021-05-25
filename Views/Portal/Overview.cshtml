@@ -8,9 +8,9 @@
         <h1>My Dashboard</h1>
         <hr />
     </div>
-    <div class="width-and-center" style="text-align:left; margin-top: 25px ">
+    @*<div class="width-and-center" style="text-align:left; margin-top: 25px ">
         <h3>My Stats</h3>
-    </div>
+    </div>*@
     <div class="top-cards-container card-columns width-and-center">
 
         <div class="card bg-white card-shadow">
@@ -51,15 +51,32 @@
         </div>
         <div class="card bg-white card-shadow">
             <div class="card-body text-left">
-                <div style="display: inline-block">
-                    <h2 class="card-text">Non Productive Hours</h2>
-                    <p class="card-text">@Math.Round(Model.WorkingHours.NonProductive.TotalHours, 2) Hrs</p>
-                </div>
-                <div style="display: inline-block; float: right;">
-                    <img src="~/Content/SVG/icon-total-hours.svg" class="card-img" />
-                </div>
-            </div>
+                <div style="display: inline-block; text-align:center">
+                    <h2 class="card-text">Clock IN</h2>
+                    @{
+                        if (Model.TimeTracker.StartTime.HasValue)
+                        {
+                            string st = Model.TimeTracker.StartTime.Value.ToLocalTime().ToString("HH:mm:ss");
+                            <p class="card-text">@st</p>
+                        }
+                    }
 
+                </div>
+                @{
+                    if (Model.TimeTracker.EndTime.HasValue)
+                    {
+                        <div style="float: right; text-align: center">
+                            <h2 class="card-text">Clock out</h2>
+
+                            @{string st = Model.TimeTracker.EndTime.Value.ToLocalTime().ToString("HH:mm:ss");
+
+                                <p class="card-text">@st</p>
+                            }
+
+                        </div>
+                    }
+                }
+            </div>
         </div>
 
 
@@ -84,21 +101,24 @@
                 <div class="main-form">
                     <div class="left-buttons">
                         <div>
-                            <button type="button" class="btn btn-primary main-form-btn" id="checkIn-btn" onclick="CheckIn()" style="background-color: #4a7dff; border-color: #4a7dff">Check in</button>
+                            <button type="button" class="btn btn-primary main-form-btn" id="checkIn-btn" onclick="ClockIn()" style="background-color: #4a7dff; border-color: #4a7dff">Check in</button>
                         </div>
                         <div>
-                            <button type="button" class="btn btn-primary main-form-btn" id="checkOut-btn" style="background-color: #f93939; border-color:  #f93939">Check Out</button>
+                            <button type="button" class="btn btn-primary main-form-btn" id="checkOut-btn" onclick="ClockOut()" style="background-color: #f93939; border-color:  #f93939">Check Out</button>
                         </div>
-                        
 
-                        @Html.DropDownListFor(model => model.ActionName, Model.ActionsDropDown, new { @class = "form-control main-form-btn" })
+
+                        @Html.DropDownListFor(model => model.ActionName, Model.ActionsDropDown, new { @class = "form-control main-form-btn"})
 
                         @Html.DropDownListFor(model => model.ProjectId, Model.ProjectDropDown, new { @class = "form-control main-form-btn" })
+                        <div>
+                            <button type="button" class="btn btn-primary main-form-btn" id="update-btn" onclick="UpdateStatus()" style="background-color: #51ce2c; border-color: #51ce2c">Update</button>
+                        </div>
 
                     </div>
                     <div class="right-text-box">
                         <div class="textarea-placeholder">
-                            <textarea rows="8" cols="91" placeholder="Type Comment..."></textarea>
+                            <textarea rows="8" cols="91" placeholder="Type Comment..." id="commets"></textarea>
                         </div>
                     </div>
                 </div>
@@ -114,16 +134,16 @@
                 </div>
 
                 @{
-                    if(Model.TodayActions.Count > 0)
+                    if (Model.TodayActions != null && Model.TodayActions.Count > 0)
                     {
                         foreach(var item in Model.TodayActions)
                         {
-                            
+
                             string st = item.StartTime.ToLocalTime().ToString("HH:mm");
-                                <div class="card-list-item">
-                                    <div class="left-item">@item.Name</div>
-                                    <div class="right-item">@st</div>
-                                </div>
+                            <div class="card-list-item">
+                                <div class="left-item">@item.Name</div>
+                                <div class="right-item">@st</div>
+                            </div>
                         }
                     }
                 }
@@ -160,11 +180,12 @@
         <div class="card bg-white card-shadow" style="height: 210px;">
             <div class="card-body text-center" style="height: 210px; overflow-y:auto ">
                 <div>
+
                     <h2 class="card-text">Daily Logins</h2>
                 </div>
 
                 @{
-                    if (Model.LeaveStatus.Count > 0)
+                    if (Model.LeaveStatus != null && Model.LeaveStatus.Count > 0)
                     {
                         foreach (var item in Model.DailyLogins)
                         {
@@ -216,11 +237,11 @@
         constructor(obj) {
             //this.startTime = ConvertJsonToDate(obj.StartTime).getSeconds();
             this.startTime = ConvertJsonToDate(obj.StartTime)
-            this.currentTime = this.SetCurrentTime()
-            this.endTime = ConvertJsonToDate(obj.EndTime)
+            this.endTime = ConvertJsonToDate(obj.MaxFinishTime)
             this.trackBar = document.getElementById("time-trackbar").querySelector("#track-pointer");
             this.position = 0;
-
+            this.activeEndTime = ConvertJsonToDate(obj.EndTime)
+            this.currentTime = this.SetCurrentTime()
         }
 
         CalculatePosition() {
@@ -234,7 +255,12 @@
             this.ShowTimeToHtml();
         }
         SetCurrentTime() {
-            this.currentTime = new Date();
+            if (this.activeEndTime == null) {
+                this.currentTime = new Date();
+            } else {
+                this.currentTime = this.activeEndTime
+            }
+           
         }
 
 
@@ -276,15 +302,31 @@
     }
 
 
+    function ConvertJosnToDatwWithoutUTC(jsaonDate) {
+        if (jsaonDate != null) {
+
+            //Since the date received from the server is in UTC Format, we need to convert it to local timezone.
+            //ge the time zone offset
+
+
+            var convertedDate = new Date(new Date(Number(jsaonDate.replace(/\D/g, ''))).getTime());
+
+            return convertedDate;
+        }
+        return null;
+    }
+
     var obj = @Html.Raw(Json.Encode(Model.TimeTracker));
     var timeTracker = new TimeTracker(obj);
-    if (obj.StartTime != null) {
+    if (obj.StartTime != null && obj.EndTime == null) {
         setInterval(() => timeTracker.CalculatePosition(), 1000)
+    } else {
+        timeTracker.CalculatePosition()
     }
 
 
 
-    function CheckIn() {
+    function ClockIn() {
 
         var obj = {
             Type: "",
@@ -304,16 +346,89 @@
             success: function (result) {
                 var notif = new Notifier();
                 notif.error(result.message, "Error");
-                console.log(result)
             },
             error: function (result) {
-                console.log(result)
+               alert(result)
             }
         })
 
 
     }
 
+    function ClockOut() {
+          $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '@Url.Action("ClockOut", "Portal")',
+            dataType: 'json',
+            success: function (result) {
+                var notif = new Notifier();
+                notif.error(result.message, "Error");
+            },
+            error: function (result) {
+               alert(result)
+            }
+        })
+    }
 
+    function UpdateStatus() {
+        var obj = {
+            Type: "",
+            ProjectId: 0,
+            Comment: ""
+        }
+
+        obj.Type = document.getElementById("ActionName").value;
+        obj.ProjectId = document.getElementById("ProjectId").value
+        obj.Comment = document.getElementById("commets").value;
+        var data = JSON.stringify(obj);
+
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '@Url.Action("UpdateStatus", "Portal")',
+            dataType: 'json',
+            data: data,
+            success: function (result) {
+                var notif = new Notifier();
+                if (result.result == false) {
+                    notif.error(result.message, "Error");
+                } else if (result.result == true) {
+                    notif.success(result.message, "Success");
+                    UpdateCardAction(result.newobj)
+                }
+            },
+            error: function (result) {
+                alert(result)
+            }
+        })
+    }
+
+    function UpdateCardAction(obj) {
+        if (obj != null) {
+            var maindiv = document.getElementsByClassName("right-middle-card")[0];
+            var innerDiv = maindiv.getElementsByClassName("card-body")[0];
+
+            var newDiv = document.createElement("div")
+            newDiv.classList.add("card-list-item")
+
+            var innerLeft = document.createElement("div");
+            innerLeft.classList.add("left-item")
+            innerLeft.innerHTML = obj.Current_Status
+
+            var innerRight = document.createElement("div");
+            innerRight.classList.add("right-item");
+
+
+            var startDate = ConvertJosnToDatwWithoutUTC(obj.Status_Start_Time);
+            var hours = startDate.getHours() + ":" + startDate.getMinutes()
+            innerRight.innerHTML = hours;
+
+            newDiv.appendChild(innerLeft)
+            newDiv.appendChild(innerRight)
+            innerDiv.appendChild(newDiv)
+        }
+
+    }
 
 </script>

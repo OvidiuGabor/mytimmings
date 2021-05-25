@@ -35,6 +35,7 @@ namespace mytimmings.Models.Portal
             DailyLogins = logins;
             GetTodayActions(user.ID);
             GenerateWorkinghours();
+            SetSelectedDropDowns();
 
         }
 
@@ -66,6 +67,16 @@ namespace mytimmings.Models.Portal
             }
 
            
+        }
+
+        private void SetSelectedDropDowns()
+        {
+            if(TodayActions.Count > 0)
+            {
+                var temp = TodayActions.OrderByDescending(x => x.StartTime);
+                ProjectId = temp.First().ProjectId.ToString();
+                ActionName = temp.First().Name;
+            }
         }
 
     }

@@ -219,5 +219,18 @@ namespace mytimmings.Utilities
                 throw ex;
             }
         }
+
+        public static string StripDangerousCharacters(string str)
+        {
+            if (!String.IsNullOrEmpty(str))
+            {
+                var temp = str.Trim();
+                temp.Replace("  ", "");
+                return temp;
+            }
+
+
+            return "";
+        }
     }
 }

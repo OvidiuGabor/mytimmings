@@ -103,6 +103,13 @@
 .right-middle-card {
     width: 48.5% !important;
     float: right;
-    height: 379px;
-    overflow-y:auto;
+    height: 28em;
+/*    overflow-y:auto;*/
 }
+
+    .right-middle-card .card-body {
+        overflow-y: auto;
+        height: 418px;
+        position: absolute;
+        width: 100%;
+    }

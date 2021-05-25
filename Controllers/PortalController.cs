@@ -57,7 +57,7 @@ namespace mytimmings.Controllers
 
             //Get a list of all the daily loginsfor the x days
             #region loginsList
-            var dailyLoginsDb = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.Date.Value.CompareTo(startDate) >= 0);
+            var dailyLoginsDb = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.Date.Value.CompareTo(startDate) >= 0).OrderByDescending(x =>x.LoginTime);
 
             foreach(var item in dailyLoginsDb)
             {
@@ -96,15 +96,8 @@ namespace mytimmings.Controllers
             var overviewModel = new Models.Portal.Overview(statusList, timeTracker, DailyLoginsList,leaveStatus, user);
 
 
-
             return View(overviewModel);
         }
-
-
-
-
-
-
 
 
         [HttpPost]
@@ -182,24 +175,129 @@ namespace mytimmings.Controllers
             return RedirectToAction("Overview", "Portal");
         }
 
-
-
-        public JsonResult ChangeStatus(Models.Portal.Action data)
+        public ActionResult UpdateStatus(Models.Portal.Action data)
         {
+            //Get the date in UTC Format;
+            DateTime CurrentTime = DateTime.UtcNow;
+            DateTime PreviousTime = DateTime.UtcNow.AddDays(-1);
 
-            return Json(new { result = false, message = "Already Clocked In for today!" }, JsonRequestBehavior.AllowGet);
+            Models.Security.User user = GetUserFromSession();
+            if (user != null)
+            {
+                if (data.Type == "0")
+                    return Json(new { result = false, message = "Please select a status!" }, JsonRequestBehavior.AllowGet);
+
+                if(data.ProjectId == 0)
+                    return Json(new { result = false, message = "Please select a Project!" }, JsonRequestBehavior.AllowGet);
+
+
+
+                //get the last records and set the EndStatus to now
+
+
+                var addFinishTimelst = db.Main_Data.Where(x => x.userID == user.ID && x.Status_End_Time == null).OrderByDescending(x => x.Status_Start_Time).FirstOrDefault();
+                if(addFinishTimelst != null)
+                {
+                    try
+                    {
+                        addFinishTimelst.Status_End_Time = CurrentTime;
+                        db.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+
+                        //Log the exception
+
+                        return Json(new { result = false, message = "Something happen! Please try again!" }, JsonRequestBehavior.AllowGet);
+                    }
+                   
+                }
+
+
+
+                //create a main data record with projectID as 0 and Status as Available as default!;
+                DBContext.Main_Data mainData = new DBContext.Main_Data
+                {
+                    userID = user.ID,
+                    CurrentDate = CurrentTime,
+                    Status_Start_Time = CurrentTime,
+                    ProjectID = data.ProjectId,
+                    Current_Status = data.Type,
+                    Comments = Utilities.Helper.StripDangerousCharacters(data.Comment)
+
+                };
+
+                try
+                {
+                    db.Main_Data.Add(mainData);
+                    db.SaveChanges();
+                    return Json(new { result = true, message = "Status Updated!", newobj = mainData }, JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception ex)
+                {
+                    //Log the exception
+
+                    return Json(new { result = false, message = "Something happen! Please try again!" }, JsonRequestBehavior.AllowGet);
+                }
+
+
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+          
         }
 
-        public JsonResult ChangeProject(Models.Portal.Action data)
+        public ActionResult ClockOut()
         {
 
-            return Json(new { result = false, message = "Already Clocked In for today!" }, JsonRequestBehavior.AllowGet);
-        }
+            DateTime CurrentTime = DateTime.UtcNow;
+            DateTime PreviousTime = DateTime.UtcNow.AddDays(-1);
 
-        public JsonResult ClockOut(Models.Portal.Action data)
-        {
+            Models.Security.User user = GetUserFromSession();
+            if (user != null)
+            {
+                //get the last Login Record
+                var loginRecord = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.LoginTime > PreviousTime && x.LoginTime == null).OrderByDescending(x => x.LoginTime).FirstOrDefault();
+                if(loginRecord != null)
+                {
+                    loginRecord.LogoutTime = CurrentTime;
+                }
+                else
+                {
+                    return Json(new { result = false, message = "You didn't Clock In for today!" }, JsonRequestBehavior.AllowGet);
+                }
 
-            return Json(new { result = false, message = "Already Clocked In for today!" }, JsonRequestBehavior.AllowGet);
+                //get the last records and set the EndStatus to now
+                var addFinishTimelst = db.Main_Data.Where(x => x.userID == user.ID && x.Status_End_Time == null).OrderByDescending(x => x.Status_Start_Time).FirstOrDefault();
+                if (addFinishTimelst != null)
+                {
+                    addFinishTimelst.Status_End_Time = CurrentTime;
+
+                }
+
+
+                try
+                {
+                    db.SaveChanges();
+                    //return Json(new { result = true, message = "Clock Out Successfully!" }, JsonRequestBehavior.AllowGet);
+                    return  RedirectToAction("Overview", "Portal", null);
+                }
+                catch (Exception ex)
+                {
+                    //Log the exception
+
+                    return Json(new { result = false, message = "Something happen! Please try again!" }, JsonRequestBehavior.AllowGet);
+                }
+
+
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
 
 
