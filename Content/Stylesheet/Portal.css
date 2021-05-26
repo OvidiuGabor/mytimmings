@@ -113,3 +113,16 @@
         position: absolute;
         width: 100%;
     }
+.request-item {
+    border: none;
+    box-shadow: 0px 2px 4px 0px #656b7b;
+}
+
+.request-item:hover{
+    cursor: pointer;
+    transform: scale(1.02)
+}
+
+.add-margin-left{
+    margin-left: 10px;
+}

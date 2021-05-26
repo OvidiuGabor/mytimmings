@@ -24,7 +24,7 @@ namespace mytimmings.Models.Portal
         public List<SelectListItem> ActionsDropDown = new List<SelectListItem>(); //Dropdown for Action
 
         public List<SelectListItem> ProjectDropDown = new List<SelectListItem>(); //project Dropdown
-
+        public PartialStatus Partial { get; set; }
         public Overview(List<Action> statuses, TimeTracker timeTracker, List<TimeTracker> logins, List<LeaveStatus> leaveStatuses, Models.Security.User user)
         {
             TimeTracker = timeTracker;
@@ -36,6 +36,7 @@ namespace mytimmings.Models.Portal
             GetTodayActions(user.ID);
             GenerateWorkinghours();
             SetSelectedDropDowns();
+            Partial = new PartialStatus(user.Company);
 
         }
 
@@ -71,7 +72,7 @@ namespace mytimmings.Models.Portal
 
         private void SetSelectedDropDowns()
         {
-            if(TodayActions.Count > 0)
+            if(TodayActions != null && TodayActions.Count > 0)
             {
                 var temp = TodayActions.OrderByDescending(x => x.StartTime);
                 ProjectId = temp.First().ProjectId.ToString();

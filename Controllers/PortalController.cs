@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace mytimmings.Controllers
 {
@@ -98,27 +99,26 @@ namespace mytimmings.Controllers
 
             return View(overviewModel);
         }
-
-
-        [HttpPost]
         public ActionResult CheckIn(Models.Portal.Action data)
         {
             //Get the date in UTC Format;
             DateTime CurrentTime = DateTime.UtcNow;
+            DateTime PreviousTime = DateTime.UtcNow.AddDays(-1);
 
             //get user from the sessiopn
             Models.Security.User user = GetUserFromSession();
             if (user != null)
             {
                 //IF the user didnt select any status and any project then we create a record in login table and another one in main data with Available as default
-
-                //Check if the user has already Clock in for today and return error
-                var checkRecord = db.User_Login_Logout.Where(x => x.Date.Value.Day == CurrentTime.Day && x.Date.Value.Month == CurrentTime.Month && x.Date.Value.Year == CurrentTime.Year).FirstOrDefault();
-                if(checkRecord != null){
+                //check if the user has  clock out already
+                var clockedOut = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.LoginTime.Value > PreviousTime && x.LogoutTime != null).OrderByDescending(x => x.LogoutTime).FirstOrDefault();
+                if (clockedOut != null)
+                    return Json(new { result = false, message = "Already Clocked Out for today!" }, JsonRequestBehavior.AllowGet);
+               
+                //check if the user has  clock In already
+                var clockedIn = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.LoginTime.Value > PreviousTime && x.LogoutTime == null).OrderByDescending(x => x.LogoutTime).FirstOrDefault();
+                if (clockedOut != null)
                     return Json(new { result = false, message = "Already Clocked In for today!" }, JsonRequestBehavior.AllowGet);
-                }
-
-
 
                 //Create a login object
                 DBContext.User_Login_Logout login = new DBContext.User_Login_Logout
@@ -150,13 +150,15 @@ namespace mytimmings.Controllers
                     mainData.Current_Status = data.Type;
 
 
-                if(data.Type != "0" && data.ProjectId ==0)
-                    return Json(new { result = false, message = "Need to select a project!" }, JsonRequestBehavior.AllowGet);
+                //if(data.Type != "0" && data.ProjectId ==0)
+                //    return Json(new { result = false, message = "Need to select a project!" }, JsonRequestBehavior.AllowGet);
 
                 try
                 {
                     db.Main_Data.Add(mainData);
                     db.SaveChanges();
+                    
+                    return Json(new { result = true, message = "Clocked In!" , location = Url.Action("Overview", "Portal")}, JsonRequestBehavior.AllowGet);
                 }
                 catch (Exception ex)
                 {
@@ -172,7 +174,7 @@ namespace mytimmings.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            return RedirectToAction("Overview", "Portal");
+            
         }
 
         public ActionResult UpdateStatus(Models.Portal.Action data)
@@ -192,9 +194,18 @@ namespace mytimmings.Controllers
 
 
 
+                //check if the user has clock in and if not clock out for today
+                var clockedOut = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.LoginTime.Value > PreviousTime && x.LogoutTime != null).OrderByDescending(x => x.LoginTime).FirstOrDefault();
+                if (clockedOut != null)
+                    return Json(new { result = false, message = "Already Clocked, cannot change status!" }, JsonRequestBehavior.AllowGet);
+
+
+                var clockedIn = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.LoginTime.Value > PreviousTime && x.LogoutTime == null).OrderByDescending(x => x.LoginTime).FirstOrDefault();
+                if (clockedIn == null)
+                    return Json(new { result = false, message = "Please Clock In First!" }, JsonRequestBehavior.AllowGet);
+
+
                 //get the last records and set the EndStatus to now
-
-
                 var addFinishTimelst = db.Main_Data.Where(x => x.userID == user.ID && x.Status_End_Time == null).OrderByDescending(x => x.Status_Start_Time).FirstOrDefault();
                 if(addFinishTimelst != null)
                 {
@@ -260,7 +271,12 @@ namespace mytimmings.Controllers
             if (user != null)
             {
                 //get the last Login Record
-                var loginRecord = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.LoginTime > PreviousTime && x.LoginTime == null).OrderByDescending(x => x.LoginTime).FirstOrDefault();
+                var checkRecord = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.LoginTime > PreviousTime && x.LogoutTime != null).OrderByDescending(x => x.LogoutTime).FirstOrDefault();
+                if(checkRecord != null){
+                    return Json(new { result = false, message = "Already Clock Out Today!" }, JsonRequestBehavior.AllowGet);
+                }
+
+                var loginRecord = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.LoginTime > PreviousTime && x.LogoutTime == null).OrderByDescending(x => x.LoginTime).FirstOrDefault();
                 if(loginRecord != null)
                 {
                     loginRecord.LogoutTime = CurrentTime;
@@ -283,7 +299,7 @@ namespace mytimmings.Controllers
                 {
                     db.SaveChanges();
                     //return Json(new { result = true, message = "Clock Out Successfully!" }, JsonRequestBehavior.AllowGet);
-                    return  RedirectToAction("Overview", "Portal", null);
+                    return Json(new { result = true, message = "Clocked Out!", location = Url.Action("Overview", "Portal") }, JsonRequestBehavior.AllowGet);
                 }
                 catch (Exception ex)
                 {
@@ -291,7 +307,6 @@ namespace mytimmings.Controllers
 
                     return Json(new { result = false, message = "Something happen! Please try again!" }, JsonRequestBehavior.AllowGet);
                 }
-
 
             }
             else

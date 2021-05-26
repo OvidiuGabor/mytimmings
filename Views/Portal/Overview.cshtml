@@ -59,23 +59,29 @@
                             string st = Model.TimeTracker.StartTime.Value.ToLocalTime().ToString("HH:mm:ss");
                             <p class="card-text">@st</p>
                         }
+                        else
+                        {
+                            <p class="card-text" style="color: white">a</p>
+                        }
                     }
 
                 </div>
-                @{
-                    if (Model.TimeTracker.EndTime.HasValue)
+                <div style="float: right; text-align: center">
+                    <h2 class="card-text">Clock out</h2>
+                    @if (Model.TimeTracker.EndTime.HasValue)
                     {
-                        <div style="float: right; text-align: center">
-                            <h2 class="card-text">Clock out</h2>
 
-                            @{string st = Model.TimeTracker.EndTime.Value.ToLocalTime().ToString("HH:mm:ss");
 
-                                <p class="card-text">@st</p>
-                            }
+                        string st = Model.TimeTracker.EndTime.Value.ToLocalTime().ToString("HH:mm:ss");
 
-                        </div>
+                        <p class="card-text">@st</p>
+
                     }
-                }
+                    else
+                    {
+                        <p class="card-text" style="color: white">b</p>
+                    }
+                </div>
             </div>
         </div>
 
@@ -155,7 +161,7 @@
 
 
     <div class="bottom-cards-container width-and-center card-columns">
-        <div class="card bg-white card-shadow" style="height: 210px;">
+        <div class="card bg-white card-shadow" style="height: 220px;">
             <div class="card-body text-center">
                 <div>
                     <h2 class="card-text">Leave Credits</h2>
@@ -177,8 +183,8 @@
             </div>
 
         </div>
-        <div class="card bg-white card-shadow" style="height: 210px;">
-            <div class="card-body text-center" style="height: 210px; overflow-y:auto ">
+        <div class="card bg-white card-shadow" style="height: 220px;">
+            <div class="card-body text-center" style="height: 220px; overflow-y:auto ">
                 <div>
 
                     <h2 class="card-text">Daily Logins</h2>
@@ -202,29 +208,75 @@
             </div>
 
         </div>
-        <div class="card bg-white card-shadow" style="height: 210px;">
-            <div class="card-body text-left">
-                <div style="display: inline-block">
-                    <h2 class="card-text">Non Productive Hours</h2>
-                    <p class="card-text">@Math.Round(Model.WorkingHours.NonProductive.TotalHours, 2) Hrs</p>
+        <div class="card bg-white card-shadow" style="height: 220px;">
+            <div class="card-body text-center" style="height: 220px; overflow-y:auto ">
+                <div>
+
+                    <h2 class="card-text">Additional Times</h2>
                 </div>
-                <div style="display: inline-block; float: right;">
-                    <img src="~/Content/SVG/icon-idle-hours.svg" class="card-img" />
-                </div>
+
+                @{
+                    Dictionary<string, TimeSpan> statusesDic = new Dictionary<string, TimeSpan>();
+                    if (Model.Partial.PartialStatusesAvailable != null && Model.Partial.PartialStatusesAvailable.Count > 0)
+                    {
+                        foreach (var item in Model.Partial.PartialStatusesAvailable)
+                        {
+                            if (!statusesDic.ContainsKey(item))
+                            {
+                                statusesDic.Add(item, new TimeSpan(0, 0, 0));
+                            }
+                        }
+                    }
+
+
+
+
+                    if (Model.Statuses != null && Model.Statuses.Count > 0)
+                    {
+
+                        foreach (var item in Model.Statuses)
+                        {
+
+                            if (statusesDic.ContainsKey(item.Name))
+                            {
+                                statusesDic[item.Name] += item.Duration;
+                            }
+                        }
+
+                        foreach (var item in statusesDic)
+                        {
+                            <div class="card-list-item">
+                                <div class="left-item">@item.Key</div>
+                                <div class="right-item">@item.Value</div>
+                            </div>
+                        }
+
+
+
+
+                    }
+                }
             </div>
 
         </div>
-        <div class="card bg-white card-shadow" style="height: 210px;">
-            <div class="card-body text-left">
-                <div style="display: inline-block">
-                    <h2 class="card-text">Non Productive Hours</h2>
-                    <p class="card-text">@Math.Round(Model.WorkingHours.NonProductive.TotalHours, 2) Hrs</p>
-                </div>
-                <div style="display: inline-block; float: right;">
-                    <img src="~/Content/SVG/icon-total-hours.svg" class="card-img" />
-                </div>
-            </div>
+        <div class="card bg-white card-shadow" style="height: 220px;">
 
+            <div class="card-body text-center" style="height: 220px; overflow-y:auto ">
+                <div>
+                    <h2 class="card-text">Requests</h2>
+                </div>
+
+                <div class="card-list-item request-item">
+                    <div class="left-item add-margin-left">Overtime</div>
+                </div>
+                <div class="card-list-item request-item">
+                    <div class="left-item add-margin-left">Recovery</div>
+                </div>
+                <div class="card-list-item request-item">
+                    <div class="left-item add-margin-left">Partial Time Off</div>
+                </div>
+
+            </div>
         </div>
     </div>
 
@@ -273,7 +325,12 @@
             var m = this.float2int((elapsedTime % 1) * 60) // get minutes
 
             var formatedTime = this.checkTime(h) + ":" + this.checkTime(m);
-            p.innerHTML = formatedTime;
+            if (this.startTime != null) {
+                p.innerHTML = formatedTime;
+            } else {
+                p.innerHTML = "00:00"
+            }
+            
         }
 
         checkTime(time) {
@@ -345,9 +402,18 @@
             data: data,
             success: function (result) {
                 var notif = new Notifier();
-                notif.error(result.message, "Error");
+                if (result.result == false) {
+                    notif.error(result.message, "Error");
+                } else {
+                    if (result.location != null) {
+                        notif.success(result.message, "Success");
+                        window.location.href = result.location;
+                    }
+                }
+                console.log(result + " success" )
             },
             error: function (result) {
+                console.log(result + "error")
                alert(result)
             }
         })
@@ -363,10 +429,19 @@
             dataType: 'json',
             success: function (result) {
                 var notif = new Notifier();
-                notif.error(result.message, "Error");
+                if (result.result == false) {
+                    notif.error(result.message, "Error");
+                } else {
+                      if (result.location != null){
+                          window.location.href = result.location;
+                      }
+                }
+              
+                console.log(result + " success")
             },
             error: function (result) {
-               alert(result)
+                console.log(result + " error")
+                alert(result)
             }
         })
     }
