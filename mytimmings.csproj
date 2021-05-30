@@ -175,6 +175,7 @@
     <Content Include="Content\fullcalendar.print.css" />
     <Content Include="Content\fullcalendar.print.min.css" />
     <Content Include="Content\Stylesheet\MediaQueries.css" />
+    <Content Include="Content\Stylesheet\NotFound.css" />
     <Content Include="Content\Stylesheet\Portal.css" />
     <Content Include="Content\Stylesheet\Index.css" />
     <Content Include="Content\SVG\icon-idle-hours.svg" />
@@ -359,6 +360,10 @@
     <Content Include="Fonts\Poppins-SemiBoldItalic.ttf" />
     <Content Include="Fonts\Poppins-Thin.ttf" />
     <Content Include="Fonts\Poppins-ThinItalic.ttf" />
+    <None Include="compilerconfig.json" />
+    <None Include="compilerconfig.json.defaults">
+      <DependentUpon>compilerconfig.json</DependentUpon>
+    </None>
     <None Include="Properties\PublishProfiles\FTPProfile.pubxml" />
     <Content Include="Readme.txt" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -473,6 +478,7 @@
     <Content Include="Scripts\moment-with-locales.min.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\moment.min.js" />
+    <Content Include="Scripts\NotFound.js" />
     <Content Include="Scripts\Notification.js" />
     <Content Include="Scripts\popper-utils.js" />
     <Content Include="Scripts\popper-utils.min.js" />
@@ -572,6 +578,7 @@
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\ErrorHandler\Index.cshtml" />
     <Content Include="Views\Portal\Overview.cshtml" />
+    <Content Include="Views\Error\NotFound.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

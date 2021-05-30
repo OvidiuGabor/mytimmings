@@ -44,6 +44,7 @@ namespace mytimmings.Controllers
             //List of records
             List<Models.Portal.Action> statusList = Models.Portal.Action.CreateFromDbList(dbRecords);
 
+
             //Create the timetracker Object
             //get the record from the Login table, if exists
             #region CurrentTimeTracker

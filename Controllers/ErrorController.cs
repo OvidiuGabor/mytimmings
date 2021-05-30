@@ -13,5 +13,11 @@ namespace mytimmings.Controllers
         {
             return View();
         }
+        
+
+        public ActionResult NotFound()
+        {
+            return View();
+        }
     }
 }
