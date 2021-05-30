@@ -318,6 +318,19 @@ namespace mytimmings.Controllers
 
 
 
+
+        #region Partial Requests
+
+        public ActionResult OvertimeRequest()
+        {
+
+            return Json(new { result = false, message = "Already Clock Out Today!" }, JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
+
+
+
         private Models.Security.User GetUserFromSession()
         {
             return (Models.Security.User)Session["User"];

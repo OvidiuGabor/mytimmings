@@ -11,6 +11,7 @@
     @*<div class="width-and-center" style="text-align:left; margin-top: 25px ">
         <h3>My Stats</h3>
     </div>*@
+    @Html.Partial("_OvertimeModal")
     <div class="top-cards-container card-columns width-and-center">
 
         <div class="card bg-white card-shadow">
@@ -266,8 +267,8 @@
                     <h2 class="card-text">Requests</h2>
                 </div>
 
-                <div class="card-list-item request-item">
-                    <div class="left-item add-margin-left">Overtime</div>
+                <div class="card-list-item request-item" data-toggle="modal" data-target="#overtime-modal">
+                    <div class="left-item add-margin-left" >Overtime</div>
                 </div>
                 <div class="card-list-item request-item">
                     <div class="left-item add-margin-left">Recovery</div>
@@ -312,7 +313,7 @@
             } else {
                 this.currentTime = this.activeEndTime
             }
-           
+
         }
 
 
@@ -330,7 +331,7 @@
             } else {
                 p.innerHTML = "00:00"
             }
-            
+
         }
 
         checkTime(time) {
@@ -436,7 +437,7 @@
                           window.location.href = result.location;
                       }
                 }
-              
+
                 console.log(result + " success")
             },
             error: function (result) {
@@ -505,5 +506,46 @@
         }
 
     }
+
+
+    //Modals Section
+
+    $("#overtime-modal").on("show.bs.modal", function (event) {
+        var $modal = $("#overtime-modal");
+        var $projectEl = $modal.find("#project");
+
+        PopulateProjectDropDown($projectEl);
+    })
+
+
+    //Helper Functions
+
+    function PopulateProjectDropDown(el) {
+        //first we check if the el exists
+        if (el != null) {
+            var optionEl = el.find("option")
+            optionEl.remove();
+
+            //ge the Model from the controller
+            var obj = @Html.Raw(Json.Encode(Model));
+            if (obj.ProjectDropDown != null) {
+                for (var i = 0; i < obj.ProjectDropDown.length; i++) {
+                    var currentItem = obj.ProjectDropDown[i]
+                    if (currentItem.Selected == true) {
+                        el.append('<option value=' + currentItem.value + ' selected = "selected">' + currentItem.Text + '</option>')
+                    } else {
+                        el.append('<option value=' + currentItem.value + '>' + currentItem.Text + '</option>')
+                    }
+
+                }
+            }else {
+                el.remove();
+            }
+
+        }
+    }
+
+
+
 
 </script>
