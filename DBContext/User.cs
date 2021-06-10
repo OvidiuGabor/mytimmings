@@ -10,10 +10,13 @@ namespace DBContext
     public partial class User
     {
         [Key]
+        [Column(Order = 0)]
         [StringLength(100)]
         public string EmailAddress { get; set; }
+
         [StringLength(50)]
         public string FirstName { get; set; }
+
         [StringLength(50)]
         public string LastName { get; set; }
 
@@ -39,12 +42,20 @@ namespace DBContext
         [StringLength(100)]
         public string PhotoPath { get; set; }
 
+        [Key]
+        [Column(Order = 1)]
         public bool isUser { get; set; }
 
+        [Key]
+        [Column(Order = 2)]
         public bool isManager { get; set; }
 
+        [Key]
+        [Column(Order = 3)]
         public bool isAdmin { get; set; }
 
+        [Key]
+        [Column(Order = 4)]
         public bool isDeveloper { get; set; }
     }
 }

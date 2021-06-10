@@ -41,3 +41,10 @@ h3{
 
 }
 
+.notif-number {
+    font-size: 10px;
+    vertical-align: top;
+    font-weight: bold;
+    position: absolute;
+}
+

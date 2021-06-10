@@ -545,7 +545,64 @@
         }
     }
 
+      $(function () {
 
+            var notifications = $.connection.notificationHub;
+          notifications.client.receiveNotification = function () {
+                //console.log("aa")
+               getAllNotif()
+            };
+
+            console.log(notifications)
+            $.connection.hub.start().done(function () {
+                //console.log("aaa");
+                getAllNotif();
+             })
+                .fail(function (e) { console.log(e) })
+      })
+
+
+
+        function getAllNotif() {
+
+            $.ajax({
+                url: '@Url.Action("GeLiveNotification", "Portal")',
+                contentType: 'application/html ; charset:utf-8',
+                type: 'GET',
+                dataType: 'html',
+                success: function (result) {
+                    const obj = JSON.parse(result)
+                    UpdateNotifNumber(obj)
+                    console.log(obj);
+                },
+                error: function (result) {
+                    alert(result)
+                }
+
+            })
+        }
+
+
+        function UpdateNotifNumber(result) {
+
+            var span = document.getElementById("notif-placeholder");
+            var notifbell = document.getElementById("notif-bell");
+            if (result.length > 0) {
+
+                var notifCount = result.length;
+                span.innerHTML = notifCount;
+                notifbell.style.color = "#f93939"
+            } else {
+
+                span.innerHTML = "";
+                notifbell.style.color = "black"
+            }
+        }
+
+
+    function UpdateNotifList(result) {
+
+    }
 
 
 </script>

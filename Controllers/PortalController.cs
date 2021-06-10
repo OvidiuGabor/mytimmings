@@ -330,6 +330,27 @@ namespace mytimmings.Controllers
         #endregion
 
 
+        #region SignalR
+
+
+        public JsonResult GeLiveNotification()
+        {
+            Models.Security.User user = GetUserFromSession();
+            List<Hubs.LiveNotification> notif = new List<Hubs.LiveNotification>();
+            var liveNotif = new Hubs.LiveNotification(user.ID);
+            notif = liveNotif.GetOpenNotificationByID();
+
+            return Json(notif, JsonRequestBehavior.AllowGet);
+
+        }
+       
+
+
+
+
+
+        #endregion
+
 
         private Models.Security.User GetUserFromSession()
         {
