@@ -605,7 +605,7 @@
     <Content Include="Views\Error\NotFound.cshtml" />
     <Content Include="Views\Portal\_OvertimeModal.cshtml" />
     <Content Include="Views\Error\Index.cshtml" />
-    <Content Include="Views\Shared\_Notifications.cshtml" />
+    <Content Include="Views\Shared\_PushNotifications.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

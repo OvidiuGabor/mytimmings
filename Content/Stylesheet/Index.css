@@ -48,3 +48,28 @@ h3{
     position: absolute;
 }
 
+.modal-open{
+    overflow: revert !important;
+
+}
+
+.modal-backdrop.show{
+    opacity: 0;
+}
+.modal-dialog{
+    margin: 0;
+    width: 300px;
+
+}
+.NotificationModal {
+    position: fixed;
+    top: auto;
+    right: auto;
+    left: auto;
+    bottom: 0;
+    box-shadow: 0px 0px 27px -13px;
+}
+.modal-content {
+    border: none !important;
+    background: #F2F3F7;
+}
