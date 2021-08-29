@@ -136,5 +136,30 @@ namespace mytimmings.Hubs
             }
            
         }
+
+        public static void  InsertNotification(string userId, DateTime receiveDate, string title, string message, string sender, string type)
+        {
+            var db = new DBContext.DBModel();
+            var record = new DBContext.LiveNotification();
+            record.UserId = userId;
+            record.DateReceived = receiveDate;
+            record.Title = title;
+            record.Message = message;
+            record.Sender = sender;
+            record.Type = type;
+
+            try
+            {
+                db.LiveNotifications.Add(record);
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+           
+        }
+
     }
 }

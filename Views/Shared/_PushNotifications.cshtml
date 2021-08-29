@@ -1,6 +1,6 @@
 ﻿<div class="NotificationModal" id="pushNotificationsModal" style="display: none">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-notif">
+        <div class="modal-content modal-content-notif">
             <div class="modal-header">
                 <h5 class="modal-title">Notifications</h5>
                 <button type="button" class="close" style="outline: none" onclick="CloseModal()">
@@ -12,23 +12,87 @@
                     <div class="notif">
                         <div class="notification-body">
                             <div class="notification-type">
-
+                                <p class="notif-type-text">Information</p>
                             </div>
                             <div class="notification-title">
-
+                                <p class="notif-title-text">Update Yesterday Clock Out</p>
                             </div>
                             <div class="notification-message">
-
+                                <p class="notif-message-body-text">You have an update pending. Click <span style="color: red; cursor: pointer">here</span></p>
                             </div>
                             <div class="notification-signature">
-
+                                <p class="notif-signature-text">System</p>
                             </div>
                         </div>
                         <div class="notification-time">
-                            
-                            
+
+                            <p class="notif-time-text"> 16 Nov 2021 at 9:30 AM</p>
                         </div>
                     </div>
+                    <hr />
+                    <div class="notif">
+                        <div class="notification-body">
+                            <div class="notification-type">
+                                <p class="notif-type-text">Information</p>
+                            </div>
+                            <div class="notification-title">
+                                <p class="notif-title-text">Update Yesterday Clock Out</p>
+                            </div>
+                            <div class="notification-message">
+                                <p class="notif-message-body-text">You have an update pending. Click <span style="color: red; cursor: pointer">here</span></p>
+                            </div>
+                            <div class="notification-signature">
+                                <p class="notif-signature-text">System</p>
+                            </div>
+                        </div>
+                        <div class="notification-time">
+
+                            <p class="notif-time-text"> 16 Nov 2021 at 9:30 AM</p>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="notif">
+                        <div class="notification-body">
+                            <div class="notification-type">
+                                <p class="notif-type-text">Information</p>
+                            </div>
+                            <div class="notification-title">
+                                <p class="notif-title-text">Update Yesterday Clock Out</p>
+                            </div>
+                            <div class="notification-message">
+                                <p class="notif-message-body-text">You have an update pending. Click <span style="color: red; cursor: pointer">here</span></p>
+                            </div>
+                            <div class="notification-signature">
+                                <p class="notif-signature-text">System</p>
+                            </div>
+                        </div>
+                        <div class="notification-time">
+
+                            <p class="notif-time-text"> 16 Nov 2021 at 9:30 AM</p>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="notif">
+                        <div class="notification-body">
+                            <div class="notification-type">
+                                <p class="notif-type-text">Information</p>
+                            </div>
+                            <div class="notification-title">
+                                <p class="notif-title-text">Update Yesterday Clock Out</p>
+                            </div>
+                            <div class="notification-message">
+                                <p class="notif-message-body-text">You have an update pending. Click <span style="color: red; cursor: pointer">here</span></p>
+                            </div>
+                            <div class="notification-signature">
+                                <p class="notif-signature-text">System</p>
+                            </div>
+                        </div>
+                        <div class="notification-time">
+
+                            <p class="notif-time-text"> 16 Nov 2021 at 9:30 AM</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -40,3 +104,33 @@
         $modal.css("display", "none")
     }
 </script>
+
+<style>
+    .notif p{
+        margin: 0;
+        font-size: 12px;
+    }
+    .notif-type-text {
+        background: green;
+        color: white;
+        width: 85px;
+        border: 1px solid green;
+        border-radius: 6px;
+        padding-left: 6px;
+    }
+
+    .notif-title-text {
+        margin: 8px 0 5px 0 !important;
+        font-weight: bold;
+    }
+
+    .notification-message {
+        margin: 0px 0 6px 0 !important;
+    }
+
+    .notif-signature-text {
+        color: #f93939;
+        font-weight: bold;
+    }
+
+</style>

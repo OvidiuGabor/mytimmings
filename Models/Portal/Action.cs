@@ -21,7 +21,19 @@ namespace mytimmings.Models.Portal
         {
 
         }
+        public Action(string userId, DateTime start, DateTime end, string status, int projectId, string comment)
+        {
+            if (userId == null || status == null)
+                throw new ArgumentNullException("The arguments for this Method Cannot be null!");
 
+            UserId = userId;
+            StartTime = start;
+            EndTime = end;
+            Name = status;
+            ProjectId = projectId;
+            Comment = comment;
+
+        }
         public Action(DBContext.Main_Data data)
         {
             if (data == null)
@@ -50,11 +62,12 @@ namespace mytimmings.Models.Portal
 
         private TimeSpan CalculateDuration(DateTime startTime, DateTime? endTime)
         {
-
-            DateTime startUtcTime = Utilities.Helper.convertToUTC(startTime);
+            //Dont need to convert to UTC, as the time is recorded in UTC Directly 
+            //DateTime startUtcTime = Utilities.Helper.convertToUTC(startTime);
+            DateTime startUtcTime = startTime;
             DateTime endUtcTime = DateTime.UtcNow;
             if (endTime != null)
-                endUtcTime = Utilities.Helper.convertToUTC(endTime.Value);
+                endUtcTime = endTime.Value;
 
             if (startTime == null)
                 throw new ArgumentNullException("Cannot calclate duration when the Start Time is null.");
@@ -83,6 +96,37 @@ namespace mytimmings.Models.Portal
 
             return result;
 
+
+        }
+
+
+        public void AddRecord()
+        {
+            InsertRecord();
+        }
+
+        private void InsertRecord()
+        {
+            var db = new DBContext.DBModel();
+            var newRec = new DBContext.Main_Data();
+            newRec.userID = UserId;
+            newRec.CurrentDate = StartTime;
+            newRec.Status_End_Time = EndTime;
+            newRec.Status_Start_Time = StartTime;
+            newRec.Current_Status = Name;
+            newRec.ProjectID = ProjectId;
+            newRec.Comments = Comment;
+
+            try
+            {
+                db.Main_Data.Add(newRec);
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
 
         }
 

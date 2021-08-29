@@ -29,7 +29,7 @@ namespace DBContext
         public virtual DbSet<Leave_Requests> Leave_Requests { get; set; }
         public virtual DbSet<Leave> Leaves { get; set; }
         public virtual DbSet<LiveNotification> LiveNotifications { get; set; }
-
+        public virtual DbSet<PartialTime_Requests> PartialTime_Requests { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -105,7 +105,13 @@ namespace DBContext
                .Property(e => e.ID)
                .HasPrecision(18, 0);
 
+            modelBuilder.Entity<PartialTime_Requests>()
+              .Property(e => e.Id)
+              .HasPrecision(18, 0);
 
+            modelBuilder.Entity<PartialTime_Requests>()
+                .Property(e => e.ProjectId)
+                .HasPrecision(18, 0);
 
         }
 

@@ -19,8 +19,10 @@ namespace DBContext
         public DateTime? DateReceived { get; set; }
 
         public DateTime? DateClosed { get; set; }
-
         [StringLength(150)]
+        public string Title { get; set; }
+
+        [StringLength(1500)]
         public string Message { get; set; }
 
         [StringLength(50)]

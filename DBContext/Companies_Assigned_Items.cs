@@ -29,5 +29,10 @@ namespace DBContext
 
         [StringLength(500)]
         public string Partial { get; set; }
+
+        [StringLength(500)]
+        public string AutoApprove { get; set; }
+        [StringLength(500)]
+        public string ManualApprove { get; set; }
     }
 }

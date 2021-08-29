@@ -48,18 +48,18 @@ h3{
     position: absolute;
 }
 
-.modal-open{
+/*.modal-open{
     overflow: revert !important;
 
-}
+}*/
 
-.modal-backdrop.show{
+/*.modal-backdrop.show{
     opacity: 0;
-}
-.modal-dialog{
+}*/
+.modal-dialog-notif {
     margin: 0;
     width: 300px;
-
+    max-height: 600px;
 }
 .NotificationModal {
     position: fixed;
@@ -68,8 +68,10 @@ h3{
     left: auto;
     bottom: 0;
     box-shadow: 0px 0px 27px -13px;
+    overflow-y: auto;
+    width: 300px;
 }
-.modal-content {
+.modal-content-notif {
     border: none !important;
     background: #F2F3F7;
 }

@@ -12,82 +12,95 @@
         <h3>My Stats</h3>
     </div>*@
     @Html.Partial("_OvertimeModal")
-    <div class="top-cards-container card-columns width-and-center">
+<div class="top-cards-container card-columns width-and-center">
 
-        <div class="card bg-white card-shadow">
-            <div class="card-body text-left">
-                <div style="display: inline-block">
-                    <h2 class="card-text">Total Hours</h2>
-                    <p class="card-text">@Math.Round(Model.WorkingHours.TotalTime.TotalHours, 2) Hrs</p>
-                </div>
-                <div style="display: inline-block; float: right;">
-                    <img src="~/Content/SVG/icon-total-hours.svg" class="card-img" />
-                </div>
+    @{
+        var h = (int)Model.WorkingHours.TotalTime.TotalHours;
+        var m = Model.WorkingHours.TotalTime.Minutes;
+    }
+
+    <div class="card bg-white card-shadow">
+        <div class="card-body text-left">
+            <div style="display: inline-block">
+                <h2 class="card-text">Total Hours</h2>
+                <p class="card-text">@h.@m Hrs</p>
             </div>
-
-        </div>
-        <div class="card bg-white card-shadow">
-            <div class="card-body text-left">
-                <div style="display: inline-block">
-                    <h2 class="card-text">Productive Hours</h2>
-                    <p class="card-text">@Math.Round(Model.WorkingHours.Productive.TotalHours, 2) Hrs</p>
-                </div>
-                <div style="display: inline-block; float: right;">
-                    <img src="~/Content/SVG/icon-pro-hours.svg" class="card-img" />
-                </div>
+            <div style="display: inline-block; float: right;">
+                <img src="~/Content/SVG/icon-total-hours.svg" class="card-img" />
             </div>
-
         </div>
-        <div class="card bg-white card-shadow">
-            <div class="card-body text-left">
-                <div style="display: inline-block">
-                    <h2 class="card-text">Non Productive Hours</h2>
-                    <p class="card-text">@Math.Round(Model.WorkingHours.NonProductive.TotalHours, 2) Hrs</p>
-                </div>
-                <div style="display: inline-block; float: right;">
-                    <img src="~/Content/SVG/icon-idle-hours.svg" class="card-img" />
-                </div>
+
+    </div>
+    @{
+        h = (int)Model.WorkingHours.Productive.TotalHours;
+        m = Model.WorkingHours.Productive.Minutes;
+    }
+    <div class="card bg-white card-shadow">
+        <div class="card-body text-left">
+            <div style="display: inline-block">
+                <h2 class="card-text">Productive Hours</h2>
+                <p class="card-text">@h.@m Hrs</p>
             </div>
-
+            <div style="display: inline-block; float: right;">
+                <img src="~/Content/SVG/icon-pro-hours.svg" class="card-img" />
+            </div>
         </div>
-        <div class="card bg-white card-shadow">
-            <div class="card-body text-left">
-                <div style="display: inline-block; text-align:center">
-                    <h2 class="card-text">Clock IN</h2>
-                    @{
-                        if (Model.TimeTracker.StartTime.HasValue)
-                        {
-                            string st = Model.TimeTracker.StartTime.Value.ToLocalTime().ToString("HH:mm:ss");
-                            <p class="card-text">@st</p>
-                        }
-                        else
-                        {
-                            <p class="card-text" style="color: white">a</p>
-                        }
-                    }
 
-                </div>
-                <div style="float: right; text-align: center">
-                    <h2 class="card-text">Clock out</h2>
-                    @if (Model.TimeTracker.EndTime.HasValue)
+    </div>
+    @{
+        h = (int)Model.WorkingHours.NonProductive.TotalHours;
+        m = Model.WorkingHours.NonProductive.Minutes;
+    }
+    <div class="card bg-white card-shadow">
+        <div class="card-body text-left">
+            <div style="display: inline-block">
+                <h2 class="card-text">Non Productive Hours</h2>
+                <p class="card-text">@h.@m Hrs</p>
+            </div>
+            <div style="display: inline-block; float: right;">
+                <img src="~/Content/SVG/icon-idle-hours.svg" class="card-img" />
+            </div>
+        </div>
+
+    </div>
+    <div class="card bg-white card-shadow">
+        <div class="card-body text-left">
+            <div style="display: inline-block; text-align:center">
+                <h2 class="card-text">Clock IN</h2>
+                @{
+                    if (Model.TimeTracker.StartTime.HasValue)
                     {
-
-
-                        string st = Model.TimeTracker.EndTime.Value.ToLocalTime().ToString("HH:mm:ss");
-
+                        string st = Model.TimeTracker.StartTime.Value.ToLocalTime().ToString("HH:mm:ss");
                         <p class="card-text">@st</p>
-
                     }
                     else
                     {
-                        <p class="card-text" style="color: white">b</p>
+                        <p class="card-text" style="color: white">a</p>
                     }
-                </div>
+                }
+
+            </div>
+            <div style="float: right; text-align: center">
+                <h2 class="card-text">Clock out</h2>
+                @if (Model.TimeTracker.EndTime.HasValue)
+                {
+
+
+                    string st = Model.TimeTracker.EndTime.Value.ToLocalTime().ToString("HH:mm:ss");
+
+                    <p class="card-text">@st</p>
+
+                }
+                else
+                {
+                    <p class="card-text" style="color: white">b</p>
+                }
             </div>
         </div>
-
-
     </div>
+
+
+</div>
 
 
     <div class="middle-part-container width-and-center card-columns" style="column-count: 2 !important">
@@ -267,7 +280,7 @@
                     <h2 class="card-text">Requests</h2>
                 </div>
 
-                <div class="card-list-item request-item" data-toggle="modal" data-target="#pushNotificationsModal">
+                <div class="card-list-item request-item" data-toggle="modal" data-target="#overtime-modal">
                     <div class="left-item add-margin-left" >Overtime</div>
                 </div>
                 <div class="card-list-item request-item">
@@ -528,13 +541,14 @@
 
             //ge the Model from the controller
             var obj = @Html.Raw(Json.Encode(Model));
+            console.log(obj)
             if (obj.ProjectDropDown != null) {
                 for (var i = 0; i < obj.ProjectDropDown.length; i++) {
                     var currentItem = obj.ProjectDropDown[i]
                     if (currentItem.Selected == true) {
-                        el.append('<option value=' + currentItem.value + ' selected = "selected">' + currentItem.Text + '</option>')
+                        el.append('<option value=' + currentItem.Value + ' selected = "selected">' + currentItem.Text + '</option>')
                     } else {
-                        el.append('<option value=' + currentItem.value + '>' + currentItem.Text + '</option>')
+                        el.append('<option value=' + currentItem.Value + '>' + currentItem.Text + '</option>')
                     }
 
                 }
@@ -543,65 +557,6 @@
             }
 
         }
-    }
-
-      $(function () {
-
-            var notifications = $.connection.notificationHub;
-          notifications.client.receiveNotification = function () {
-                //console.log("aa")
-               getAllNotif()
-            };
-
-            console.log(notifications)
-            $.connection.hub.start().done(function () {
-                //console.log("aaa");
-                getAllNotif();
-             })
-                .fail(function (e) { console.log(e) })
-      })
-
-
-
-        function getAllNotif() {
-
-            $.ajax({
-                url: '@Url.Action("GeLiveNotification", "Portal")',
-                contentType: 'application/html ; charset:utf-8',
-                type: 'GET',
-                dataType: 'html',
-                success: function (result) {
-                    const obj = JSON.parse(result)
-                    UpdateNotifNumber(obj)
-                    console.log(obj);
-                },
-                error: function (result) {
-                    alert(result)
-                }
-
-            })
-        }
-
-
-        function UpdateNotifNumber(result) {
-
-            var span = document.getElementById("notif-placeholder");
-            var notifbell = document.getElementById("notif-bell");
-            if (result.length > 0) {
-
-                var notifCount = result.length;
-                span.innerHTML = notifCount;
-                notifbell.style.color = "#f93939"
-            } else {
-
-                span.innerHTML = "";
-                notifbell.style.color = "black"
-            }
-        }
-
-
-    function UpdateNotifList(result) {
-
     }
 
 

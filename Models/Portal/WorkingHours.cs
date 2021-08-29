@@ -18,8 +18,8 @@ namespace mytimmings.Models.Portal
 
         public WorkingHours(List<Action> statuses)
         {
-            if (statuses.Count < 1)
-                throw new ArgumentOutOfRangeException("The list must have at least 1 element.");
+            //if (statuses.Count < 1)
+            //    throw new ArgumentOutOfRangeException("The list must have at least 1 element.");
             StatusesList = statuses;
 
         }

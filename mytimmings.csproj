@@ -175,6 +175,9 @@
     <Compile Include="Models\Portal\Overview.cs" />
     <Compile Include="Models\Portal\Action.cs" />
     <Compile Include="Models\Portal\PartialStatus.cs" />
+    <Compile Include="Models\Portal\Partial_Request\IPartialRequest.cs" />
+    <Compile Include="Models\Portal\Partial_Request\OvertimeRequest.cs" />
+    <Compile Include="Models\Portal\Partial_Request\PartialRequestDb.cs" />
     <Compile Include="Models\Portal\TimeTracker.cs" />
     <Compile Include="Models\Portal\WorkingHours.cs" />
     <Compile Include="Models\Security\AuthState.cs" />

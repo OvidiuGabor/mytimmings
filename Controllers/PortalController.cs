@@ -38,7 +38,7 @@ namespace mytimmings.Controllers
 
 
             //test
-            startDate = startDate.AddDays(-40).Date;
+            //startDate = startDate.AddDays(-40).Date;
             //Get the records from the database
             List<DBContext.Main_Data> dbRecords = db.Main_Data.Where(x => x.userID == user.ID && x.CurrentDate.CompareTo(startDate) >= 0).ToList();
             //List of records
@@ -321,13 +321,196 @@ namespace mytimmings.Controllers
 
         #region Partial Requests
 
-        public ActionResult OvertimeRequest()
+        public ActionResult OvertimeRequest(Models.Portal.Partial_Request.OvertimeRequest req)
         {
+            //when a request is send
+            //1. add a notification to the liveNotification table where we inform the manager that a new overtime request has been sent for appoval if the request is set for ManaualApprove
+            //2. if the request is set for AutoApprove, then we just inform the manager that someone has requested for Overtime.
 
-            return Json(new { result = false, message = "Already Clock Out Today!" }, JsonRequestBehavior.AllowGet);
+            //get ther user details from session
+            var user = GetUserFromSession();
+            if (user == null)
+                return RedirectToAction("Overview");
+
+            //add the current user as the User who made the request.
+            req.AddUser(user);
+
+
+            //Perform some checkes about the notification.
+            //1. The request cannot be in the past;
+            //2. The Request cannot be during shift time, so need to check for the starting time of the shift, then calculate the end time.
+            //3. End time of the request cannot be higher then 4 hours per day. Maybe in here we can add some seetings on how much time an overtime can have.
+            //4. Check for the duration to be higher then 0 minutes
+            //5. check for the project, to be different then 0
+            //6. check for the start time to be higher then 0
+            DateTime currentTime = DateTime.UtcNow;
+
+            //check for the start and end time
+            if(DateTime.Compare(req.StartDate , req.StartDate.Add(req.Duration)) > 0)
+            {
+                return Json(new { result = false, message = "Start time cannot be later then End Time!" }, JsonRequestBehavior.AllowGet);
+            }
+            //check duration
+            if(req.Duration.Ticks == 0)
+            {
+                return Json(new { result = false, message = "Duration need to be higher then 0!" }, JsonRequestBehavior.AllowGet);
+            }
+            if (req.StartTime.Ticks == 0)
+            {
+                return Json(new { result = false, message = "Start Time need to be higher then 0!" }, JsonRequestBehavior.AllowGet);
+            }
+            if (req.ProjectId == 0)
+            {
+                return Json(new { result = false, message = "Need to select a project!" }, JsonRequestBehavior.AllowGet);
+            }
+            //if the user didnt select a date, we cab take the date from the time, as it is basically the same!
+            //Technically in the view we should check for this situation and not allow a empty date field
+            if (req.StartDate.Ticks == 0)
+                req.StartDate = req.StartTime;
+
+
+
+            //Check if there is another request raised for the specific period and tell the user that cannot raise a new one.
+            //if the request is already approve, need to contact the manager to request it
+            //if the request is not approved you can cancel it, and then request a new one
+
+
+
+
+            //check for the start time
+            if (DateTime.Compare(req.StartDate.Date, currentTime.Date) < 0)
+            {
+                return Json(new { result = false, message = "Cannot add Overtime for a past day!" }, JsonRequestBehavior.AllowGet);
+            }
+            //current day
+            else if(DateTime.Compare(req.StartDate.Date, currentTime.Date) == 0) {
+                //check for the shift time.
+
+                var shiftStart = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.LoginTime.Value.Year == currentTime.Year && x.LoginTime.Value.Month == currentTime.Month && x.LoginTime.Value.Day == currentTime.Day).FirstOrDefault();
+                if(shiftStart != null)
+                {
+                    var userSettings = db.User_Settings.Find(user.ID);
+                    if(userSettings != null)
+                    {
+                        var supposeEnd = shiftStart.LoginTime.Value.Add(userSettings.ShiftTime.Value);
+                        if (DateTime.Compare(req.StartDate, supposeEnd) < 0)
+                        {
+                            return Json(new { result = false, message = "Cannot request Overtime during shift period!" }, JsonRequestBehavior.AllowGet);
+                        }
+                    }
+                    else
+                    {
+                        return Json(new { result = false, message = "There has been an error. Contact the Administrator!" }, JsonRequestBehavior.AllowGet);
+                    }
+
+                }
+            }
+            //in the future
+            else
+            {
+
+            }
+
+
+          
+
+
+
+            //Get the Approve stattus from the compnay settings
+            var companySettings = db.Companies_Assigned_Items.Where(x => x.Company_ID == user.Company).FirstOrDefault();
+            if(companySettings == null)
+            {
+                //log the error
+                //send error to the Dev team
+                return Json(new { result = false, message = "There has been an error when processing your request!" }, JsonRequestBehavior.AllowGet);
+            }
+
+            List<string> AutoApproveLst = Utilities.Helper.convertStringtoList(companySettings.AutoApprove, ';');
+            List<string> ManualApprove = Utilities.Helper.convertStringtoList(companySettings.ManualApprove, ';');
+
+            if (AutoApproveLst.Contains(req.Type)) //if the request type is set to manual
+            {
+                //send notif tot he manager that the request has been autoApprove
+                //autoApprove the request
+                //since the request is set to autoApprove we can update directly the mai_data table with the request.
+                //Add also a record into the partial Time Request table with the status of approved!
+                try
+                {
+                    Approve(req);
+                    //Create the notitication and send it to the Manager.
+                    string title = req.Type + " request!";
+                    string message = user.FirstName + " " + user.LastName + " has submited an " + req.Type + " request for the date of " + req.StartDate.ToString("dd-MM-yyyy") + " with the starting time at " + req.StartTime.ToString("HH:mm") +
+                        " and a total duration of " + req.Duration + ". This request has been Auto Approved according to the process in place.";
+
+                    //Add record into the partila Tine Requests
+                    //Add record into the main data
+
+                    
+                    Hubs.LiveNotification.InsertNotification(user.ManagerID, DateTime.Now, title, message, user.ID, "Approve");
+
+                }
+                catch (Exception ex)
+                {
+
+                    //log the error
+                    return Json(new { result = false, message = "There has been an error when processing your request!" }, JsonRequestBehavior.AllowGet);
+                }
+              
+            }
+            else if (ManualApprove.Contains(req.Type)) //if the request type is set to auto
+            {
+
+                //Add record into the PartialTime_request db
+
+
+
+
+                //send notification to the manager that there is a pending request
+                string title = req.Type + " request pending for Approval!";
+                string message = user.FirstName + " " + user.LastName + " has submited an " + req.Type + " request for the date of " + req.StartDate.ToString("dd-MM-yyyy") + " with the starting time at " + req.StartTime.ToString("HH:mm") +
+                    " and a total duration of " + req.Duration + ". This request is on pending state as of now. Please take an action from below and resolv it.";
+
+                Hubs.LiveNotification.InsertNotification(user.ManagerID, DateTime.Now, title, message, user.ID, "Info");
+            }
+            else
+            {
+                //log the error
+                //send error to the Dev team
+                return Json(new { result = false, message = "There has been an error when processing your request!" }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new { result = true, message = "Request has been submited!" }, JsonRequestBehavior.AllowGet);
         }
 
         #endregion
+
+
+
+        private void Approve(Models.Portal.Partial_Request.IPartialRequest request)
+        {
+
+            if (request == null)
+            {
+                //log the request
+                throw new ArgumentNullException("The requst argument cannot be null.");
+            }
+
+            request.AddRequest();
+            
+        }
+           
+        private void Decline(Models.Portal.Partial_Request.IPartialRequest request)
+        {
+          
+            if(request == null)
+            {
+                //log the request
+                throw new ArgumentNullException("The requst argument cannot be null.");
+            }
+
+            request.DeleteRequest();
+            
+        }
 
 
         #region SignalR
@@ -336,6 +519,7 @@ namespace mytimmings.Controllers
         public JsonResult GeLiveNotification()
         {
             Models.Security.User user = GetUserFromSession();
+
             List<Hubs.LiveNotification> notif = new List<Hubs.LiveNotification>();
             var liveNotif = new Hubs.LiveNotification(user.ID);
             notif = liveNotif.GetOpenNotificationByID();
@@ -344,11 +528,6 @@ namespace mytimmings.Controllers
 
         }
        
-
-
-
-
-
         #endregion
 
 

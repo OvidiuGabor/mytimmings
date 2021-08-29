@@ -8,35 +8,52 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form>
+                <form id="overtimeForm">
+                    <input type="hidden" value="Overtime" id="Type" name="Type"/>
                     <div>
                         <div class="form-group" style="display: inline-block">
                             <label for="request-date" class="col-form-label">Date</label>
-                            <input type="date" class="form-control" id="request-date">
+                            <input type="date" class="form-control" id="StartDate" name="StartDate">
                         </div>
                         <div class="form-group" style="display: inline-block">
-                            <label for="start-time" class="col-form-label">Start Time</label>
-                            <input type="time" class="form-control" id="start-time">
+                            <label for="start-time" class="col-form-label">StartTime</label>
+                            <input type="time" class="form-control" id="StartTime" name="StartTime">
                         </div>
                         <div class="form-group" style="display: inline-block">
-                            <label for="duration" class="col-form-label">Duration</label>
-                            <input type="time" class="form-control" id="duration">
+                            <label for="Duration" class="col-form-label">Duration</label>
+                            <input type="time" class="form-control" id="Duration" name="Duration">
                         </div>
                     </div>
                     <div class="form-group" style="display: inline-block">
-                        <label for="project" class="col-form-label">Project</label>
-                        <select id="project" class="form-control"></select>
+                        <label for="project" class="col-form-label">ProjectId</label>
+                        <select id="project" class="form-control" name="ProjectId"></select>
                     </div>
                     <div class="form-group">
                         <label for="message-text" class="col-form-label">Comments</label>
-                        <textarea class="form-control" id="message-text"></textarea>
+                        <textarea class="form-control" id="message-text" name="Comments"></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Send message</button>
+                <button type="button" class="btn btn-primary" onclick="SubmitForm()">Send</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    //this function handle the submit for and fetch the retun from the controller
+    function SubmitForm() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("Post", "@Url.Action("OvertimeRequest", "Portal")")
+        xhr.onload = function (event) {
+            console.log(event.target.response);
+        }
+
+        var formData = new FormData(document.getElementById("overtimeForm"));
+        console.log(formData)
+        xhr.send(formData)
+    }
+
+</script>
