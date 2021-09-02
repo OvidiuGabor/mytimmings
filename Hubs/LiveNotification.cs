@@ -13,6 +13,7 @@ namespace mytimmings.Hubs
         public DateTime DateReceived { get; set; }
         public DateTime? DateClosed { get; set; }
         public string Message { get; set; }
+        public string Title { get; set; }
         public string Sender { get; set; }
         public string Type { get; set; }
 
@@ -36,7 +37,7 @@ namespace mytimmings.Hubs
 
         }
 
-        public LiveNotification(string dateReceived, string dateClosed, string message, string sender, string type)
+        public LiveNotification(string dateReceived, string dateClosed, string title, string message, string sender, string type)
         {
            
 
@@ -47,6 +48,7 @@ namespace mytimmings.Hubs
             }
          
             Message = message;
+            Title = title;
             Sender = GetNameFromId(sender);
             Type = type;
 
@@ -61,6 +63,7 @@ namespace mytimmings.Hubs
             DateReceived = db.DateReceived.Value;
             DateClosed = db.DateClosed;
             Message = db.Message;
+            Title = Title;
             Sender = GetNameFromId(db.Sender);
             Type = db.Type;
 
@@ -94,17 +97,28 @@ namespace mytimmings.Hubs
             SqlConnection conn = new SqlConnection(Connstring);
             conn.Open();
             SqlCommand cmd = new SqlCommand();
+            //cmd.CommandText = @"SELECT [ID]
+            //                  ,[UserId]
+            //                  ,[DateReceived]
+            //                  ,[DateClosed]
+            //                  ,[Message]
+            //                  ,[Title]
+            //                  ,[Sender]
+            //                  ,[Type]
+            //              FROM [mytimngs_admin].[LiveNotification] where UserId = " + "'" + UserId + "'";
             cmd.CommandText = @"SELECT [ID]
                               ,[UserId]
                               ,[DateReceived]
                               ,[DateClosed]
                               ,[Message]
+                              ,[Title]
                               ,[Sender]
                               ,[Type]
-                          FROM [mytimngs_admin].[LiveNotification]";
+                          FROM [mytimngs_admin].[LiveNotification] ";
             cmd.Connection = conn;
             cmd.CommandType = CommandType.Text;
             Dependecy = new SqlDependency(cmd);
+        
             Dependecy.OnChange += new OnChangeEventHandler(dependecy_OnChage);
 
             if (conn.State == ConnectionState.Closed)
@@ -118,7 +132,7 @@ namespace mytimmings.Hubs
             for(int i = 0; i  < dt.Rows.Count; i++)
             {
                 var curRow = dt.Rows[i];
-                notifList.Add(new LiveNotification(curRow["DateReceived"].ToString(), curRow["DateClosed"].ToString(), curRow["Message"].ToString(), curRow["Sender"].ToString(), curRow["Type"].ToString()));
+                notifList.Add(new LiveNotification(curRow["DateReceived"].ToString(), curRow["DateClosed"].ToString(), curRow["Title"].ToString(), curRow["Message"].ToString(), curRow["Sender"].ToString(), curRow["Type"].ToString()));
             }
 
 
@@ -128,11 +142,17 @@ namespace mytimmings.Hubs
 
         private void dependecy_OnChage(object sender, SqlNotificationEventArgs e)
         {
+            if (Dependecy != null)
+            {
+                Dependecy.OnChange -= new OnChangeEventHandler(dependecy_OnChage);
+                Dependecy = null;
+            }
             if (e.Type == SqlNotificationType.Change)
             {
                 GetOpenNotificationByID();
                 NotificationHub.SendNotification();
-                Dependecy.OnChange -= new OnChangeEventHandler(dependecy_OnChage);
+               
+               
             }
            
         }

@@ -15,15 +15,27 @@
 <div class="top-cards-container card-columns width-and-center">
 
     @{
+        string convertedTime = "";
         var h = (int)Model.WorkingHours.TotalTime.TotalHours;
         var m = Model.WorkingHours.TotalTime.Minutes;
+        if (m < 10)
+        {
+            convertedTime = h + ".0" + m;
+        }
+        else
+        {
+            convertedTime = h + "." + m;
+        }
+
+
+
     }
 
     <div class="card bg-white card-shadow">
         <div class="card-body text-left">
             <div style="display: inline-block">
                 <h2 class="card-text">Total Hours</h2>
-                <p class="card-text">@h.@m Hrs</p>
+                <p class="card-text">@convertedTime Hrs</p>
             </div>
             <div style="display: inline-block; float: right;">
                 <img src="~/Content/SVG/icon-total-hours.svg" class="card-img" />
@@ -34,12 +46,20 @@
     @{
         h = (int)Model.WorkingHours.Productive.TotalHours;
         m = Model.WorkingHours.Productive.Minutes;
+        if (m < 10)
+        {
+            convertedTime = h + ".0" + m;
+        }
+        else
+        {
+            convertedTime = h + "." + m;
+        }
     }
     <div class="card bg-white card-shadow">
         <div class="card-body text-left">
             <div style="display: inline-block">
                 <h2 class="card-text">Productive Hours</h2>
-                <p class="card-text">@h.@m Hrs</p>
+                <p class="card-text">@convertedTime Hrs</p>
             </div>
             <div style="display: inline-block; float: right;">
                 <img src="~/Content/SVG/icon-pro-hours.svg" class="card-img" />
@@ -50,12 +70,20 @@
     @{
         h = (int)Model.WorkingHours.NonProductive.TotalHours;
         m = Model.WorkingHours.NonProductive.Minutes;
+        if (m < 10)
+        {
+            convertedTime = h + ".0" + m;
+        }
+        else
+        {
+            convertedTime = h + "." + m;
+        }
     }
     <div class="card bg-white card-shadow">
         <div class="card-body text-left">
             <div style="display: inline-block">
                 <h2 class="card-text">Non Productive Hours</h2>
-                <p class="card-text">@h.@m Hrs</p>
+                <p class="card-text">@convertedTime Hrs</p>
             </div>
             <div style="display: inline-block; float: right;">
                 <img src="~/Content/SVG/icon-idle-hours.svg" class="card-img" />

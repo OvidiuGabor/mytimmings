@@ -507,6 +507,8 @@
     <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\NotFound.js" />
     <Content Include="Scripts\Notification.js" />
+    <Content Include="Scripts\Personal\PushNotification.js" />
+    <Content Include="Scripts\Personal\Utilities.js" />
     <Content Include="Scripts\popper-utils.js" />
     <Content Include="Scripts\popper-utils.min.js" />
     <Content Include="Scripts\popper.js" />

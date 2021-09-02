@@ -440,12 +440,12 @@ namespace mytimmings.Controllers
                     //Create the notitication and send it to the Manager.
                     string title = req.Type + " request!";
                     string message = user.FirstName + " " + user.LastName + " has submited an " + req.Type + " request for the date of " + req.StartDate.ToString("dd-MM-yyyy") + " with the starting time at " + req.StartTime.ToString("HH:mm") +
-                        " and a total duration of " + req.Duration + ". This request has been Auto Approved according to the process in place.";
+                    " and a total duration of " + req.Duration + ". This request is on pending state as of now. Please take an action from below and resolve it.";
 
-                    //Add record into the partila Tine Requests
+                    //Add record into the partial Tine Requests
                     //Add record into the main data
 
-                    
+
                     Hubs.LiveNotification.InsertNotification(user.ManagerID, DateTime.Now, title, message, user.ID, "Approve");
 
                 }
@@ -467,8 +467,9 @@ namespace mytimmings.Controllers
 
                 //send notification to the manager that there is a pending request
                 string title = req.Type + " request pending for Approval!";
+                
                 string message = user.FirstName + " " + user.LastName + " has submited an " + req.Type + " request for the date of " + req.StartDate.ToString("dd-MM-yyyy") + " with the starting time at " + req.StartTime.ToString("HH:mm") +
-                    " and a total duration of " + req.Duration + ". This request is on pending state as of now. Please take an action from below and resolv it.";
+                        " and a total duration of " + req.Duration + ". This request has been Auto Approved according to the process in place.";
 
                 Hubs.LiveNotification.InsertNotification(user.ManagerID, DateTime.Now, title, message, user.ID, "Info");
             }
@@ -498,7 +499,12 @@ namespace mytimmings.Controllers
             request.AddRequest();
             
         }
-           
+        //Approve by ID
+        private void Approve(string id)
+        {
+
+        }
+
         private void Decline(Models.Portal.Partial_Request.IPartialRequest request)
         {
           
