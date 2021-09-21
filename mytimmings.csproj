@@ -168,7 +168,7 @@
     <Compile Include="Hubs\LiveNotification.cs" />
     <Compile Include="Hubs\NotificationHub.cs" />
     <Compile Include="Interfaces\Notification.cs" />
-    <Compile Include="Models\Notification\Notification.cs" />
+    <Compile Include="Models\Notification\Notification_Comm.cs" />
     <Compile Include="Models\Portal\Helpers\JsonObj.cs" />
     <Compile Include="Models\Portal\Leave.cs" />
     <Compile Include="Models\Portal\LeaveStatus.cs" />

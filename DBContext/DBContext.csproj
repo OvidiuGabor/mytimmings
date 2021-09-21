@@ -61,6 +61,7 @@
     <Compile Include="Leave_Requests.cs" />
     <Compile Include="LiveNotification.cs" />
     <Compile Include="Main_Data.cs" />
+    <Compile Include="Notification_Comunication_History.cs" />
     <Compile Include="Params.cs" />
     <Compile Include="PartialTime_Requests.cs" />
     <Compile Include="Project.cs" />

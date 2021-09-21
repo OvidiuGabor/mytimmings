@@ -10,6 +10,7 @@ namespace mytimmings.Hubs
 {
     public class LiveNotification
     {
+        public int NotificationId { get; set; }
         public DateTime DateReceived { get; set; }
         public DateTime? DateClosed { get; set; }
         public string Message { get; set; }
@@ -37,10 +38,10 @@ namespace mytimmings.Hubs
 
         }
 
-        public LiveNotification(string dateReceived, string dateClosed, string title, string message, string sender, string type)
+        public LiveNotification(string notificationID, string dateReceived, string dateClosed, string title, string message, string sender, string type)
         {
-           
 
+            NotificationId = Convert.ToInt32(notificationID);
             DateReceived = DateTime.Parse(dateReceived);
             if(!String.IsNullOrEmpty(dateClosed))
             {
@@ -105,7 +106,7 @@ namespace mytimmings.Hubs
             //                  ,[Title]
             //                  ,[Sender]
             //                  ,[Type]
-            //              FROM [mytimngs_admin].[LiveNotification] where UserId = " + "'" + UserId + "'";
+            //              FROM [mytimngs_admin].[LiveNotification] where DateClosed is null and UserId = " + "'" + UserId + "' ORDER BY DateReceived desc";
             cmd.CommandText = @"SELECT [ID]
                               ,[UserId]
                               ,[DateReceived]
@@ -114,7 +115,7 @@ namespace mytimmings.Hubs
                               ,[Title]
                               ,[Sender]
                               ,[Type]
-                          FROM [mytimngs_admin].[LiveNotification] ";
+                          FROM [mytimngs_admin].[LiveNotification] where DateClosed is null ORDER BY DateReceived desc";
             cmd.Connection = conn;
             cmd.CommandType = CommandType.Text;
             Dependecy = new SqlDependency(cmd);
@@ -132,7 +133,7 @@ namespace mytimmings.Hubs
             for(int i = 0; i  < dt.Rows.Count; i++)
             {
                 var curRow = dt.Rows[i];
-                notifList.Add(new LiveNotification(curRow["DateReceived"].ToString(), curRow["DateClosed"].ToString(), curRow["Title"].ToString(), curRow["Message"].ToString(), curRow["Sender"].ToString(), curRow["Type"].ToString()));
+                notifList.Add(new LiveNotification(curRow["ID"].ToString(), curRow["DateReceived"].ToString(), curRow["DateClosed"].ToString(), curRow["Title"].ToString(), curRow["Message"].ToString(), curRow["Sender"].ToString(), curRow["Type"].ToString()));
             }
 
 

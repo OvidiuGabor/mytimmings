@@ -317,8 +317,6 @@ namespace mytimmings.Controllers
         }
 
 
-
-
         #region Partial Requests
 
         public ActionResult OvertimeRequest(Models.Portal.Partial_Request.OvertimeRequest req)
@@ -382,10 +380,9 @@ namespace mytimmings.Controllers
             {
                 return Json(new { result = false, message = "Cannot add Overtime for a past day!" }, JsonRequestBehavior.AllowGet);
             }
-            //current day
-            else if(DateTime.Compare(req.StartDate.Date, currentTime.Date) == 0) {
+            else if(DateTime.Compare(req.StartDate.Date, currentTime.Date) == 0)//current day
+            {
                 //check for the shift time.
-
                 var shiftStart = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.LoginTime.Value.Year == currentTime.Year && x.LoginTime.Value.Month == currentTime.Month && x.LoginTime.Value.Day == currentTime.Day).FirstOrDefault();
                 if(shiftStart != null)
                 {
@@ -416,7 +413,7 @@ namespace mytimmings.Controllers
 
 
 
-            //Get the Approve stattus from the compnay settings
+            //Get the Approve status from the compnay settings
             var companySettings = db.Companies_Assigned_Items.Where(x => x.Company_ID == user.Company).FirstOrDefault();
             if(companySettings == null)
             {
@@ -430,7 +427,7 @@ namespace mytimmings.Controllers
 
             if (AutoApproveLst.Contains(req.Type)) //if the request type is set to manual
             {
-                //send notif tot he manager that the request has been autoApprove
+                //send notif tot the manager saying that the request has been autoApprove
                 //autoApprove the request
                 //since the request is set to autoApprove we can update directly the mai_data table with the request.
                 //Add also a record into the partial Time Request table with the status of approved!
@@ -443,6 +440,7 @@ namespace mytimmings.Controllers
                     " and a total duration of " + req.Duration + ". This request is on pending state as of now. Please take an action from below and resolve it.";
 
                     //Add record into the partial Tine Requests
+
                     //Add record into the main data
 
 
@@ -485,7 +483,21 @@ namespace mytimmings.Controllers
 
         #endregion
 
+        public ActionResult ApproveRequest(string id)
+        {
 
+
+
+            return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult DeclineReqeust(string id)
+        {
+
+
+
+            return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+        }
 
         private void Approve(Models.Portal.Partial_Request.IPartialRequest request)
         {

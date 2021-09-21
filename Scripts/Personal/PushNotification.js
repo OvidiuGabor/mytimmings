@@ -76,13 +76,26 @@ function AddNotificationToView(result) {
     var linebreak = "<hr />"
 
     if (result.length > 0) {
+        $container.innerHTML = null;
         for (var i = 0; i < result.length; i++) {
             var current = result[i];
 
             var html = '<div class="notif">';
                 html += '<div class="notification-body"> ';
                     html += '<div class="notification-type">';
-                        html += '<p class="notif-type-text">' + current.Type + '</p>';
+            switch (current.Type) {
+                case "Info": html += '<p class="notif-type-text notif-blue">' + current.Type + '</p>'
+                    break;
+                case "Approve": html += '<p class="notif-type-text notif-purple">' + current.Type + '</p>'
+                    break;
+                case "Success": html += '<p class="notif-type-text notif-green">' + current.Type + '</p>'
+                    break;
+                case "Warning": html += '<p class="notif-type-text notif-red">' + current.Type + '</p>'
+                    break;
+
+                default: html += '<p class="notif-type-text notif-orange">' + current.Type + '</p>'
+            }
+                        ;
                     html += '</div';
                 html += ' <div class="notification-title">';
                     html += ' <p class="notif-title-text">' + current.Title + '</p>';
@@ -93,13 +106,18 @@ function AddNotificationToView(result) {
                     html += '<p class="notif-message-body-text">'
                     //check for the length of the message
                     //if message length > 50 characters then add the click here part for opening the notification widow page, in order to see more detail about the message
-                    if (current.Message.length > 50) {
-                        html += current.Message.substring(0, 50) + '...  <a href = "#" style="color: red">read</a>'
+                    if (current.Message.length > 70) {
+                        html += current.Message.substring(0, 70) + '...  <a href = "#" style="color: red">read</a>'
                     } else {
                         html += current.Message
                     }
 
                     html += '</p>'
+                    if (current.Type == "Approve") {
+                        html += "<a href = '#' class = 'notif-small-link-btn' style='margin-right: 30px'>Approve</a>"
+                        html += "<a href = '#' class = 'notif-small-link-btn'>Decline</a>"
+                    }
+
                  html += '</div>'
 
             //add the signature
@@ -112,6 +130,7 @@ function AddNotificationToView(result) {
             html += '<p class="notif-time-text">' + formatDate(ConvertJsonDate(current.DateReceived)) + '</p>'
             html += '</div></div>'
             html += linebreak
+            
             $container.innerHTML += html
         }
 
