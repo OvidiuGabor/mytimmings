@@ -3,7 +3,7 @@
     if (typeof date !== 'undefined' && date.length > 0) {
         var num = date.match(/\d+/g); //regex to extract numbers 
         var date = new Date(parseFloat(num)); //converting to date
-        console.log(date)
+/*        console.log(date)*/
         return ConvertFromUTC(date);
     }
 }

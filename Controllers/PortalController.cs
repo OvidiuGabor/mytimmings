@@ -333,7 +333,6 @@ namespace mytimmings.Controllers
             //add the current user as the User who made the request.
             req.AddUser(user);
 
-
             //Perform some checkes about the notification.
             //1. The request cannot be in the past;
             //2. The Request cannot be during shift time, so need to check for the starting time of the shift, then calculate the end time.
@@ -344,7 +343,7 @@ namespace mytimmings.Controllers
             DateTime currentTime = DateTime.UtcNow;
 
             //check for the start and end time
-            if(DateTime.Compare(req.StartDate , req.StartDate.Add(req.Duration)) > 0)
+            if(DateTime.Compare(req.RequestDate, req.RequestDate.Add(req.Duration)) > 0)
             {
                 return Json(new { result = false, message = "Start time cannot be later then End Time!" }, JsonRequestBehavior.AllowGet);
             }
@@ -363,8 +362,8 @@ namespace mytimmings.Controllers
             }
             //if the user didnt select a date, we cab take the date from the time, as it is basically the same!
             //Technically in the view we should check for this situation and not allow a empty date field
-            if (req.StartDate.Ticks == 0)
-                req.StartDate = req.StartTime;
+            if (req.RequestDate.Ticks == 0)
+                req.RequestDate = req.StartTime;
 
 
 
@@ -376,11 +375,11 @@ namespace mytimmings.Controllers
 
 
             //check for the start time
-            if (DateTime.Compare(req.StartDate.Date, currentTime.Date) < 0)
+            if (DateTime.Compare(req.RequestDate.Date, currentTime.Date) < 0)
             {
                 return Json(new { result = false, message = "Cannot add Overtime for a past day!" }, JsonRequestBehavior.AllowGet);
             }
-            else if(DateTime.Compare(req.StartDate.Date, currentTime.Date) == 0)//current day
+            else if(DateTime.Compare(req.RequestDate.Date, currentTime.Date) == 0)//current day
             {
                 //check for the shift time.
                 var shiftStart = db.User_Login_Logout.Where(x => x.UserId == user.ID && x.LoginTime.Value.Year == currentTime.Year && x.LoginTime.Value.Month == currentTime.Month && x.LoginTime.Value.Day == currentTime.Day).FirstOrDefault();
@@ -390,7 +389,7 @@ namespace mytimmings.Controllers
                     if(userSettings != null)
                     {
                         var supposeEnd = shiftStart.LoginTime.Value.Add(userSettings.ShiftTime.Value);
-                        if (DateTime.Compare(req.StartDate, supposeEnd) < 0)
+                        if (DateTime.Compare(req.StartTime, supposeEnd) < 0)
                         {
                             return Json(new { result = false, message = "Cannot request Overtime during shift period!" }, JsonRequestBehavior.AllowGet);
                         }
@@ -407,11 +406,6 @@ namespace mytimmings.Controllers
             {
 
             }
-
-
-          
-
-
 
             //Get the Approve status from the compnay settings
             var companySettings = db.Companies_Assigned_Items.Where(x => x.Company_ID == user.Company).FirstOrDefault();
@@ -433,19 +427,25 @@ namespace mytimmings.Controllers
                 //Add also a record into the partial Time Request table with the status of approved!
                 try
                 {
-                    Approve(req);
-                    //Create the notitication and send it to the Manager.
-                    string title = req.Type + " request!";
-                    string message = user.FirstName + " " + user.LastName + " has submited an " + req.Type + " request for the date of " + req.StartDate.ToString("dd-MM-yyyy") + " with the starting time at " + req.StartTime.ToString("HH:mm") +
-                    " and a total duration of " + req.Duration + ". This request is on pending state as of now. Please take an action from below and resolve it.";
-
-                    //Add record into the partial Tine Requests
+                    //Add record into the partial Time Requests
+                    req.Status ="Approved";
+                    req.Approver = "System";
+                    req.AddRequest();
 
                     //Add record into the main data
+                    var mainRecord = new Models.Portal.Action(req);
+                    mainRecord.AddRecord();
 
+                    //Create the notitication and send it to the Manager.
+                    string title = req.Type + " request!";
+                    string message = user.FirstName + " " + user.LastName + " has submited an " + req.Type + " request for the date of " + req.RequestDate.ToString("dd-MM-yyyy") + " with the starting time at " + req.StartTime.ToString("HH:mm") +
+                    " and a total duration of " + req.Duration + ". This request is Auto Approved due to System settings. If you still want to cancell this request you can access the Request page and search the request.";
+                    Hubs.LiveNotification.InsertNotification(user.ManagerID, DateTime.Now, title, message, user.ID, "Info");
 
-                    Hubs.LiveNotification.InsertNotification(user.ManagerID, DateTime.Now, title, message, user.ID, "Approve");
+                    var notifCommTracker = new Models.Notification.Notification_Comm(req.getNotificationId(), DateTime.UtcNow, req.Comments, req.User.ID);
+                    notifCommTracker.AddNewRecord(notifCommTracker);
 
+                    //send email to the user who created the request.
                 }
                 catch (Exception ex)
                 {
@@ -457,19 +457,35 @@ namespace mytimmings.Controllers
             }
             else if (ManualApprove.Contains(req.Type)) //if the request type is set to auto
             {
+                try
+                {
+                    //Add record into the PartialTime_request db
+                    req.Status = "Pending";
+                    req.Approver = user.ManagerID;
+                    req.AddRequest();
 
-                //Add record into the PartialTime_request db
 
 
+                    //send notification to the manager that there is a pending request
+                    string title = req.Type + " request pending for Approval!";
 
+                    string message = user.FirstName + " " + user.LastName + " has submited an " + req.Type + " request for the date of " + req.RequestDate.ToString("dd-MM-yyyy") + " with the starting time at " + req.StartTime.ToString("HH:mm") +
+                            " and a total duration of " + req.Duration + ". The Request is waiting your feetback.";
 
-                //send notification to the manager that there is a pending request
-                string title = req.Type + " request pending for Approval!";
-                
-                string message = user.FirstName + " " + user.LastName + " has submited an " + req.Type + " request for the date of " + req.StartDate.ToString("dd-MM-yyyy") + " with the starting time at " + req.StartTime.ToString("HH:mm") +
-                        " and a total duration of " + req.Duration + ". This request has been Auto Approved according to the process in place.";
+                    Hubs.LiveNotification.InsertNotification(user.ManagerID, DateTime.Now, title, message, user.ID, "Approve");
 
-                Hubs.LiveNotification.InsertNotification(user.ManagerID, DateTime.Now, title, message, user.ID, "Info");
+                    var notifCommTracker = new Models.Notification.Notification_Comm(req.getNotificationId(), DateTime.UtcNow, req.Comments, req.User.ID);
+                    notifCommTracker.AddNewRecord(notifCommTracker);
+
+                    //send email to the manager with the user in CC
+                }
+                catch (Exception ex)
+                {
+
+                    //log the error
+                    return Json(new { result = false, message = "There has been an error when processing your request!" }, JsonRequestBehavior.AllowGet);
+                }
+               
             }
             else
             {
@@ -483,21 +499,43 @@ namespace mytimmings.Controllers
 
         #endregion
 
-        public ActionResult ApproveRequest(string id)
+        public ActionResult ApproveRequest(string id, string comment = null)
         {
 
+            if (String.IsNullOrEmpty(id))
+            {
+                return Json(new { result = true, message = "There is a problem with the request. Contact Support Team!" }, JsonRequestBehavior.AllowGet);
+            }
+
+            var request = new Models.Portal.Partial_Request.OvertimeRequest(id);
+            request.ApproveRequest();
+
+            //add record into live notification
 
 
-            return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+
+            return Json(new { result = true, message = "Request has been approved!" }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult DeclineReqeust(string id)
         {
 
+            if (String.IsNullOrEmpty(id))
+            {
+                return Json(new { result = true, message = "There is a problem with the request. Contact Support Team!" }, JsonRequestBehavior.AllowGet);
+            }
+
+            var request = new Models.Portal.Partial_Request.OvertimeRequest(id);
+            request.ApproveRequest();
+
+            //add record into live notification
 
 
-            return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+
+            return Json(new { result = true, message = "Request has been approved!" }, JsonRequestBehavior.AllowGet);
         }
+
+
 
         private void Approve(Models.Portal.Partial_Request.IPartialRequest request)
         {
@@ -507,13 +545,6 @@ namespace mytimmings.Controllers
                 //log the request
                 throw new ArgumentNullException("The requst argument cannot be null.");
             }
-
-            request.AddRequest();
-            
-        }
-        //Approve by ID
-        private void Approve(string id)
-        {
 
         }
 
@@ -525,8 +556,6 @@ namespace mytimmings.Controllers
                 //log the request
                 throw new ArgumentNullException("The requst argument cannot be null.");
             }
-
-            request.DeleteRequest();
             
         }
 

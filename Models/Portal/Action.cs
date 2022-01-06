@@ -50,6 +50,16 @@ namespace mytimmings.Models.Portal
           
         }
 
+        public Action(Partial_Request.IPartialRequest request)
+        {
+            Name = request.Type;
+            StartTime = request.StartTime;
+            EndTime = request.StartTime.Add(request.Duration);
+            UserId = request.User.ID;
+            ProjectId = request.ProjectId;
+            Comment = request.Comments;
+        }
+
         public static List<Action> CreateFromDbList( List<DBContext.Main_Data> lst)
         {
             List<Action> result = new List<Action>();

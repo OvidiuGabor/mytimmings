@@ -15,8 +15,10 @@ namespace DBContext
 
         [StringLength(10)]
         public string UserId { get; set; }
+        [StringLength(10)]
+        public string RequestId { get; set; }
 
-
+        public DateTime SubmitedDate { get; set; }
         public TimeSpan RequestTime { get; set; }
 
         [Column(TypeName = "date")]

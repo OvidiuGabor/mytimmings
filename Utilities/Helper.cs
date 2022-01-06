@@ -140,8 +140,6 @@ namespace mytimmings.Utilities
             return statuses;
           
         }
-
-
         public static string getCompanyId(string userID)
         {
             if (String.IsNullOrEmpty(userID))
@@ -166,6 +164,63 @@ namespace mytimmings.Utilities
             return newList;
         
         
+        }
+
+        //Generate an requestId when the user submits a request
+        public static string generateRequestId(string requestType)
+        {
+            string requestId = "REQ";
+            int retry = 0;
+            try
+            {
+                requestId += requestType.Substring(0, 1);
+                requestId = createRequestString(requestId);
+                retry++;
+
+                //in order to check if the id exists, we are going to make a request inot the db, and if the result is null, then the id is good.
+                //if we get a result, then the id is not good and we start again, so that the number will increase.
+                //after 5 retry, we can send it as a error;
+                var checkId = db.PartialTime_Requests.Where(x => x.RequestId == requestId).FirstOrDefault();
+
+                if(checkId != null)
+                {
+                    if(retry > 5)
+                    {
+                        throw new InvalidOperationException("Cannot generate a new Id for the partial time request");
+                    }
+                    generateRequestId(requestType);
+                }
+            }
+            catch (Exception)
+            {
+                if (retry > 5)
+                {
+                    throw new InvalidOperationException("Cannot generate a new Id for the partial time request");
+                }
+                retry++;
+                    
+                generateRequestId(requestType);
+               
+            }
+
+
+            return requestId;
+        }
+
+
+        private static string createRequestString(string partialID)
+        {
+            int countRec = db.PartialTime_Requests.Count() +1;
+
+            string convertedInt = countRec.ToString();
+            int characterscount = convertedInt.Length;
+            string finalId = partialID;
+            for (var i = 0; i < (6 -characterscount); i++)
+            {
+                finalId += "0";
+            }
+            finalId += convertedInt;
+            return finalId;
         }
         #endregion
 

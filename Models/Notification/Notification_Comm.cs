@@ -39,12 +39,10 @@ namespace mytimmings.Models.Notification
 
         }
 
-
-
         public void AddNewRecord(Notification_Comm notifMessage)
         {
             if (notifMessage == null)
-                throw new ArgumentNullException("Paramter supplied cannot be null!");
+                throw new ArgumentNullException("Parameter supplied cannot be null!");
 
             DBContext.DBModel db = new DBContext.DBModel();
 
