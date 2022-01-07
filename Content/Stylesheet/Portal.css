@@ -1,4 +1,4 @@
-﻿.container {
+﻿/*.container {
     margin-left: 300px;
     margin-top: 43px;
     text-align: center;
@@ -7,6 +7,38 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
+}
+*/
+
+.conainer-padding{
+    padding: 0.01em 50px;
+}
+
+
+.user-details{
+
+    display: inline-block;
+}
+
+
+.user-body {
+    padding: 1em;
+}
+
+
+.devider {
+    width: 1px;
+    height: 3em;
+    display: inline-block;
+    position: relative;
+    float: right;
+    transform: rotate(30deg);
+    opacity: 26%;
+}
+
+
+.user-detail-title{
+    font-weight: bold;
 }
 
 .width-and-center {

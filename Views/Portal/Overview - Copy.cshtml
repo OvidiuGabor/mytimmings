@@ -1,0 +1,590 @@
+﻿@model mytimmings.Models.Portal.Overview
+<link href="~/Content/Stylesheet/Portal.css" rel="stylesheet" />
+@{
+    ViewBag.Title = "Overview";
+}
+<div class="container w3-main">
+    <div class="page-tile width-and-center">
+        <h1>My Dashboard</h1>
+        <hr />
+    </div>
+    @*<div class="width-and-center" style="text-align:left; margin-top: 25px ">
+        <h3>My Stats</h3>
+    </div>*@
+    @Html.Partial("_OvertimeModal")
+<div class="top-cards-container card-columns width-and-center">
+
+    @{
+        string convertedTime = "";
+        var h = (int)Model.WorkingHours.TotalTime.TotalHours;
+        var m = Model.WorkingHours.TotalTime.Minutes;
+        if (m < 10)
+        {
+            convertedTime = h + ".0" + m;
+        }
+        else
+        {
+            convertedTime = h + "." + m;
+        }
+
+
+
+    }
+
+    <div class="card bg-white card-shadow">
+        <div class="card-body text-left">
+            <div style="display: inline-block">
+                <h2 class="card-text">Total Hours</h2>
+                <p class="card-text">@convertedTime Hrs</p>
+            </div>
+            <div style="display: inline-block; float: right;">
+                <img src="~/Content/SVG/icon-total-hours.svg" class="card-img" />
+            </div>
+        </div>
+
+    </div>
+    @{
+        h = (int)Model.WorkingHours.Productive.TotalHours;
+        m = Model.WorkingHours.Productive.Minutes;
+        if (m < 10)
+        {
+            convertedTime = h + ".0" + m;
+        }
+        else
+        {
+            convertedTime = h + "." + m;
+        }
+    }
+    <div class="card bg-white card-shadow">
+        <div class="card-body text-left">
+            <div style="display: inline-block">
+                <h2 class="card-text">Productive Hours</h2>
+                <p class="card-text">@convertedTime Hrs</p>
+            </div>
+            <div style="display: inline-block; float: right;">
+                <img src="~/Content/SVG/icon-pro-hours.svg" class="card-img" />
+            </div>
+        </div>
+
+    </div>
+    @{
+        h = (int)Model.WorkingHours.NonProductive.TotalHours;
+        m = Model.WorkingHours.NonProductive.Minutes;
+        if (m < 10)
+        {
+            convertedTime = h + ".0" + m;
+        }
+        else
+        {
+            convertedTime = h + "." + m;
+        }
+    }
+    <div class="card bg-white card-shadow">
+        <div class="card-body text-left">
+            <div style="display: inline-block">
+                <h2 class="card-text">Non Productive Hours</h2>
+                <p class="card-text">@convertedTime Hrs</p>
+            </div>
+            <div style="display: inline-block; float: right;">
+                <img src="~/Content/SVG/icon-idle-hours.svg" class="card-img" />
+            </div>
+        </div>
+
+    </div>
+    <div class="card bg-white card-shadow">
+        <div class="card-body text-left">
+            <div style="display: inline-block; text-align:center">
+                <h2 class="card-text">Clock IN</h2>
+                @{
+                    if (Model.TimeTracker.StartTime.HasValue)
+                    {
+                        string st = Model.TimeTracker.StartTime.Value.ToLocalTime().ToString("HH:mm:ss");
+                        <p class="card-text">@st</p>
+                    }
+                    else
+                    {
+                        <p class="card-text" style="color: white">a</p>
+                    }
+                }
+
+            </div>
+            <div style="float: right; text-align: center">
+                <h2 class="card-text">Clock out</h2>
+                @if (Model.TimeTracker.EndTime.HasValue)
+                {
+
+
+                    string st = Model.TimeTracker.EndTime.Value.ToLocalTime().ToString("HH:mm:ss");
+
+                    <p class="card-text">@st</p>
+
+                }
+                else
+                {
+                    <p class="card-text" style="color: white">b</p>
+                }
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+    <div class="middle-part-container width-and-center card-columns" style="column-count: 2 !important">
+
+        <div class="card bg-white card-shadow" style="width: 151.5%">
+            <div class="card-body text-left" style="padding-left: 70px; padding-right: 70px;">
+                <div style="display: inline-block">
+                    <h2 class="card-text">Today Progress</h2>
+                </div>
+                <div class="trackbar" id="time-trackbar">
+                    <div class="track-button" id="track-pointer">
+                        <p id="time-keeper">00:00</p>
+                        <img src="~/Content/SVG/Bar-tracker.svg" style="height: 60px;"/>
+                    </div>
+                    <div id="track-line" class="track-line" data-maxTime="@Model.TimeTracker.MaxFinishTime"></div>
+                </div>
+
+                <div class="main-form">
+                    <div class="left-buttons">
+                        <div>
+                            <button type="button" class="btn btn-primary main-form-btn" id="checkIn-btn" onclick="ClockIn()" style="background-color: #4a7dff; border-color: #4a7dff">Clock in</button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-primary main-form-btn" id="checkOut-btn" onclick="ClockOut()" style="background-color: #f93939; border-color:  #f93939">Clock Out</button>
+                        </div>
+
+
+                        @Html.DropDownListFor(model => model.ActionName, Model.ActionsDropDown, new { @class = "form-control main-form-btn"})
+
+                        @Html.DropDownListFor(model => model.ProjectId, Model.ProjectDropDown, new { @class = "form-control main-form-btn" })
+                        <div>
+                            <button type="button" class="btn btn-primary main-form-btn" id="update-btn" onclick="UpdateStatus()" style="background-color: #51ce2c; border-color: #51ce2c">Update</button>
+                        </div>
+
+                    </div>
+                    <div class="right-text-box">
+                        <div class="textarea-placeholder">
+                            <textarea rows="8" cols="91" placeholder="Type Comment..." id="commets"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+        <div class="card bg-white card-shadow right-middle-card">
+            <div class="card-body text-center">
+                <div>
+                    <h2 class="card-text">Actions</h2>
+                </div>
+
+                @{
+                    if (Model.TodayActions != null && Model.TodayActions.Count > 0)
+                    {
+                        foreach(var item in Model.TodayActions)
+                        {
+
+                            string st = item.StartTime.ToLocalTime().ToString("HH:mm");
+                            <div class="card-list-item">
+                                <div class="left-item">@item.Name</div>
+                                <div class="right-item">@st</div>
+                            </div>
+                        }
+                    }
+                }
+               
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="bottom-cards-container width-and-center card-columns">
+        <div class="card bg-white card-shadow" style="height: 220px;">
+            <div class="card-body text-center">
+                <div>
+                    <h2 class="card-text">Leave Credits</h2>
+                </div>
+
+                @{
+                    if (Model.LeaveStatus.Count > 0)
+                    {
+                        foreach (var item in Model.LeaveStatus)
+                        {
+
+                            <div class="card-list-item">
+                                <div class="left-item">@item.Type</div>
+                                <div class="right-item">@item.DaysRemaining D</div>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+
+        </div>
+        <div class="card bg-white card-shadow" style="height: 220px;">
+            <div class="card-body text-center" style="height: 220px; overflow-y:auto ">
+                <div>
+
+                    <h2 class="card-text">Daily Logins</h2>
+                </div>
+
+                @{
+                    if (Model.LeaveStatus != null && Model.LeaveStatus.Count > 0)
+                    {
+                        foreach (var item in Model.DailyLogins)
+                        {
+
+                            var date = item.StartTime.Value.ToString("dd.MM.yyyy");
+                            var time = item.StartTime.Value.ToLocalTime().ToString("HH:mm");
+                                <div class="card-list-item">
+                                    <div class="left-item">@date</div>
+                                    <div class="right-item">@time</div>
+                                </div>
+                        }
+                    }
+                }
+            </div>
+
+        </div>
+        <div class="card bg-white card-shadow" style="height: 220px;">
+            <div class="card-body text-center" style="height: 220px; overflow-y:auto ">
+                <div>
+
+                    <h2 class="card-text">Additional Times</h2>
+                </div>
+
+                @{
+                    Dictionary<string, TimeSpan> statusesDic = new Dictionary<string, TimeSpan>();
+                    if (Model.Partial.PartialStatusesAvailable != null && Model.Partial.PartialStatusesAvailable.Count > 0)
+                    {
+                        foreach (var item in Model.Partial.PartialStatusesAvailable)
+                        {
+                            if (!statusesDic.ContainsKey(item))
+                            {
+                                statusesDic.Add(item, new TimeSpan(0, 0, 0));
+                            }
+                        }
+                    }
+
+
+
+
+                    if (Model.Statuses != null && Model.Statuses.Count > 0)
+                    {
+
+                        foreach (var item in Model.Statuses)
+                        {
+
+                            if (statusesDic.ContainsKey(item.Name))
+                            {
+                                statusesDic[item.Name] += item.Duration;
+                            }
+                        }
+
+                        foreach (var item in statusesDic)
+                        {
+                            <div class="card-list-item">
+                                <div class="left-item">@item.Key</div>
+                                <div class="right-item">@item.Value</div>
+                            </div>
+                        }
+
+
+
+
+                    }
+                }
+            </div>
+
+        </div>
+        <div class="card bg-white card-shadow" style="height: 220px;">
+
+            <div class="card-body text-center" style="height: 220px; overflow-y:auto ">
+                <div>
+                    <h2 class="card-text">Requests</h2>
+                </div>
+
+                <div class="card-list-item request-item" data-toggle="modal" data-target="#overtime-modal">
+                    <div class="left-item add-margin-left" >Overtime</div>
+                </div>
+                <div class="card-list-item request-item">
+                    <div class="left-item add-margin-left">Recovery</div>
+                </div>
+                <div class="card-list-item request-item">
+                    <div class="left-item add-margin-left">Partial Time Off</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    class TimeTracker{
+
+        constructor(obj) {
+            //this.startTime = ConvertJsonToDate(obj.StartTime).getSeconds();
+            this.startTime = ConvertJsonToDate(obj.StartTime)
+            this.endTime = ConvertJsonToDate(obj.MaxFinishTime)
+            this.trackBar = document.getElementById("time-trackbar").querySelector("#track-pointer");
+            this.position = 0;
+            this.activeEndTime = ConvertJsonToDate(obj.EndTime)
+            this.currentTime = this.SetCurrentTime()
+        }
+
+        CalculatePosition() {
+            this.SetCurrentTime();
+            if (this.startTime != null) {
+                var TotalDistance = Math.abs((this.startTime - this.endTime) / 1000)
+                var distanceSoFar = Math.abs((this.startTime - this.currentTime) / 1000)
+                this.position = (distanceSoFar / TotalDistance) * 100
+                this.trackBar.style.left = this.position + "%";
+            }
+            this.ShowTimeToHtml();
+        }
+        SetCurrentTime() {
+            if (this.activeEndTime == null) {
+                this.currentTime = new Date();
+            } else {
+                this.currentTime = this.activeEndTime
+            }
+
+        }
+
+
+        ShowTimeToHtml() {
+
+            var html = document.getElementById("track-pointer");
+            var p = html.getElementsByTagName("p")[0];
+            var elapsedTime = (Math.abs(this.startTime - this.currentTime) / 1000) / 3600 //get total hours and minutes
+            var h = this.float2int(elapsedTime) //get hours
+            var m = this.float2int((elapsedTime % 1) * 60) // get minutes
+
+            var formatedTime = this.checkTime(h) + ":" + this.checkTime(m);
+            if (this.startTime != null) {
+                p.innerHTML = formatedTime;
+            } else {
+                p.innerHTML = "00:00"
+            }
+
+        }
+
+        checkTime(time) {
+            if (time < 10) {
+                return "0" + time;
+            }
+            return time
+        }
+        float2int(value) {
+            return ~~value; //this one returns the whole number from a floating number (2.45885 -> 2)
+        }
+    }
+
+    function ConvertJsonToDate(jsonDatetoConvert) {
+        if (jsonDatetoConvert != null) {
+
+            //Since the date received from the server is in UTC Format, we need to convert it to local timezone.
+            //ge the time zone offset
+            var timeZone = new Date().getTimezoneOffset() * 60000;
+
+            var convertedDate = new Date(new Date(Number(jsonDatetoConvert.replace(/\D/g, ''))).getTime() - timeZone);
+
+            return convertedDate;
+        }
+        return null;
+    }
+
+    function ConvertJosnToDatwWithoutUTC(jsaonDate) {
+        if (jsaonDate != null) {
+
+            //Since the date received from the server is in UTC Format, we need to convert it to local timezone.
+            //ge the time zone offset
+
+
+            var convertedDate = new Date(new Date(Number(jsaonDate.replace(/\D/g, ''))).getTime());
+
+            return convertedDate;
+        }
+        return null;
+    }
+
+    var obj = @Html.Raw(Json.Encode(Model.TimeTracker));
+    var timeTracker = new TimeTracker(obj);
+    if (obj.StartTime != null && obj.EndTime == null) {
+        setInterval(() => timeTracker.CalculatePosition(), 1000)
+    } else {
+        timeTracker.CalculatePosition()
+    }
+
+
+
+    function ClockIn() {
+
+        var obj = {
+            Type: "",
+            ProjectId: 0
+        }
+
+        obj.Type = document.getElementById("ActionName").value;
+        obj.ProjectId = document.getElementById("ProjectId").value
+        var data = JSON.stringify(obj);
+        //var data = "aaaaa";
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '@Url.Action("CheckIn", "Portal")',
+            dataType: 'json',
+            data: data,
+            success: function (result) {
+                var notif = new Notifier();
+                if (result.result == false) {
+                    notif.error(result.message, "Error");
+                } else {
+                    if (result.location != null) {
+                        notif.success(result.message, "Success");
+                        window.location.href = result.location;
+                    }
+                }
+                console.log(result + " success" )
+            },
+            error: function (result) {
+                console.log(result + "error")
+               alert(result)
+            }
+        })
+
+
+    }
+
+    function ClockOut() {
+          $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '@Url.Action("ClockOut", "Portal")',
+            dataType: 'json',
+            success: function (result) {
+                var notif = new Notifier();
+                if (result.result == false) {
+                    notif.error(result.message, "Error");
+                } else {
+                      if (result.location != null){
+                          window.location.href = result.location;
+                      }
+                }
+
+                console.log(result + " success")
+            },
+            error: function (result) {
+                console.log(result + " error")
+                alert(result)
+            }
+        })
+    }
+
+    function UpdateStatus() {
+        var obj = {
+            Type: "",
+            ProjectId: 0,
+            Comment: ""
+        }
+
+        obj.Type = document.getElementById("ActionName").value;
+        obj.ProjectId = document.getElementById("ProjectId").value
+        obj.Comment = document.getElementById("commets").value;
+        var data = JSON.stringify(obj);
+
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: '@Url.Action("UpdateStatus", "Portal")',
+            dataType: 'json',
+            data: data,
+            success: function (result) {
+                var notif = new Notifier();
+                if (result.result == false) {
+                    notif.error(result.message, "Error");
+                } else if (result.result == true) {
+                    notif.success(result.message, "Success");
+                    UpdateCardAction(result.newobj)
+                }
+            },
+            error: function (result) {
+                alert(result)
+            }
+        })
+    }
+
+    function UpdateCardAction(obj) {
+        if (obj != null) {
+            var maindiv = document.getElementsByClassName("right-middle-card")[0];
+            var innerDiv = maindiv.getElementsByClassName("card-body")[0];
+
+            var newDiv = document.createElement("div")
+            newDiv.classList.add("card-list-item")
+
+            var innerLeft = document.createElement("div");
+            innerLeft.classList.add("left-item")
+            innerLeft.innerHTML = obj.Current_Status
+
+            var innerRight = document.createElement("div");
+            innerRight.classList.add("right-item");
+
+
+            var startDate = ConvertJosnToDatwWithoutUTC(obj.Status_Start_Time);
+            var hours = startDate.getHours() + ":" + startDate.getMinutes()
+            innerRight.innerHTML = hours;
+
+            newDiv.appendChild(innerLeft)
+            newDiv.appendChild(innerRight)
+            innerDiv.appendChild(newDiv)
+        }
+
+    }
+
+
+    //Modals Section
+
+    $("#overtime-modal").on("show.bs.modal", function (event) {
+        var $modal = $("#overtime-modal");
+        var $projectEl = $modal.find("#project");
+
+        PopulateProjectDropDown($projectEl);
+    })
+
+
+    //Helper Functions
+
+    function PopulateProjectDropDown(el) {
+        //first we check if the el exists
+        if (el != null) {
+            var optionEl = el.find("option")
+            optionEl.remove();
+
+            //ge the Model from the controller
+            var obj = @Html.Raw(Json.Encode(Model));
+            console.log(obj)
+            if (obj.ProjectDropDown != null) {
+                for (var i = 0; i < obj.ProjectDropDown.length; i++) {
+                    var currentItem = obj.ProjectDropDown[i]
+                    if (currentItem.Selected == true) {
+                        el.append('<option value=' + currentItem.Value + ' selected = "selected">' + currentItem.Text + '</option>')
+                    } else {
+                        el.append('<option value=' + currentItem.Value + '>' + currentItem.Text + '</option>')
+                    }
+
+                }
+            }else {
+                el.remove();
+            }
+
+        }
+    }
+
+
+</script>
