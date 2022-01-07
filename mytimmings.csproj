@@ -168,6 +168,7 @@
     <Compile Include="Hubs\LiveNotification.cs" />
     <Compile Include="Hubs\NotificationHub.cs" />
     <Compile Include="Interfaces\Notification.cs" />
+    <Compile Include="Models\DayRecord.cs" />
     <Compile Include="Models\Notification\Notification_Comm.cs" />
     <Compile Include="Models\Portal\Dashboard.cs" />
     <Compile Include="Models\Portal\Helpers\JsonObj.cs" />
@@ -179,8 +180,10 @@
     <Compile Include="Models\Portal\Partial_Request\IPartialRequest.cs" />
     <Compile Include="Models\Portal\Partial_Request\OvertimeRequest.cs" />
     <Compile Include="Models\Portal\Partial_Request\PartialRequestDb.cs" />
+    <Compile Include="Models\Portal\TimeSheet.cs" />
     <Compile Include="Models\Portal\TimeTracker.cs" />
     <Compile Include="Models\Portal\WorkingHours.cs" />
+    <Compile Include="Models\Portal\WorkRecord.cs" />
     <Compile Include="Models\Security\AuthState.cs" />
     <Compile Include="Models\Security\LoginModel.cs" />
     <Compile Include="Models\Security\User.cs" />

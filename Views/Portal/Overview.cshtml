@@ -80,15 +80,35 @@
             </div>
 
         </div>
+        <div class="container-fluid">
+            <div class="row user-time-status g-2" style="padding-top: 10px; margin-left: 0px">
+                <div class="col-md-9 w3-white round-corners-left-15 round-corners-right-15 margin-right-1">
+                 
+                        <div class="timesheat-card-title">
+                            <div class="timesheet-title">
+                                <h5>Work hours</h5>
+                            </div>
+                            <div class="user-choice">
+                                <select>
+                                    <option value="1" selected> Last 7 days</option>
+                                    <option value="2"> Last Month</option>
+                                    <option value="3"> Last 3 Months</option>
+                                </select>
+                            </div>
+                        </div>
 
-        <div class="row user-time-status">
-            <div class="col-md-6 w3-white round-corners-left-15 round-corners-right-15">
-                <canvas id="myChart" width="400" height="400"></canvas>
-            </div>
-            <div class="col-md-6 w3-white">
+                        <div class="drawning-canvas">
+                            
+                            <canvas id="myChart" width="400" height="400"></canvas>
+                        </div>
+                   
+                </div>
+                <div class="col-md-3 w3-white round-corners-left-15 round-corners-right-15">
 
+                </div>
             </div>
         </div>
+        
 
     </div>
 </div>
@@ -156,6 +176,8 @@
                     });
                 }
             },
+            responsive: true,
+            maintainAspectRatio: false,
             legend: {
                 "display": false
             },
@@ -170,7 +192,7 @@
                         display: false
                     },
                     ticks: {
-                        max: 16,
+                        max: 10,
                         //display: false,
                         beginAtZero: true
                     }

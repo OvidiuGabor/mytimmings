@@ -47,7 +47,7 @@ namespace DBContext
                .HasPrecision(18, 0);
 
             modelBuilder.Entity<Main_Data>()
-                .Property(e => e.ProjectID)
+                .Property(e => e.Project_ID)
                 .HasPrecision(18, 0);
 
             modelBuilder.Entity<Project>()
