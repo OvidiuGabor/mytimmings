@@ -19,7 +19,7 @@ namespace mytimmings.Controllers
             Models.Security.User user = (Models.Security.User)Session["User"];
             Models.Security.AuthState userState = (Models.Security.AuthState)Session["AuthState"];
 
-            if(user == null|| userState == null)
+            if(user == null || userState == null)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -52,6 +52,81 @@ namespace mytimmings.Controllers
 
             return View(dashboard);
         }
+
+        [HttpPost]
+        public JsonResult ChangePeriodForChart(int periodType)
+        {
+            if(periodType == 0)
+                return Json(new { reuslt = new Dictionary<int, double>() }, JsonRequestBehavior.AllowGet);
+
+            Models.Security.User user = (Models.Security.User)Session["User"];
+            Models.Security.AuthState userState = (Models.Security.AuthState)Session["AuthState"];
+
+            if (user == null || userState == null)
+            {
+                //passs the redirect to the view, in order to send the user back to the login page.
+                //further will have to build a way whwere we log out the user if it doesnot do anything on the page.
+                //build a solution to keep the user logged in if he actually using the website. like always reseting the timmer for the session variable
+                return Json(new { reuslt = false, redirectUrl = Url.Action("Index", "Home"), isRedirect = true }, JsonRequestBehavior.AllowGet);
+            }
+
+
+            int defaultDays = 0;
+            switch (periodType)
+            {
+                case 1:
+                    defaultDays = -7;
+                    break;
+                case 2:
+                    defaultDays = -14;
+                    break;
+                case 3:
+                    defaultDays = -30;
+                    break;
+                default:
+                    defaultDays = 0;
+                    break;
+
+            }
+
+            DateTime todayDate = DateTime.UtcNow;
+            DateTime sevenDaysBackT = todayDate.AddDays(defaultDays);
+            DateTime svn = new DateTime(sevenDaysBackT.Year, sevenDaysBackT.Month, sevenDaysBackT.Day, 0, 0, 0);
+            DateTime yesterdayDate = new DateTime(todayDate.AddDays(-1).Year, todayDate.AddDays(-1).Month, todayDate.AddDays(-1).Day, 23, 59, 59);
+            try
+            {
+                //Get the list of records for the past default Days.
+                List<DBContext.Main_Data> records = db.Main_Data.Where(x => x.Status_Start_Time >= svn && x.Status_End_Time <= yesterdayDate && x.User_ID == user.ID).ToList();
+                List<Models.Portal.WorkRecord> workRecords = new List<Models.Portal.WorkRecord>();
+                foreach (var record in records)
+                {
+                    var newWorkRecord = new Models.Portal.WorkRecord(record);
+                    workRecords.Add(newWorkRecord);
+                }
+
+                var dailyTotalHours = Models.Portal.TimeSheet.CalculateTotalHoursForPeriod(workRecords, defaultDays, todayDate);
+
+                return Json(new { result = true, data = dailyTotalHours.ToList() }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new { result = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+           
+
+
+           
+        }
+
+
+
+
+
+
+
+
+
         //public ActionResult CheckIn(Models.Portal.Action data)
         //{
         //    //Get the date in UTC Format;

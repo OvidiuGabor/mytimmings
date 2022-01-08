@@ -89,7 +89,7 @@
                                 <h5>Work hours</h5>
                             </div>
                             <div class="user-choice">
-                                <select>
+                                <select onchange="changePeriodForChart(value)">
                                     <option value="1" selected> Last 7 days</option>
                                     <option value="2"> Last Month</option>
                                     <option value="3"> Last 3 Months</option>
@@ -114,6 +114,11 @@
 </div>
 
 <script>
+
+    var dataFromTheModel = @Html.Raw(Json.Encode(Model.dailyTotalHours.ToList()));
+    var parsedData = parseDataForChart(dataFromTheModel);
+
+
     const ctx = document.getElementById('myChart');
     const plugin = {
         id: 'custom_canvas_background_color',
@@ -129,19 +134,20 @@
     const myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['1', '2', '3', '4', '5', '6', '7'],
+            labels: parsedData.label,
             datasets: [{
                 label: 'Hours',
-                data: [7.5, 8, 9, 7.5, 0, 7.5, 9],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)' ,
-                    'rgba(255, 159, 64, 1)'
-                ]
+                data: parsedData.data,
+                backgroundColor: parsedData.color
+                //backgroundColor: [
+                //    'rgba(255, 99, 132, 1)',
+                //    'rgba(54, 162, 235, 1)',
+                //    'rgba(255, 206, 86, 1)',
+                //    'rgba(75, 192, 192, 1)',
+                //    'rgba(153, 102, 255, 1)',
+                //    'rgba(255, 159, 64, 1)' ,
+                //    'rgba(255, 159, 64, 1)'
+                //]
                 //borderColor: [
                 //    'rgba(255, 99, 132, 1)',
                 //    'rgba(54, 162, 235, 1)',
@@ -153,12 +159,13 @@
                //borderWidth: 1
             }]
         },
+
         options: {
             "hover": {
-                "animationDuration": 0
+                "animationDuration": 1
             },
             "animation": {
-                "duration": 1,
+/*                "duration": 1,*/
                 "onComplete": function () {
                     var chartInstance = this.chart,
                         ctx = chartInstance.ctx;
@@ -196,7 +203,7 @@
                         //display: false,
                         beginAtZero: true
                     }
-                    
+
                 }],
 
                 xAxes: [{
@@ -206,18 +213,100 @@
                      ticks: {
                         beginAtZero: true
                     }
-                    
+
                 }]
-               
+
             }
         },
          plugins: [plugin]
     });
 
 
+    function parseDataForChart(dataToParse) {
+        var outputData = {
+            "label": [],
+            "data": [],
+            "color": []
+        };
 
-    
+        if (dataToParse == null)
+            return outputData;
+
+        for (const entry of dataToParse.entries()) {
+
+            outputData.label.push(entry[1].Key);
+            outputData.data.push(entry[1].Value);
+            outputData.color.push(getColorbyValue(entry[1].Value))
+
+        }
+
+        return outputData;
+
+    }
 
 
+    function changePeriodForChart(newPeriod) {
+
+        console.log(newPeriod)
+        var data = {
+            periodType: newPeriod
+        }
+        var notif = new Notifier();
+        $.ajax({
+            type: "post",
+            url: '@Url.Action("ChangePeriodForChart", "Portal")',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(data),
+            dataType: "json",
+            success: function (data) {
+/*                console.log(data.data)*/
+                if (data.result == true) {
+
+                    var parsedData = parseDataForChart(data.data)
+/*                    refresh the chart data, with the new one based on the choice*/
+                    myChart.data.labels = parsedData.label
+                    myChart.data.datasets.forEach((dataset) => {
+                        dataset.data = parsedData.data;
+                        dataset.backgroundColor = parsedData.color;
+                    })
+                    myChart.update();
+
+                } else if (data.result == false && data.isRedirect == true) {
+                    window.location.href = json.redirectUrl;
+                } else {
+                    notif.error(data.message, "Error");
+                }
+                
+            },
+            error: function (data) {
+                notif.error("Something happen! Please try again later!", "Error");
+            }
+
+        })
+    }
+
+
+
+
+
+
+
+    //Set the Color Scheme for the bar temporartly, till i found a better solution
+    function getColorbyValue(value) {
+        const colorScheme = ["#4a7dff", "#ff8800", "#f93939"]
+
+        if (value > 8) {
+            return colorScheme[0]
+        }
+        else if (value < 8 && value > 6) {
+            return colorScheme[1];
+        }
+        else {
+            return colorScheme[2];
+        }
+
+
+
+    }
 
 </script>

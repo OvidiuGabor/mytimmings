@@ -7,7 +7,7 @@ namespace mytimmings.Models.Portal
 {
     public class TimeSheet
     {
-        private static Dictionary<int, double> dailyTotalHours;
+        private static Dictionary<string, double> dailyTotalHours;
 
         private static int daysToPursue = 0;
         private static DateTime beginDate;
@@ -15,7 +15,7 @@ namespace mytimmings.Models.Portal
 
 
 
-        public static Dictionary<int, double> CalculateTotalHoursForPeriod(List<WorkRecord> records, int daystoCalculate, DateTime dateToCalculate)
+        public static Dictionary<string, double> CalculateTotalHoursForPeriod(List<WorkRecord> records, int daystoCalculate, DateTime dateToCalculate)
         {
             daysToPursue = daystoCalculate;
             beginDate = dateToCalculate;
@@ -27,27 +27,27 @@ namespace mytimmings.Models.Portal
 
 
 
-        public static Dictionary<int, double> CalculateTotalHours(List<WorkRecord> records)
+        public static Dictionary<string, double> CalculateTotalHours(List<WorkRecord> records)
         {
 
             if (records.Count == 0 || records == null)
                 throw new ArgumentNullException("The recods count cannot be 0 or the argument cannot be null!");
 
             if(dailyTotalHours == null)
-                dailyTotalHours = new Dictionary<int, double>();
+                dailyTotalHours = new Dictionary<string, double>();
 
             foreach(var record in records)
             {
                 if(record.startDate.Day == record.startDate.Day)
                 {
                     int day = record.startDate.Day;
-                    if (dailyTotalHours.ContainsKey(day))
+                    if (dailyTotalHours.ContainsKey(day.ToString()))
                     {
-                        dailyTotalHours[day] += Utilities.Helper.ConvertSecondsToHours(CalculateDuration(record.startDate, record.endDate));
+                        dailyTotalHours[day.ToString()] += Utilities.Helper.ConvertSecondsToHours(CalculateDuration(record.startDate, record.endDate));
                     }
                     else
                     {
-                        dailyTotalHours.Add(day, Utilities.Helper.ConvertSecondsToHours(CalculateDuration(record.startDate, record.endDate)));
+                        dailyTotalHours.Add(day.ToString(), Utilities.Helper.ConvertSecondsToHours(CalculateDuration(record.startDate, record.endDate)));
                     }
                     
                 }
@@ -80,7 +80,7 @@ namespace mytimmings.Models.Portal
 
         private static void SetUpDictionary()
         {
-            dailyTotalHours = new Dictionary<int, double>();
+            dailyTotalHours = new Dictionary<string, double>();
            
 
 
@@ -88,7 +88,9 @@ namespace mytimmings.Models.Portal
             {
                 DateTime tempDate = beginDate.AddDays(i);
                 int day = tempDate.Date.Day;
-                dailyTotalHours.Add(day, 0);
+
+                if(!dailyTotalHours.ContainsKey(day.ToString()))
+                    dailyTotalHours.Add(day.ToString(), 0);
 
             }
 

@@ -294,7 +294,7 @@ namespace mytimmings.Utilities
                 return 0;
 
 
-            return seconds / 3600;
+            return Math.Round((seconds / 3600), 2);
         }
     }
 }
