@@ -14,7 +14,7 @@
         </div>*@
 
     <div class="w3-container conainer-padding" style="padding-top: 10px">
-        <div class="row user-information-header" style="margin-left: 0px">
+        <div class="row user-information-header small-box-shadow-cord" style="margin-left: 0px">
             <div class="col-md-3 w3-white round-corners-left-15">
                 <div class="user-body">
                     <div class="user-details">
@@ -82,7 +82,7 @@
         </div>
         <div class="container-fluid">
             <div class="row user-time-status g-2" style="padding-top: 10px; margin-left: 0px">
-                <div class="col-md-9 w3-white round-corners-left-15 round-corners-right-15 margin-right-1">
+                <div class="col-md-9 w3-white round-corners-left-15 round-corners-right-15 margin-right-1 small-box-shadow-cord">
                  
                         <div class="timesheat-card-title">
                             <div class="timesheet-title">
@@ -103,8 +103,66 @@
                         </div>
                    
                 </div>
-                <div class="col-md-3 w3-white round-corners-left-15 round-corners-right-15">
+                <div class="col-md-3 w3-white round-corners-left-15 round-corners-right-15 small-box-shadow-cord">
+                    <div class="timesheat-card-title">
+                        <div class="timesheet-title">
+                            <h5>My stats</h5>
+                        </div>
 
+                    </div>
+                    <div class="row" style="text-align: center; margin-top: 10px;">
+                        <div class=" col-md-6 w3-white" style="padding-right: 0px;">
+                            <div class="my-stats-box" style="border-bottom: 1px solid rgba(101,107,123, 0.3); border-right: 1px solid rgba(101,107,123, 0.3) ">
+                                <p>Today's Time In'</p>
+                            </div>
+
+                        </div>
+                        <div class=" col-md-6 w3-white" style="padding-left: 0px">
+                            <div class="my-stats-box" style=" border-bottom: 1px solid rgba(101,107,123, 0.3)">
+                                <p>Break Time</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="text-align: center;">
+                        <div class=" col-md-6 w3-white" style="padding-right: 0px;">
+                            <div class="my-stats-box" style="border-bottom: 1px solid rgba(101,107,123, 0.3); border-right: 1px solid rgba(101,107,123, 0.3)">
+                                <p>Work Time</p>
+                            </div>
+
+                        </div>
+                        <div class=" col-md-6 w3-white" style="padding-left: 0px">
+                            <div class="my-stats-box" style="border-bottom: 1px solid rgba(101,107,123, 0.3);">
+                                <p>Log Out time</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="text-align: center;">
+                        <div class=" col-md-6 w3-white" style="padding-right: 0px;">
+                            <div class="my-stats-box" style="border-right: 1px solid rgba(101,107,123, 0.3)">
+                                <p>Total Leaves</p>
+                            </div>
+
+                        </div>
+                        <div class=" col-md-6 w3-white" style="padding-left: 0px">
+                            <div class="my-stats-box" ">
+                                <p>Remaining Leaves</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" style="text-align: center; margin-top: 28px;">
+                        <div class=" col-md-6 w3-white" style="padding: 0px; border-bottom-left-radius: 15px">
+                            <div class="my-stats-box " style="background-color: rgba(242,243, 247, 0.7)">
+                                <a href="">View my Tasks -></a>
+                            </div>
+
+                        </div>
+                        <div class=" col-md-6 w3-white" style="padding: 0px; border-bottom-right-radius: 15px">
+                            <div class="my-stats-box" style="background-color: rgba(242,243, 247, 0.7)">
+                                <a href="">View my Leaves -></a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -259,7 +317,7 @@
             data: JSON.stringify(data),
             dataType: "json",
             success: function (data) {
-/*                console.log(data.data)*/
+               console.log(data.data)
                 if (data.result == true) {
 
                     var parsedData = parseDataForChart(data.data)
@@ -272,7 +330,8 @@
                     myChart.update();
 
                 } else if (data.result == false && data.isRedirect == true) {
-                    window.location.href = json.redirectUrl;
+                        window.location.href = json.redirectUrl;
+
                 } else {
                     notif.error(data.message, "Error");
                 }

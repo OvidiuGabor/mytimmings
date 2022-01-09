@@ -12,9 +12,6 @@ namespace mytimmings.Models.Portal
         private static int daysToPursue = 0;
         private static DateTime beginDate;
 
-
-
-
         public static Dictionary<string, double> CalculateTotalHoursForPeriod(List<WorkRecord> records, int daystoCalculate, DateTime dateToCalculate)
         {
             daysToPursue = daystoCalculate;
@@ -24,8 +21,6 @@ namespace mytimmings.Models.Portal
 
             return dailyTotalHours;
         }
-
-
 
         public static Dictionary<string, double> CalculateTotalHours(List<WorkRecord> records)
         {

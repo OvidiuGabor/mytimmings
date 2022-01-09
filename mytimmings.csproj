@@ -174,15 +174,11 @@
     <Compile Include="Models\Portal\Helpers\JsonObj.cs" />
     <Compile Include="Models\Portal\Leave.cs" />
     <Compile Include="Models\Portal\LeaveStatus.cs" />
-    <Compile Include="Models\Portal\Overview.cs" />
-    <Compile Include="Models\Portal\Action.cs" />
-    <Compile Include="Models\Portal\PartialStatus.cs" />
     <Compile Include="Models\Portal\Partial_Request\IPartialRequest.cs" />
     <Compile Include="Models\Portal\Partial_Request\OvertimeRequest.cs" />
     <Compile Include="Models\Portal\Partial_Request\PartialRequestDb.cs" />
     <Compile Include="Models\Portal\TimeSheet.cs" />
-    <Compile Include="Models\Portal\TimeTracker.cs" />
-    <Compile Include="Models\Portal\WorkingHours.cs" />
+    <Compile Include="Models\Portal\UserStatus.cs" />
     <Compile Include="Models\Portal\WorkRecord.cs" />
     <Compile Include="Models\Security\AuthState.cs" />
     <Compile Include="Models\Security\LoginModel.cs" />

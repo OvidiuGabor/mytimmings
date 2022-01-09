@@ -41,7 +41,23 @@ namespace mytimmings.Controllers
 
             var dailyTotalHours = Models.Portal.TimeSheet.CalculateTotalHoursForPeriod(workRecords,defaultDays, todayDate);
 
+            //Get the stats for today;
 
+            var todayRecords = db.Main_Data.Where(x => x.Status_Start_Time.Day == todayDate.Day && x.Status_Start_Time.Month == todayDate.Month && x.Status_Start_Time.Year == todayDate.Year && x.User_ID == user.ID).ToList();
+            List<Models.Portal.WorkRecord> todayRecordsModel = new List<Models.Portal.WorkRecord>();
+            foreach(var record in todayRecords)
+            {
+                var newWorkRecord = new Models.Portal.WorkRecord(record);
+                todayRecordsModel.Add(newWorkRecord);
+            }
+
+
+
+            var userSettings = new Models.Security.UserSettings();
+            List<Models.Portal.Leave> leaves = new List<Models.Portal.Leave>();
+
+            var userStats = new Models.Portal.UserStatus(userSettings, todayRecordsModel, leaves);
+            userStats.CalculateStats();
 
 
 
@@ -67,7 +83,7 @@ namespace mytimmings.Controllers
                 //passs the redirect to the view, in order to send the user back to the login page.
                 //further will have to build a way whwere we log out the user if it doesnot do anything on the page.
                 //build a solution to keep the user logged in if he actually using the website. like always reseting the timmer for the session variable
-                return Json(new { reuslt = false, redirectUrl = Url.Action("Index", "Home"), isRedirect = true }, JsonRequestBehavior.AllowGet);
+                return Json(new { result = false, redirectUrl = Url.Action("Index", "Home"), isRedirect = true }, JsonRequestBehavior.AllowGet);
             }
 
 
@@ -609,6 +625,5 @@ namespace mytimmings.Controllers
         {
             return (Models.Security.User)Session["User"];
         }
-
     }
 }
