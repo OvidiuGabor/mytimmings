@@ -75,5 +75,41 @@
 }
 
 .my-stats-box{
-    padding: 2em;
+    padding: 1em;
+}
+
+.svg-card {
+    width: 40px;
+    height: 40px;
+    margin-top: 5px;
+}
+.description-text p{
+    font-size: 12px;
+}
+
+.highlight-information p {
+    font-weight: bolder;
+    font-size: 20px;
+    margin-bottom: 2px;
+    color: black;
+}
+
+.alert-item{
+    margin-top: 20px;
+    margin-left: 0px;
+}
+
+.alert-item p {
+    margin: 0;
+    padding: 1.2em;
+}
+
+.svg-card-alert {
+    width: 30px;
+    height: 30px;
+    margin-top: 40%;
+}
+.btn-alert-item {
+    margin-top: 2%;
+    margin-left: 50px;
 }

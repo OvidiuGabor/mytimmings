@@ -51,19 +51,67 @@ namespace mytimmings.Controllers
                 todayRecordsModel.Add(newWorkRecord);
             }
 
-
-
             var userSettings = new Models.Security.UserSettings();
-            List<Models.Portal.Leave> leaves = new List<Models.Portal.Leave>();
 
-            var userStats = new Models.Portal.UserStatus(userSettings, todayRecordsModel, leaves);
+            //calculate work time for the current month;
+            int currentMonth = todayDate.Month;
+
+            var monthlyRecords = db.Main_Data.Where(x => x.Status_Start_Time.Day >= 1 && x.Status_Start_Time.Month == currentMonth && x.Status_Start_Time.Year == todayDate.Year && x.Status_Start_Time.Day <= 31 && x.User_ID == user.ID).ToList();
+            var recordsModel = new List<Models.Portal.WorkRecord>();
+            foreach (var record in monthlyRecords)
+            {
+                var newWorkRecord = new Models.Portal.WorkRecord(record);
+                recordsModel.Add(newWorkRecord);
+            }
+          
+            //Get the leaves status
+            List<DBContext.Leave> thisYearleaves = db.Leaves.Where(x => x.StartDate.Value.Year == todayDate.Year && x.UserId == user.ID).ToList();
+            List<Models.Portal.Leave> leaves = new List<Models.Portal.Leave>();
+            foreach(var leave in thisYearleaves)
+            {
+                var newleave = new Models.Portal.Leave(leave);
+                leaves.Add(newleave);
+            }
+
+
+            //get user leaves status(entitled, accrued, carried over)
+            List<DBContext.User_Leaves_Status> userLeavesStatusDb = db.User_Leaves_Status.Where(x => x.UserId == user.ID).ToList();
+            List<Models.Portal.UserLeaveStatus> userLeaveStatus = new List<Models.Portal.UserLeaveStatus>();
+            foreach(var item in userLeavesStatusDb)
+            {
+                var newLeave = new Models.Portal.UserLeaveStatus(item);
+                userLeaveStatus.Add(newLeave);
+            }
+
+            //Set User Stats and calculate the data
+            var userStats = new Models.Portal.UserStatus(userSettings, todayRecordsModel, leaves, userLeaveStatus);
+            userStats.totalWorkedHoursPerMonth = userStats.CalculateWorkTimeForGivenList(recordsModel);
             userStats.CalculateStats();
 
 
 
 
+            //Get user Alerts!
+            List<DBContext.Alert> alerts = db.Alerts.Where(x => x.UserID == user.ID || (x.ManagerId == user.ManagerID && x.IsForEveryone == true)).ToList();
+            //Filter the list;
+            alerts = alerts.Where(x => (x.StartDate == null || x.EndDate == null) || x.EndDate.Value.Date > todayDate.Date).ToList();
 
-            var dashboard = new Models.Portal.Dashboard(user, dailyTotalHours);
+
+            List<Models.Portal.Alert> alertList = new List<Models.Portal.Alert>();
+
+            foreach(var alert in alerts)
+            {
+                var newAlert = new Models.Portal.Alert(alert);
+                alertList.Add(newAlert);
+
+            }
+
+            //Generate AutoAlerts and add them to the list of the already existing one
+
+
+
+
+            var dashboard = new Models.Portal.Dashboard(user, dailyTotalHours, userStats, leaves, alertList);
 
 
             return View(dashboard);

@@ -11,6 +11,7 @@ namespace mytimmings.Models.Portal
         private Models.Security.UserSettings userSettings;
         private List<WorkRecord> records;
         private List<Leave> leaves;
+        private List<UserLeaveStatus> leavesStatus;
 
         public DateTime loginDateTime { get; set; }
         public TimeSpan breakLength { get; set; }
@@ -21,16 +22,18 @@ namespace mytimmings.Models.Portal
         public int totalVacationDaysRemaning{ get; set; }
         public int totalMedicalDaysUsed { get; set; }
 
-        Dictionary<string, int> leavesUsed { get; set; }
-        Dictionary<string, int> leavesRemaning { get; set; }
+        public Dictionary<string, int> leavesUsed { get; set; }
+        public Dictionary<string, int> leavesRemaning { get; set; }
 
 
-        public UserStatus(Security.UserSettings userSettings, List<WorkRecord> records, List<Leave> leaves)
+        public UserStatus(Security.UserSettings userSettings, List<WorkRecord> records, List<Leave> leaves, List<UserLeaveStatus> leavesStatus)
         {
 
             this.userSettings = userSettings;
             this.records = records;
             this.leaves = leaves;
+            this.leavesStatus = leavesStatus;
+            
         }
 
 
@@ -39,13 +42,32 @@ namespace mytimmings.Models.Portal
             setloginTime();
             calculateBreakTime();
             calculateWorkTimeForToday();
+            leavesUsed = splitLeavesByType();
+            leavesRemaning = splitLeavesStatusByType();
         }
-        
+
+        public TimeSpan CalculateWorkTimeForGivenList(List<WorkRecord> records)
+        {
+            TimeSpan workTime = new TimeSpan();
+
+            foreach (var record in records)
+            {
+                if(record.status != "Break")
+                {
+                    if(record.startDate.Ticks < record.endDate.Ticks)
+                    {
+                        workTime += record.endDate - record.startDate;
+                    }
+                }
+            }
+            return workTime;
+        }
+
 
 
         private void setloginTime()
         {
-            if(records != null)
+            if(records.Count > 0)
             {
 
                 var first = records.OrderBy(x => x.startDate).FirstOrDefault();
@@ -83,5 +105,42 @@ namespace mytimmings.Models.Portal
 
             workLength = workTime;
         }
+
+        private Dictionary<string, int> splitLeavesByType()
+        {
+            Dictionary<string, int> leavesSplit = new Dictionary<string, int>();
+            foreach (var leave in leaves)
+            {
+                if (leavesSplit.ContainsKey(leave.Type))
+                {
+                    leavesSplit[leave.Type] += leave.NumberofDays;
+                }
+                else
+                {
+                    leavesSplit.Add(leave.Type, leave.NumberofDays);
+                }
+            }
+
+            return leavesSplit;
+        }
+
+        private Dictionary<string, int> splitLeavesStatusByType()
+        {
+            Dictionary<string, int> leavesSplit = new Dictionary<string, int>();
+            foreach (var leave in leavesStatus)
+            {
+                if (leavesSplit.ContainsKey(leave.leaveType))
+                {
+                    leavesSplit[leave.leaveType] += (leave.daysEntitled + leave.daysCarriedOver - leave.daysAccrued);
+                }
+                else
+                {
+                    leavesSplit.Add(leave.leaveType, (leave.daysEntitled + leave.daysCarriedOver - leave.daysAccrued));
+                }
+            }
+
+            return leavesSplit;
+        }
+
     }
 }

@@ -31,9 +31,19 @@ namespace DBContext
         public virtual DbSet<LiveNotification> LiveNotifications { get; set; }
         public virtual DbSet<PartialTime_Requests> PartialTime_Requests { get; set; }
         public virtual DbSet<Notification_Comunication_History> Notification_Comunication_History { get; set; }
+        public virtual DbSet<Alert> Alerts { get; set; }
+        public virtual DbSet<Public_Holidays> Public_Holidays { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Alert>()
+               .Property(e => e.Id)
+               .HasPrecision(18, 0);
+
+            modelBuilder.Entity<Public_Holidays>()
+                .Property(e => e.Holiday_Id)
+                .HasPrecision(18, 0);
+
             modelBuilder.Entity<Company>()
                 .Property(e => e.ID)
                 .HasPrecision(18, 0);

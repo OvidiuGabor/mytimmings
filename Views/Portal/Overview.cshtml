@@ -83,25 +83,25 @@
         <div class="container-fluid">
             <div class="row user-time-status g-2" style="padding-top: 10px; margin-left: 0px">
                 <div class="col-md-9 w3-white round-corners-left-15 round-corners-right-15 margin-right-1 small-box-shadow-cord">
-                 
-                        <div class="timesheat-card-title">
-                            <div class="timesheet-title">
-                                <h5>Work hours</h5>
-                            </div>
-                            <div class="user-choice">
-                                <select onchange="changePeriodForChart(value)">
-                                    <option value="1" selected> Last 7 days</option>
-                                    <option value="2"> Last Month</option>
-                                    <option value="3"> Last 3 Months</option>
-                                </select>
-                            </div>
-                        </div>
 
-                        <div class="drawning-canvas">
-                            
-                            <canvas id="myChart" width="400" height="400"></canvas>
+                    <div class="timesheat-card-title">
+                        <div class="timesheet-title">
+                            <h5>Work hours</h5>
                         </div>
-                   
+                        <div class="user-choice">
+                            <select onchange="changePeriodForChart(value)">
+                                <option value="1" selected> Last 7 days</option>
+                                <option value="2"> Last Month</option>
+                                <option value="3"> Last 3 Months</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="drawning-canvas">
+
+                        <canvas id="myChart" width="400" height="400"></canvas>
+                    </div>
+
                 </div>
                 <div class="col-md-3 w3-white round-corners-left-15 round-corners-right-15 small-box-shadow-cord">
                     <div class="timesheat-card-title">
@@ -113,46 +113,276 @@
                     <div class="row" style="text-align: center; margin-top: 10px;">
                         <div class=" col-md-6 w3-white" style="padding-right: 0px;">
                             <div class="my-stats-box" style="border-bottom: 1px solid rgba(101,107,123, 0.3); border-right: 1px solid rgba(101,107,123, 0.3) ">
-                                <p>Today's Time In'</p>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <div class="highlight-information">
+                                            @{
+                                                if (Model.userStats.loginDateTime.Ticks > 1)
+                                                {
+                                                    string formatedTime = Model.userStats.loginDateTime.ToString("HH:mm");
+                                                    <p>@formatedTime</p>
+                                                }
+                                                else
+                                                {
+                                                    <p>-</p>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="description-text">
+                                            <p>Today''s In time</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3" style="padding: 0px; padding-right: 15px;">
+                                        <div class="svg-container">
+                                            <img src="~/Content/SVG/loginArrow.svg" class="svg-card" alt="loginPlaceholder">
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
 
                         </div>
                         <div class=" col-md-6 w3-white" style="padding-left: 0px">
                             <div class="my-stats-box" style=" border-bottom: 1px solid rgba(101,107,123, 0.3)">
-                                <p>Break Time</p>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <div class="highlight-information">
+                                            @{
+                                                if (Model.userStats.breakLength.Ticks > 1)
+                                                {
+                                                    int hours = Model.userStats.breakLength.Hours;
+                                                    int minutes = Model.userStats.breakLength.Minutes;
+
+                                                    string formatedTime = "";
+
+                                                    if (hours > 0)
+                                                    {
+                                                        formatedTime = hours.ToString() + " h " + minutes.ToString() + " m";
+                                                    }
+                                                    else
+                                                    {
+                                                        formatedTime = minutes.ToString() + " m";
+                                                    }
+
+                                                    //string formatedTime = Model.userStats.workLength.Hours.ToString() + " h " + Model.userStats.workLength.Minutes.ToString() + " m";
+                                                    <p>@formatedTime</p>
+                                                }
+                                                else
+                                                {
+                                                    <p>-</p>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="description-text">
+                                            <p>Break time*</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3" style="padding: 0px; padding-right: 15px;">
+                                        <div class="svg-container">
+                                            <img src="~/Content/SVG/loginArrow.svg" class="svg-card" alt="loginPlaceholder">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row" style="text-align: center;">
                         <div class=" col-md-6 w3-white" style="padding-right: 0px;">
                             <div class="my-stats-box" style="border-bottom: 1px solid rgba(101,107,123, 0.3); border-right: 1px solid rgba(101,107,123, 0.3)">
-                                <p>Work Time</p>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <div class="highlight-information">
+                                            @{
+                                                if (Model.userStats.workLength.Ticks > 1)
+                                                {
+
+                                                    int hours = Model.userStats.workLength.Hours;
+                                                    int minutes = Model.userStats.workLength.Minutes;
+
+                                                    string formatedTime = "";
+
+                                                    if (hours > 0)
+                                                    {
+                                                        formatedTime = hours.ToString() + " h " + minutes.ToString() + " m";
+                                                    }
+                                                    else
+                                                    {
+                                                        formatedTime = minutes.ToString() + " m";
+                                                    }
+
+                                                    //string formatedTime = Model.userStats.workLength.Hours.ToString() + " h " + Model.userStats.workLength.Minutes.ToString() + " m";
+                                                    <p>@formatedTime</p>
+                                                }
+                                                else
+                                                {
+                                                    <p>-</p>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="description-text">
+                                            <p>Work Time*</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3" style="padding: 0px; padding-right: 15px;">
+                                        <div class="svg-container">
+                                            <img src="~/Content/SVG/loginArrow.svg" class="svg-card" alt="loginPlaceholder">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
                         <div class=" col-md-6 w3-white" style="padding-left: 0px">
                             <div class="my-stats-box" style="border-bottom: 1px solid rgba(101,107,123, 0.3);">
-                                <p>Log Out time</p>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <div class="highlight-information">
+                                            @{
+                                                if (Model.userStats.totalWorkedHoursPerMonth.Ticks > 1)
+                                                {
+                                                    int days = Model.userStats.totalWorkedHoursPerMonth.Days;
+                                                    int hours = Model.userStats.totalWorkedHoursPerMonth.Hours;
+                                                    int minutes = Model.userStats.totalWorkedHoursPerMonth.Minutes;
+
+                                                    string formatedTime = "";
+
+                                                    if (hours > 0)
+                                                    {
+                                                        if (days > 0)
+                                                        {
+                                                            hours += days * 24;
+                                                        }
+                                                        formatedTime = hours.ToString() + " h " + minutes.ToString() + " m";
+
+                                                    }
+                                                    else
+                                                    {
+                                                        formatedTime = minutes.ToString() + " m";
+                                                    }
+
+                                                    //string formatedTime = Model.userStats.workLength.Hours.ToString() + " h " + Model.userStats.workLength.Minutes.ToString() + " m";
+                                                    <p>@formatedTime</p>
+                                                }
+                                                else
+                                                {
+                                                    <p>-</p>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="description-text">
+                                            <p>Monthly Hours*</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3" style="padding: 0px; padding-right: 15px;">
+                                        <div class="svg-container">
+                                            <img src="~/Content/SVG/loginArrow.svg" class="svg-card" alt="loginPlaceholder">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row" style="text-align: center;">
                         <div class=" col-md-6 w3-white" style="padding-right: 0px;">
                             <div class="my-stats-box" style="border-right: 1px solid rgba(101,107,123, 0.3)">
-                                <p>Total Leaves</p>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <div class="highlight-information">
+                                            @{
+                                                if (Model.userStats.leavesUsed.ContainsKey("Vacation"))
+                                                {
+
+                                                    int leavesUsed = Model.userStats.leavesUsed["Vacation"];
+                                                    int leavesRemaning = 0;
+                                                    string formatedData = "";
+                                                    if (Model.userStats.leavesRemaning.ContainsKey("Vacation"))
+                                                    {
+                                                        leavesRemaning = Model.userStats.leavesRemaning["Vacation"];
+                                                    }
+
+                                                    if (leavesRemaning > 0)
+                                                    {
+                                                        formatedData = leavesUsed.ToString() + " / " + leavesRemaning.ToString() + " days";
+                                                    }
+                                                    else
+                                                    {
+                                                        formatedData = Model.userStats.leavesUsed["Vacation"].ToString() + " days";
+                                                    }
+
+
+                                                    <p>@formatedData</p>
+                                                }
+                                                else
+                                                {
+                                                    <p>-</p>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="description-text">
+                                            <p>Vacation Leaves*</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3" style="padding: 0px; padding-right: 15px;">
+                                        <div class="svg-container">
+                                            <img src="~/Content/SVG/loginArrow.svg" class="svg-card" alt="loginPlaceholder">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
                         <div class=" col-md-6 w3-white" style="padding-left: 0px">
-                            <div class="my-stats-box" ">
-                                <p>Remaining Leaves</p>
+                            <div class="my-stats-box">
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <div class="highlight-information">
+                                            @{
+                                                if (Model.userStats.leavesUsed.ContainsKey("Medical"))
+                                                {
+
+                                                    int leavesUsed = Model.userStats.leavesUsed["Medical"];
+                                                    int leavesRemaning = 0;
+                                                    string formatedData = "";
+                                                    if (Model.userStats.leavesRemaning.ContainsKey("Medical"))
+                                                    {
+                                                        leavesRemaning = Model.userStats.leavesRemaning["Medical"];
+                                                    }
+
+                                                    if (leavesRemaning > 0)
+                                                    {
+                                                        formatedData = leavesUsed.ToString() + " / " + leavesRemaning.ToString() + " days";
+                                                    }
+                                                    else
+                                                    {
+                                                        formatedData = Model.userStats.leavesUsed["Medical"].ToString() + " days";
+                                                    }
+
+
+                                                    <p>@formatedData</p>
+                                                }
+                                                else
+                                                {
+                                                    <p>-</p>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="description-text">
+                                            <p>Medical Leaves*</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3" style="padding: 0px; padding-right: 15px;">
+                                        <div class="svg-container">
+                                            <img src="~/Content/SVG/loginArrow.svg" class="svg-card" alt="loginPlaceholder">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="row" style="text-align: center; margin-top: 28px;">
                         <div class=" col-md-6 w3-white" style="padding: 0px; border-bottom-left-radius: 15px">
-                            <div class="my-stats-box " style="background-color: rgba(242,243, 247, 0.7)">
+                            <div class="my-stats-box " style="background-color: rgba(242,243, 247, 0.7); border-right: 1px solid rgba(101,107,123, 0.3)">
                                 <a href="">View my Tasks -></a>
                             </div>
 
@@ -165,8 +395,65 @@
                     </div>
                 </div>
             </div>
+
+            @{
+                if (Model.alerts.Count > 0)
+                {
+                    foreach (var alert in Model.alerts)
+                    {
+                        <div class="row alert-item small-box-shadow-cord round-corners-left-15 round-corners-right-15">
+
+                            <div class="col-md-9 w3-white round-corners-left-15">
+                                <div class="row">
+                                    <div class="" style="display: inline-block; padding-left: 15px; padding-right: 15px;">
+                                        <img src="~/Content/SVG/alert.svg" class="svg-card-alert" alt="loginPlaceholder">
+                                    </div>
+
+                                    <div class="" style="display: inline-block">
+                                        <p>@alert.message</p>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            @{
+                                if (alert.dismissButton)
+                                {
+
+
+                                    <div class="col-md-3 w3-white round-corners-right-15" style="text-align: center">
+                                        <div>
+                                            <button class="btn btn-outline-primary btn-alert-item" style="margin-left: 0px;">Dismiss</button>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-3 w3-white round-corners-right-15" style="text-align: center">
+                                        <div style="display: inline-block">
+                                            <button class="btn btn-outline-primary btn-alert-item" style="margin-left: 0px;">Dismiss</button>
+                                        </div>
+                                         <div style="display: inline-block">
+                                            <button class="btn btn-outline-primary btn-alert-item" style="margin-left: 50px;">Dismiss</button>
+                                        </div>
+                                    </div>
+
+                                    <style>
+                                        .btn-alert-item{
+                                            margin-top: 7%;
+                                        }
+                                    </style>
+                                }
+                            }
+
+                        </div>
+                        
+                      }
+                }
+            }
         </div>
-        
+
 
     </div>
 </div>
@@ -335,7 +622,7 @@
                 } else {
                     notif.error(data.message, "Error");
                 }
-                
+
             },
             error: function (data) {
                 notif.error("Something happen! Please try again later!", "Error");
