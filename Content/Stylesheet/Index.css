@@ -75,3 +75,27 @@ h3{
     border: none !important;
     background: #F2F3F7;
 }
+
+
+/* BACKGROUND COlOR SET FOR ENTIRE PROJECT*/
+
+.grey{
+    background-color: #656b7b;
+}
+.redish {
+    background-color: #f93939;
+}
+
+
+
+/*Round Cornes*/
+
+.round-corners-left-15 {
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+}
+
+.round-corners-right-15 {
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+}

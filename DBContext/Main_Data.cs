@@ -14,21 +14,25 @@ namespace DBContext
         public decimal ID { get; set; }
 
         [StringLength(10)]
-        public string userID { get; set; }
+        public string User_ID { get; set; }
 
         public DateTime CurrentDate { get; set; }
 
         public DateTime Status_Start_Time { get; set; }
 
-        public DateTime? Status_End_Time { get; set; }
+        public DateTime Status_End_Time { get; set; }
 
         [StringLength(100)]
-        public string Current_Status { get; set; }
+        public string Status { get; set; }
 
         [Column(TypeName = "numeric")]
-        public decimal? ProjectID { get; set; }
+        public decimal? Project_ID { get; set; }
 
+        [StringLength(50)]
+        public string Project_Name { get; set; }
         [StringLength(1000)]
-        public string Comments { get; set; }
+        public string Description { get; set; }
+        [StringLength(50)]
+        public string Tags { get; set; }
     }
 }

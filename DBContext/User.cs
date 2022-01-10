@@ -35,9 +35,14 @@ namespace DBContext
         [StringLength(100)]
         public string Password { get; set; }
 
-        public DateTime? LoginTime { get; set; }
 
-        public DateTime? LogoutTime { get; set; }
+        [StringLength(50)]
+        public string Department { get; set; }
+
+        [StringLength(50)]
+        public string JobTitle { get; set; }
+
+        public DateTime StartDate { get; set; }
 
         [StringLength(100)]
         public string PhotoPath { get; set; }

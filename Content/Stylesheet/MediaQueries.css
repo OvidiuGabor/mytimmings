@@ -11,3 +11,11 @@
         column-count: 4 !important;
     }
 }
+@media (max-width: 768px) {
+   .col-md-9{
+       width: 100% !important;
+   }
+    .user-time-status > div {
+        max-width: 100%
+    }
+}

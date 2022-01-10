@@ -287,5 +287,14 @@ namespace mytimmings.Utilities
 
             return "";
         }
+
+        public static double ConvertSecondsToHours(double seconds)
+        {
+            if (seconds <= 0)
+                return 0;
+
+
+            return Math.Round((seconds / 3600), 2);
+        }
     }
 }

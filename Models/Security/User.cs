@@ -18,6 +18,9 @@ namespace mytimmings.Models.Security
         public string ManagerID { get; set; }
         public string Password { get; set; }
         public string PhotoPath { get; set;}
+        public string JobTitle { get; set; }
+        public string Department { get; set; }
+        public DateTime StartDate { get; set; }
         public bool isUser { get; set; }
         public bool isManager { get; set; }
         public bool isAdmin { get; set; }
