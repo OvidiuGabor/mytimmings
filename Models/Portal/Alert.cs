@@ -38,9 +38,14 @@ namespace mytimmings.Models.Portal
 
         }
 
-        public Alert(string userId, string message, bool important, DateTime startDate, DateTime endDate)
+        public Alert(string userId, string message, bool important)
         {
+            if (String.IsNullOrEmpty(userId))
+                throw new ArgumentNullException("The parameter userId cannot be null or empty!");
 
+            this.userId = userId;
+            this.message = message;
+            this.important = important;
         }
 
 
