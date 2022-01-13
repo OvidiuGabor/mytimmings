@@ -35,6 +35,7 @@ namespace mytimmings.Models.Portal
             startDate = alert.StartDate;
             endDate = alert.EndDate;
             dismissButton = true;
+            important = alert.Important ?? false;
 
         }
 
@@ -46,11 +47,24 @@ namespace mytimmings.Models.Portal
             this.userId = userId;
             this.message = message;
             this.important = important;
+
+        }
+        public Alert(string userId, string message, bool onDutyBtn, bool onleaveBtn, bool important)
+        {
+            if (String.IsNullOrEmpty(userId))
+                throw new ArgumentNullException("The parameter userId cannot be null or empty!");
+
+            this.userId = userId;
+            this.message = message;
+            this.important = important;
+            this.applyOnDutyBtn = onDutyBtn;
+            this.applyOnLeaveBtn = onleaveBtn;
         }
 
 
 
 
-       
+
+
     }
 }

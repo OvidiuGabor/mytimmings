@@ -10,7 +10,7 @@ namespace mytimmings.Models.Portal
 
         private Models.Security.UserSettings userSettings;
         private List<WorkRecord> records;
-        private List<Leave> leaves;
+        private List<Leave.ILeave> leaves;
         private List<UserLeaveStatus> leavesStatus;
 
         public DateTime loginDateTime { get; set; }
@@ -26,7 +26,7 @@ namespace mytimmings.Models.Portal
         public Dictionary<string, int> leavesRemaning { get; set; }
 
 
-        public UserStatus(Security.UserSettings userSettings, List<WorkRecord> records, List<Leave> leaves, List<UserLeaveStatus> leavesStatus)
+        public UserStatus(Security.UserSettings userSettings, List<WorkRecord> records, List<Leave.ILeave> leaves, List<UserLeaveStatus> leavesStatus)
         {
 
             this.userSettings = userSettings;
@@ -111,13 +111,13 @@ namespace mytimmings.Models.Portal
             Dictionary<string, int> leavesSplit = new Dictionary<string, int>();
             foreach (var leave in leaves)
             {
-                if (leavesSplit.ContainsKey(leave.Type))
+                if (leavesSplit.ContainsKey(leave.type))
                 {
-                    leavesSplit[leave.Type] += leave.NumberofDays;
+                    leavesSplit[leave.type] += leave.numberofDays;
                 }
                 else
                 {
-                    leavesSplit.Add(leave.Type, leave.NumberofDays);
+                    leavesSplit.Add(leave.type, leave.numberofDays);
                 }
             }
 

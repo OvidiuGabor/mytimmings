@@ -33,9 +33,14 @@ namespace DBContext
         public virtual DbSet<Notification_Comunication_History> Notification_Comunication_History { get; set; }
         public virtual DbSet<Alert> Alerts { get; set; }
         public virtual DbSet<Public_Holidays> Public_Holidays { get; set; }
+        public virtual DbSet<Leaves_Saved_Not_Submited> Leaves_Saved_Not_Submited { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Leaves_Saved_Not_Submited>()
+               .Property(e => e.Id)
+               .HasPrecision(18, 0);
+
             modelBuilder.Entity<Alert>()
                .Property(e => e.Id)
                .HasPrecision(18, 0);

@@ -59,6 +59,7 @@
     <Compile Include="Company.cs" />
     <Compile Include="DBModel.cs" />
     <Compile Include="Leave.cs" />
+    <Compile Include="Leaves_Saved_Not_Submited.cs" />
     <Compile Include="Leave_Requests.cs" />
     <Compile Include="LiveNotification.cs" />
     <Compile Include="Main_Data.cs" />

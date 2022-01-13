@@ -401,57 +401,185 @@
                 {
                     foreach (var alert in Model.alerts)
                     {
+
+
                         <div class="row alert-item small-box-shadow-cord round-corners-left-15 round-corners-right-15">
 
                             <div class="col-md-9 w3-white round-corners-left-15">
                                 <div class="row">
-                                    <div class="" style="display: inline-block; padding-left: 15px; padding-right: 15px;">
-                                        <img src="~/Content/SVG/alert.svg" class="svg-card-alert" alt="loginPlaceholder">
+                                    <div class="col-md-1" style="display: grid; align-content: space-around; padding: 0px">
+                                        <img src="~/Content/SVG/alert-red.svg" class="svg-card-alert" alt="loginPlaceholder">
                                     </div>
 
-                                    <div class="" style="display: inline-block">
-                                        <p>@alert.message</p>
+                                    <div class="col-md-11" style="padding: 0px;">
+                                        @if (alert.important)
+                                        {
+                                            <p style="color:#f93939">@Html.Raw(alert.message)</p>
+                                        }
+                                        else
+                                        {
+                                            <p>@Html.Raw(alert.message)</p>
+                                        }
+
                                     </div>
                                 </div>
 
 
                             </div>
 
+
                             @{
                                 if (alert.dismissButton)
                                 {
 
 
-                                    <div class="col-md-3 w3-white round-corners-right-15" style="text-align: center">
-                                        <div>
-                                            <button class="btn btn-outline-primary btn-alert-item" style="margin-left: 0px;">Dismiss</button>
+                                    <div class="col-md-3 w3-white round-corners-right-15" style="display: grid; align-content: space-around">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <button class="btn btn-outline-primary btn-alert-item">Dismiss</button>
+                                            </div>
+                                            <div class="col-md-6">
+                                                @*<button class="btn btn-outline-primary btn-alert-item">Apply Leave</button>*@
+                                            </div>
                                         </div>
                                     </div>
                                 }
                                 else
                                 {
-                                    <div class="col-md-3 w3-white round-corners-right-15" style="text-align: center">
-                                        <div style="display: inline-block">
-                                            <button class="btn btn-outline-primary btn-alert-item" style="margin-left: 0px;">Dismiss</button>
-                                        </div>
-                                         <div style="display: inline-block">
-                                            <button class="btn btn-outline-primary btn-alert-item" style="margin-left: 50px;">Dismiss</button>
+                                    <div class="col-md-3 w3-white round-corners-right-15" style="display: grid; align-content: space-around">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <button class="btn btn-outline-primary btn-alert-item">Apply On Duty</button>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button class="btn btn-outline-primary btn-alert-item">Apply Leave</button>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <style>
-                                        .btn-alert-item{
-                                            margin-top: 7%;
-                                        }
-                                    </style>
                                 }
                             }
 
                         </div>
-                        
-                      }
+
+                    }
                 }
             }
+
+
+            <div class="row user-leaves-status g-2" style="padding-top: 20px; margin-left: 0px">
+                <div class="col-md-9 w3-white round-corners-left-15 round-corners-right-15 margin-right-1 small-box-shadow-cord">
+                    <div class="timesheat-card-title">
+                        <div class="timesheet-title">
+                            <h5>Upcoming Leaves</h5>
+                        </div>
+                    </div>
+                    <div class="table-responsive-md">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Request Date</th>
+                                    <th scope="col">Leave From</th>
+                                    <th scope="col">Leave To</th>
+                                    <th scope="col">No of Days</th>
+                                    <th scope="col">Leave Type</th>
+                                    <th scope="col">Leave Status</th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                @foreach (var leave in Model.userLeaves)
+                                {
+                                    <tr>
+                                        @{
+                                            string requestDate = leave.requestDate.ToString("dd MMM yyyy");
+                                            string start = leave.start.ToString("dd MMM yyyy");
+                                            string end = leave.end.ToString("dd MMM yyyy");
+                                        }
+                                        <td>@requestDate</td>
+                                        <td>@start</td>
+                                        <td>@end</td>
+                                        <td>@leave.numberofDays</td>
+                                        <td>@leave.type</td>
+
+                                        <td>
+                                            <div class="leave-status">
+                                                @if (leave.status == "Approved")
+                                                {
+                                                    <img src="~/Content/SVG/Circle green.svg" alt="bulls-eye" class="bulls-eye-svg" />
+                                                }
+                                                else if (leave.status == "Pending")
+                                                {
+                                                    <img src="~/Content/SVG/Circle blue.svg" alt="bulls-eye" class="bulls-eye-svg" />
+                                                }
+                                                else
+                                                {
+                                                    <img src="~/Content/SVG/Circle orange.svg" alt="bulls-eye" class="bulls-eye-svg" />
+                                                }
+                                                <p>@leave.status</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                   
+                </div>
+                <div class="col-md-3 w3-white round-corners-left-15 round-corners-right-15 small-box-shadow-cord">
+                    <div class="timesheat-card-title">
+                        <div class="timesheet-title">
+                            <h5>Upcoming Holidays</h5>
+                        </div>
+                        <div class="user-choice">
+                            <label for="change_country">Sort By:</label>
+                            <select onchange="changeCountry(value)" id="change_country" name="change_country">
+                                <option value="1" selected> Romania</option>
+                            </select>
+
+                        </div>
+                    </div>
+
+
+                    @{
+                        if (Model.publicHolidays.Count > 0)
+                        {
+
+                            foreach (var holiday in Model.publicHolidays)
+                            {
+                                <div class="row">
+                                    <div class="col-md 12">
+                                        <div class="holiday-card">
+                                            <div class="holiday-date">
+                                                @{ 
+                                                    string formatedDate = holiday.holidayDate.ToString("dd MMM yyyy");
+                                                }
+                                                <p style="margin-bottom: 5px;">@formatedDate</p>
+                                            </div>
+                                            <div class="holiday-name">
+                                                <p style="margin-bottom: 5px;">@holiday.holidayName</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            }
+
+
+
+                        }
+                        else
+                        {
+                            <div>
+                                <p>No Upcomig Holidays!</p>
+                            </div>
+                        }
+
+                    }
+                </div>
+            </div>
+
+
+
         </div>
 
 

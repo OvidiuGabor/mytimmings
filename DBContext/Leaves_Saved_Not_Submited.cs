@@ -6,21 +6,19 @@ namespace DBContext
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("mytimngs_admin.Leaves")]
-    public partial class Leave
+    [Table("mytimngs_admin.Leaves_Saved_Not_Submited")]
+    public partial class Leaves_Saved_Not_Submited
     {
         [Column(TypeName = "numeric")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public decimal Id { get; set; }
 
-        [Column(TypeName = "numeric")]
-        public decimal RequestId { get; set; }
-
         [StringLength(10)]
-        public string UserId { get; set; }
+        public string UserID { get; set; }
 
-        [StringLength(25)]
-        public string Type { get; set; }
+        [StringLength(50)]
+        public string LeaveType { get; set; }
+
         [Column(TypeName = "date")]
         public DateTime? RequestedDate { get; set; }
 
@@ -30,6 +28,10 @@ namespace DBContext
         [Column(TypeName = "date")]
         public DateTime? EndDate { get; set; }
 
-        public decimal TotalDays { get; set; }
+        [StringLength(50)]
+        public string Status { get; set; }
+
+        [StringLength(100)]
+        public string Comments { get; set; }
     }
 }

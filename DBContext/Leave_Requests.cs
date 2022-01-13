@@ -31,6 +31,8 @@ namespace DBContext
         public DateTime? RequestEndDate { get; set; }
 
         public bool? Approved { get; set; }
+        [Column(TypeName = "date")]
+        public DateTime? ApprovedDate { get; set; }
 
         [StringLength(500)]
         public string RequestorComments { get; set; }
