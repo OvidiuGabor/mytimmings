@@ -1,0 +1,63 @@
+﻿@model mytimmings.Models.Activity.MyActivity
+
+<div lass="w3-container conainer-padding" style="padding-top: 10px">
+    <div class="container-fluid">
+        <div class="row" style="padding-top: 10px; margin-left: 0px">
+            <div class="col-md-3">
+                <div class="row">
+                    <div>
+                        <div class="col-md-12"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+
+                @foreach (var record in Model.workLogs)
+                {
+
+                    string startTime = record.startDate.ToString("hh:mm tt");
+                    string endTime = record.endDate.ToString("hh:mm tt");
+                    string date = record.startDate.ToString("dd MMM yyyy");
+
+
+
+                    <div class="row w3-white alert-item small-box-shadow-cord round-corners-left-15 round-corners-right-15 work-record-container">
+                        <div class="col-md-12">
+                            <div class="row work-record-top-section">
+                                <div class="col-md-11">
+                                    <p class="work-record-time" style="display: inline-flex">@startTime - @endTime</p>
+                                    <p class="work-record-date" style="display: inline-flex">@date</p>
+                                    <p class="work-record-title" style="display: inline-flex">@record.title</p>
+                                    <p class="work-record-project" style="display: inline-flex">@record.projectName</p>
+                                </div>
+                                <div class="col-md-1">
+                                    <button class="btn btn-primary">Edit</button>
+                                </div>
+                            </div>
+                            <div class="row work-record-middle-section">
+                                @foreach (var tag in record.tags)
+                                {
+                                    <p>@tag</p>
+                                }
+
+                            </div>
+                            <div class="row work-record-bottom-section">
+                                <p>@record.description</p>
+                            </div>
+                        </div>
+                        
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </div>
+
+</div>

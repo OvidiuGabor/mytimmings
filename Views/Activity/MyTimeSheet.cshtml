@@ -1,0 +1,70 @@
+﻿@model mytimmings.Models.Activity.MyActivity
+<link href="~/Content/Stylesheet/Portal.css" rel="stylesheet" />
+@{
+    ViewBag.Title = "My Actibity";
+}
+<style>
+    .subpage a {
+        color: #656b7b;
+    }
+    .active a {
+        color: #4a7dff;
+    }
+
+    a:hover{
+        border: none;
+        text-decoration: none;
+    }
+</style>
+
+<div class="w3-main" style="margin-left: 300px; margin-top: 43px;">
+    <div class="w3-container conainer-padding" style="padding-top: 60px">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <h1>My Activity</h1>
+
+                    <p style="display: inline-flex; margin-left: 30px; margin-right: 20px;" class="subpage active" id="timeSheetBtn"><a href="#" onclick="switchView('timeSheet')">Work Log/TimeSheet</a></p>
+                    <p style="display: inline-flex" class="subpage" id="leavesbtn"><a href="#" onclick="switchView('leave')">Leaves</a></p>
+                </div>
+            </div>
+        </div>
+
+
+
+        <hr />
+    </div>
+    <div class="w3-container conainer-padding" style="padding-top: 10px">
+        <div style="display:block" id="timesheet">
+            @{Html.RenderPartial("TimeSheet");};
+        </div>
+        <div style="display: none" id="leave">
+            @{Html.RenderPartial("View");};
+        </div>
+    </div>
+    </div>
+
+    <script>
+        function switchView(idToShow) {
+            if (idToShow == "timeSheet") {
+                $("#timesheet").show()
+                $("#timeSheetBtn").addClass("active")
+                $("#leave").hide()
+                $("#leavesbtn").removeClass("active")
+
+
+            }
+
+            if (idToShow == "leave") {
+                $("#timesheet").hide()
+                $("#timeSheetBtn").removeClass("active")
+                $("#leave").show()
+                $("#leavesbtn").addClass("active")
+            }
+
+        }
+    </script>
+
+
+
+

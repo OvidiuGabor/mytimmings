@@ -145,3 +145,25 @@
     margin-right: 5px;
     margin-left: 5px;
 }
+
+.active {
+    border-bottom: 2px solid #4a7dff;
+    color: #4a7dff;
+}
+
+.work-record-container {
+   
+}
+.work-record-top-section {
+    border-bottom: 1px solid rgba(101,107,123, 0.3);
+    margin-left: 25px;
+    margin-right: 25px;
+}
+.work-record-middle-section {
+    margin-left: 25px;
+    margin-right: 25px;
+}
+.work-record-bottom-section {
+    margin-left: 25px;
+    margin-right: 25px;
+}

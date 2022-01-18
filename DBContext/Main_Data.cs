@@ -30,6 +30,9 @@ namespace DBContext
 
         [StringLength(50)]
         public string Project_Name { get; set; }
+        [StringLength(50)]
+        public string Title { get; set; }
+
         [StringLength(1000)]
         public string Description { get; set; }
         [StringLength(50)]

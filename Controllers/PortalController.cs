@@ -80,7 +80,7 @@ namespace mytimmings.Controllers
           
 
             //Get the leaves status
-            List<DBContext.Leave> thisYearleaves = db.Leaves.Where(x => x.StartDate.Value.Year == todayDate.Year && x.UserId == user.ID && x.StartDate.Value.Day >= todayDate.Day && x.StartDate.Value.Month >= todayDate.Month).ToList();
+            List<DBContext.Leave> thisYearleaves = db.Leaves.Where(x => x.StartDate.Value.Year == todayDate.Year && x.UserId == user.ID && x.EndDate.Value.Year == todayDate.Year).ToList();
             List<Models.Portal.Leave.ILeave> leaves = new List<Models.Portal.Leave.ILeave>();
             foreach(var leave in thisYearleaves)
             {
@@ -627,66 +627,41 @@ namespace mytimmings.Controllers
 
         #endregion
 
-        public ActionResult ApproveRequest(string id, string comment = null)
-        {
+        //public ActionResult ApproveRequest(string id, string comment = null)
+        //{
 
-            if (String.IsNullOrEmpty(id))
-            {
-                return Json(new { result = true, message = "There is a problem with the request. Contact Support Team!" }, JsonRequestBehavior.AllowGet);
-            }
+        //    if (String.IsNullOrEmpty(id))
+        //    {
+        //        return Json(new { result = true, message = "There is a problem with the request. Contact Support Team!" }, JsonRequestBehavior.AllowGet);
+        //    }
 
-            var request = new Models.Portal.Partial_Request.OvertimeRequest(id);
-            request.ApproveRequest();
+        //    var request = new Models.Portal.Partial_Request.OvertimeRequest(id);
+        //    request.ApproveRequest();
 
-            //add record into live notification
-
-
-
-            return Json(new { result = true, message = "Request has been approved!" }, JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult DeclineReqeust(string id)
-        {
-
-            if (String.IsNullOrEmpty(id))
-            {
-                return Json(new { result = true, message = "There is a problem with the request. Contact Support Team!" }, JsonRequestBehavior.AllowGet);
-            }
-
-            var request = new Models.Portal.Partial_Request.OvertimeRequest(id);
-            request.ApproveRequest();
-
-            //add record into live notification
+        //    //add record into live notification
 
 
 
-            return Json(new { result = true, message = "Request has been approved!" }, JsonRequestBehavior.AllowGet);
-        }
+        //    return Json(new { result = true, message = "Request has been approved!" }, JsonRequestBehavior.AllowGet);
+        //}
+
+        //public ActionResult DeclineReqeust(string id)
+        //{
+
+        //    if (String.IsNullOrEmpty(id))
+        //    {
+        //        return Json(new { result = true, message = "There is a problem with the request. Contact Support Team!" }, JsonRequestBehavior.AllowGet);
+        //    }
+
+        //    var request = new Models.Portal.Partial_Request.OvertimeRequest(id);
+        //    request.ApproveRequest();
+
+        //    //add record into live notification
 
 
 
-        private void Approve(Models.Portal.Partial_Request.IPartialRequest request)
-        {
-
-            if (request == null)
-            {
-                //log the request
-                throw new ArgumentNullException("The requst argument cannot be null.");
-            }
-
-        }
-
-        private void Decline(Models.Portal.Partial_Request.IPartialRequest request)
-        {
-          
-            if(request == null)
-            {
-                //log the request
-                throw new ArgumentNullException("The requst argument cannot be null.");
-            }
-            
-        }
-
+        //    return Json(new { result = true, message = "Request has been approved!" }, JsonRequestBehavior.AllowGet);
+        //}
 
         #region SignalR
 

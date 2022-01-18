@@ -15,8 +15,9 @@ namespace mytimmings.Models.Portal
         public string status { get; set; }
         public int projectId { get; set; }
         public string projectName { get; set; }
+        public string title { get; set; }
         public string description { get; set; }
-        public string tags { get; set; }
+        public List<string> tags { get; set; }
 
 
 
@@ -33,10 +34,44 @@ namespace mytimmings.Models.Portal
             status = record.Status;
             projectId = (int)record.Project_ID;
             projectName = record.Project_Name;
+            title = record.Title;
             description = record.Description;
-            tags = record.Tags;
+            CreateTagsList(record.Tags);
 
 
+        }
+
+
+
+
+
+
+
+
+
+        private void CreateTagsList(string tag)
+        {
+            tags = new List<string>();
+            List<string> tempTags = new List<string>();
+
+            if (!String.IsNullOrEmpty(tag))
+            {
+                if (tag.Length > 0)
+                {
+                    tempTags = tag.Split('#').ToList();
+                }
+
+                foreach(string item in tempTags)
+                {
+                    if (!item.Contains('#') && !String.IsNullOrWhiteSpace(item))
+                    {
+                        tags.Add( "#" + item);
+                    }
+                }
+            }
+           
+          
+            
         }
     }
 }
