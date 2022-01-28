@@ -1,24 +1,46 @@
 ﻿@model mytimmings.Models.Activity.MyActivity
 
-<div lass="w3-container conainer-padding" style="padding-top: 10px">
+<div lass="w3-container conainer-padding">
     <div class="container-fluid">
-        <div class="row" style="padding-top: 10px; margin-left: 0px">
+        <div class="row" style= "margin-left: 0px">
             <div class="col-md-3">
-                <div class="row">
-                    <div>
-                        <div class="col-md-12"></div>
+                <div class="list-el-tile">
+                    <div class="timesheet-title" style="margin-bottom: 20px;">
+                        <h5>Projects</h5>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12">
+                    <div class="user-choice">
+                        <label for="chageItems">Items</label>
+                        <select onchange="changeNumber(value)" id="changeItems" name="chageItems">
+                            <option value="5" selected> 5</option>
+                            <option value="10"> 10</option>
+                            <option value="50"> 50</option>
+                            <option value="100"> 100</option>
+                        </select>
 
-                        </div>
                     </div>
                 </div>
+
+
+                @{
+                    foreach (var project in Model.projects)
+                    {
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input type="checkbox" id="@project.id" name="@project.id" value="@project.id" onchange="filterLogsByProject(value)" />
+                                <label for="@project.id">@project.name</label>
+                            </div>
+                        </div>
+                    }
+                }
             </div>
 
             <div class="col-md-9">
-
-                @foreach (var record in Model.workLogs)
+                <div class="list-el-tile">
+                    <div class="timesheet-title">
+                        <h5>Time Sheet</h5>
+                    </div>
+                </div>
+                @foreach (var record in Model.workLogs.Take(Model.numberOfItems))
                 {
 
                     string startTime = record.startDate.ToString("hh:mm tt");
@@ -51,7 +73,7 @@
                                 <p>@record.description</p>
                             </div>
                         </div>
-                        
+
                     </div>
                 }
 
@@ -61,3 +83,41 @@
     </div>
 
 </div>
+
+<script>
+    function filterLogsByProject(projectId) {
+        console.log(projectId);
+    }
+
+    function changeNumber(number) {
+        console.log(number);
+        var currentModel = @Html.Raw(Json.Encode(Model));
+        var queryItems = {
+            numberOfitem: number,
+            myActivity: currentModel
+        }
+        console.log(queryItems)
+        console.log(JSON.stringify(queryItems))
+
+        var queryItems = JSON.stringify(queryItems)
+        $.ajax({
+            type: "post",
+            url: '@Url.Action("stuff", "Activity")',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({ queryItems: queryItems}),
+            dataType: "json",
+            success: function (data) {
+               console.log(data.data)
+                
+
+            },
+            error: function (data) {
+              /*  notif.error("Something happen! Please try again later!", "Error");*/
+            }
+
+        })
+
+
+
+    }
+</script>

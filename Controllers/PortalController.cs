@@ -80,7 +80,7 @@ namespace mytimmings.Controllers
           
 
             //Get the leaves status
-            List<DBContext.Leave> thisYearleaves = db.Leaves.Where(x => x.StartDate.Value.Year == todayDate.Year && x.UserId == user.ID && x.EndDate.Value.Year == todayDate.Year).ToList();
+            List<DBContext.Leave> thisYearleaves = db.Leaves.Where(x => x.StartDate.Value >= todayDate.Date && x.UserId == user.ID).ToList();
             List<Models.Portal.Leave.ILeave> leaves = new List<Models.Portal.Leave.ILeave>();
             foreach(var leave in thisYearleaves)
             {

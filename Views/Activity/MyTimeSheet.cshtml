@@ -1,5 +1,6 @@
 ﻿@model mytimmings.Models.Activity.MyActivity
 <link href="~/Content/Stylesheet/Portal.css" rel="stylesheet" />
+<link href="~/Content/Stylesheet/Activity.css" rel="stylesheet" />
 @{
     ViewBag.Title = "My Actibity";
 }
@@ -7,11 +8,12 @@
     .subpage a {
         color: #656b7b;
     }
+
     .active a {
         color: #4a7dff;
     }
 
-    a:hover{
+    a:hover {
         border: none;
         text-decoration: none;
     }
@@ -42,28 +44,28 @@
             @{Html.RenderPartial("View");};
         </div>
     </div>
-    </div>
+</div>
 
-    <script>
-        function switchView(idToShow) {
-            if (idToShow == "timeSheet") {
-                $("#timesheet").show()
-                $("#timeSheetBtn").addClass("active")
-                $("#leave").hide()
-                $("#leavesbtn").removeClass("active")
+<script>
+    function switchView(idToShow) {
+        if (idToShow == "timeSheet") {
+            $("#timesheet").show()
+            $("#timeSheetBtn").addClass("active")
+            $("#leave").hide()
+            $("#leavesbtn").removeClass("active")
 
-
-            }
-
-            if (idToShow == "leave") {
-                $("#timesheet").hide()
-                $("#timeSheetBtn").removeClass("active")
-                $("#leave").show()
-                $("#leavesbtn").addClass("active")
-            }
 
         }
-    </script>
+
+        if (idToShow == "leave") {
+            $("#timesheet").hide()
+            $("#timeSheetBtn").removeClass("active")
+            $("#leave").show()
+            $("#leavesbtn").addClass("active")
+        }
+
+    }
+</script>
 
 
 

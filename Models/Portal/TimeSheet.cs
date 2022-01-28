@@ -25,8 +25,8 @@ namespace mytimmings.Models.Portal
         public static Dictionary<string, double> CalculateTotalHours(List<WorkRecord> records)
         {
 
-            if (records.Count == 0 || records == null)
-                throw new ArgumentNullException("The recods count cannot be 0 or the argument cannot be null!");
+            //if (records.Count == 0 || records == null)
+            //    throw new ArgumentNullException("The recods count cannot be 0 or the argument cannot be null!");
 
             if(dailyTotalHours == null)
                 dailyTotalHours = new Dictionary<string, double>();

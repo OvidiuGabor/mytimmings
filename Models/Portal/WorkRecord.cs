@@ -32,7 +32,7 @@ namespace mytimmings.Models.Portal
             startDate = record.Status_Start_Time;
             endDate = record.Status_End_Time;
             status = record.Status;
-            projectId = (int)record.Project_ID;
+            projectId = record.Project_ID.HasValue == true ? (int)record.Project_ID.Value : 0;
             projectName = record.Project_Name;
             title = record.Title;
             description = record.Description;
@@ -41,13 +41,10 @@ namespace mytimmings.Models.Portal
 
         }
 
+        public WorkRecord()
+        {
 
-
-
-
-
-
-
+        }
 
         private void CreateTagsList(string tag)
         {
