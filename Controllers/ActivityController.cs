@@ -108,11 +108,6 @@ namespace mytimmings.Controllers
             var myActivity = builder.Resolve<Models.Activity.MyActivity>();
 
 
-
-
-
-
-
             //Models.Activity.MyActivity myActivity = new Models.Activity.MyActivity();
             //myActivity.workLogs = workLogs;
             //myActivity.leaves = leaves;
@@ -125,24 +120,57 @@ namespace mytimmings.Controllers
         }
 
         
-        public ActionResult MyTimeSheet(string queryItems)
+        public JsonResult TimeSheet(string queryItems)
         {
+            if (String.IsNullOrEmpty(queryItems))
+            {
+                return Json(new { status = "error", message = "No query data provided!" }, JsonRequestBehavior.AllowGet);
+            }
+
             //get the myActivity from the Session
             var myActivity = getMyActivityFromSession();
-
-
+            const int numberOfItems = 5;
             var custom = new
             {
                 selectedItems = new List<string>(),
                 numberOfItems = ""
 
             };
-            var item = JsonConvert.DeserializeAnonymousType(queryItems, custom);
-            myActivity.numberOfItems = Int32.Parse(item.numberOfItems);
+            var convertedJson = custom;
+            //Deserialze de json accordin to the custom settings!
+            try
+            {
+                convertedJson = JsonConvert.DeserializeAnonymousType(queryItems, custom);
+            }
+            catch (Exception ex)
+            {
+                //log the exception
+                return Json(new { status = "error", message = "Wrong Json provided in query. Contact System Administrator!" }, JsonRequestBehavior.AllowGet);
+            }
+
+            //Set a default if no value provided in the Json
+            if (String.IsNullOrEmpty(convertedJson.numberOfItems))
+                myActivity.numberOfItems = numberOfItems;
+            else
+                myActivity.numberOfItems = Int32.Parse(convertedJson.numberOfItems);
+
+
+            if (!convertedJson.selectedItems.Contains("0"))
+            {
+                List<Models.Portal.WorkRecord> workLogsFiltered = new List<Models.Portal.WorkRecord>();
+
+                foreach(var projectId in convertedJson.selectedItems)
+                {
+                    int projectIdAsInt = Int32.Parse(projectId);
+                    workLogsFiltered.AddRange(myActivity.workLogs.Where(x => x.projectId == projectIdAsInt).ToList());
+                }
+                myActivity.workLogs = workLogsFiltered.OrderByDescending(x => x.startDate).ToList();
+            }
 
 
 
-            return PartialView("TimeSheet", myActivity);
+            IncreaseSessionTimout();
+            return Json(new { status = "success", data = myActivity }, JsonRequestBehavior.AllowGet);
         }
 
 
@@ -159,13 +187,19 @@ namespace mytimmings.Controllers
         private void SetMyStatSession(Models.Activity.MyActivity myActivity)
         {
             Session["myActivity"] = myActivity;
-            Session.Timeout = 120;
-
+            IncreaseSessionTimout();
         }
 
         private Models.Activity.MyActivity getMyActivityFromSession()
         {
             return (Models.Activity.MyActivity)Session["myActivity"];
         }
+
+        private void IncreaseSessionTimout()
+        {
+            Session.Timeout = 60;
+        }
+
+
     }
 }

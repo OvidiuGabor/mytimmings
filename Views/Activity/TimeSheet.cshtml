@@ -48,34 +48,21 @@
                 }
             </div>
 
-            <div class="col-md-9">
+            <div class="col-md-9" id="worklogs-container">
                 <div class="list-el-tile">
                     <div class="timesheet-title">
                         <h5>Time Sheet</h5>
                     </div>
                 </div>
-
-                <script>
-                    function clearWorkRecords() {
-                        var list = document.getElementsByClassName("alert-item");
-                        if (list.length > 0) {
-                            for (var i = 0; i < list.length; i++) {
-                                list[i].remove();
-                            }
-                        }
-                        console.log(list);
-                    }
-                    clearWorkRecords();
-                </script>
                 @{ 
                     var workLogs = Model.workLogs.Take(Model.numberOfItems);
                 }
                 @foreach (var record in workLogs)
                 {
 
-                    string startTime = record.startDate.ToString("hh:mm tt");
-                    string endTime = record.endDate.ToString("hh:mm tt");
-                    string date = record.startDate.ToString("dd MMM yyyy");
+                    string startTime = record.startDate.ToLocalTime().ToString("hh:mm tt");
+                    string endTime = record.endDate.ToLocalTime().ToString("hh:mm tt");
+                    string date = record.startDate.ToLocalTime().ToString("dd MMM yyyy");
 
 
 
@@ -120,7 +107,7 @@
     }
 
     function changeNumber(number) {
-        console.log(number);
+        //console.log(number);
         var selectedProjects = getSelectedProjects()
 
 
@@ -129,22 +116,27 @@
             selectedItems: selectedProjects,
             numberOfItems: number
         }
-        console.log(JSON.stringify(queryItems))
+        //console.log(JSON.stringify(queryItems))
 
         var queryItems = JSON.stringify(queryItems)
         $.ajax({
             type: "post",
-            url: '@Url.Action("MyTimeSheet", "Activity")',
+            url: '@Url.Action("TimeSheet", "Activity")',
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({ queryItems: queryItems}),
             dataType: "json",
             success: function (data) {
-               console.log(data.data)
-                
+               //console.log(data.data)
+                if (data.status == "success") {
+                    generateWorkLogsByNumber(data.data.workLogs, data.data.numberOfItems)
+                } else if (data.status == "error") {
+                    notif.error(data.message, "Error");
+                }
+
 
             },
             error: function (data) {
-              /*  notif.error("Something happen! Please try again later!", "Error");*/
+             notif.error("Something happen! Please try again later!", "Error");
             }
 
         })
@@ -165,6 +157,146 @@
 
         return selecteditems;
     }
+
+
+    function generateWorkLogsByNumber(workLogs, counter) {
+
+        var container = document.getElementById("worklogs-container");
+        removeExistingWorklogs(container)
+
+
+        if (workLogs.length >  0) {
+            if (workLogs.length >= counter) {
+                //console.log("aaa")
+                for (var i = 0; i < counter; i++) {
+                    createWorklogElement(workLogs[i]);
+                }
+            } else if (workLogs.length < counter) {
+               // console.log("bbb")
+                for (var i = 0; i  < workLogs.length; i++) {
+                    createWorklogElement(workLogs[i]);
+                }
+            }
+
+        } else {
+            //inform there are no worklogs
+            let mainContainer = document.createElement("div");
+            mainContainer.classList.add("row", "work-record-container");
+
+
+            let colEl = document.createElement("div");
+            colEl.classList.add("col-md-12");
+            colEl.innerHTML = "<div style='text-align: center'>"
+                + "<h2 style = 'padding: 35px; font-size: 20px'> No records!</h2>"
+            mainContainer.appendChild(colEl);
+
+            addElementToContainer(document.getElementById("worklogs-container"), mainContainer)
+        }
+
+    }
+
+    //this function remove all the worklogs elements from the view
+    function removeExistingWorklogs(container) {
+        if (container != null || container!= "") {
+            var elementsToRemove = container.getElementsByClassName("work-record-container");
+            let elLength = elementsToRemove.length;
+            for (var i = 0; i < elLength; i++) {
+                //Remove the element at index 0
+                elementsToRemove[0].remove();
+            }
+        }
+
+    }
+
+
+    //this is a template for create a worklog element on the view
+    function createWorklogElement(worklog) {
+
+        const options = {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true
+        };
+
+
+        var startDateTime = ""
+        var endDateTime = ""
+        var recordDate = "";
+        var title = "";
+        var projectName = "";
+        var description = "";
+
+        if (worklog.startDate != null || worklog.startDate != "")
+            //startDateTime = ConvertJsonDate(worklog.startDate).toLocaleTimeString("en-US", options);
+            startDateTime = formatTimeInAMPM(ConvertJsonDate(worklog.startDate))
+            recordDate = ConvertJsonDate(worklog.startDate).toIndianFormat();
+
+        if (worklog.endDate != null || worklog.endDate != "")
+            endDateTime = ConvertJsonDate(worklog.endDate).toLocaleTimeString("en-US", options);
+
+        if (worklog.title != null)
+            title = worklog.title;
+
+        if (worklog.projectName != null)
+            projectName = worklog.projectName
+
+        if (worklog.description != null)
+            description = worklog.description;
+
+
+        let mainContainer = document.createElement("div");
+        mainContainer.classList.add("row", "w3-white", "alert-item", "small-box-shadow-cord", "round-corners-left-15", "round-corners-right-15", "work-record-container");
+
+        let colEl = document.createElement("div");
+        colEl.classList.add("col-md-12");
+        //top section of the worklog
+        let topSectionEl = document.createElement("div");
+        topSectionEl.classList.add("row", "work-record-top-section")
+        topSectionEl.innerHTML = "<div class='col-md-11'>"
+        + "<p class='work-record-time' style='display: inline-flex'>" + startDateTime + " - " + endDateTime + "</p>" 
+        + "<p class='work-record-date' style='display: inline-flex'>" + recordDate + "</p>"
+        + "<p class='work-record-title' style='display: inline-flex'>" + title + "</p>"
+        + "<p class='work-record-project' style='display: inline-flex'>" + projectName + "</p></div>"
+
+        + "<div class='col-md-1'><button class='btn btn-primary'>Edit</button></div>"
+
+        //middle section of the worklog
+        let middleSectionEl = document.createElement("div");
+        middleSectionEl.classList.add("row", "work-record-middle-section")
+        for (var i = 0; i < worklog.tags.length; i++) {
+            middleSectionEl.innerHTML += "<p>" + worklog.tags[i] + "</p>"
+        }
+        //bottom section of the worklog
+        let bottomSectionEl = document.createElement("div");
+        bottomSectionEl.classList.add("row", "work-record-bottom-section")
+        bottomSectionEl.innerHTML = "<p>"  + description + "</p>"
+
+
+
+        //Append the section of the worklog
+        colEl.appendChild(topSectionEl);
+        colEl.appendChild(middleSectionEl);
+        colEl.appendChild(bottomSectionEl);
+
+        //append the worklog to the container of it.
+        mainContainer.appendChild(colEl);
+
+        addElementToContainer(document.getElementById("worklogs-container"), mainContainer)
+    }
+
+    //Append an Html element to the container
+    function addElementToContainer(container, element) {
+
+
+        if (container != null && element != null) {
+            container.appendChild(element);
+        } else {
+            notif.error("Something happen! Please try again later!", "Error")
+        }
+
+    }
+
+
 
 
 

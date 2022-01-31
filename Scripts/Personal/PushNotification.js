@@ -16,13 +16,13 @@ $(function () {
 
     var notifications = $.connection.notificationHub;
     notifications.client.receiveNotification = function () {
-        console.log("aa")
+        //console.log("aa")
         getAllNotif()
     };
 
-    console.log(notifications)
+    //console.log(notifications)
     $.connection.hub.start().done(function () {
-        console.log("aaa");
+        //console.log("aaa");
         getAllNotif();
     })
         .fail(function (e) { console.log(e) })
@@ -41,7 +41,7 @@ function getAllNotif() {
             const obj = JSON.parse(result)
             UpdateNotifNumber(obj)
             AddNotificationToView(obj)
-            console.log(obj);
+            //console.log(obj);
         },
         error: function (result) {
             alert(result)
@@ -71,7 +71,7 @@ function UpdateNotifNumber(result) {
 function AddNotificationToView(result) {
 
     var $container = document.getElementById("notification-main-container");
-    console.log($container)
+   // console.log($container)
 
     var linebreak = "<hr />"
 

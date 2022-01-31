@@ -41,3 +41,43 @@ function ConvertFromUTC(date) {
 
     return newDate;   
 }
+
+//Adds a new function toIndianFormat() to all instances of Date.
+//can be used as an extension method for date
+// new Date().toIndianFormat()
+Date.prototype.toIndianFormat = function () {
+
+    let monthNames = ["Jan", "Feb", "Mar", "Apr",
+        "May", "Jun", "Jul", "Aug",
+        "Sep", "Oct", "Nov", "Dec"];
+
+    let day = this.getDate();
+
+    let monthIndex = this.getMonth();
+    let monthName = monthNames[monthIndex];
+
+    let year = this.getFullYear();
+
+    return `${day} ${monthName} ${year}`;
+}
+
+
+function formatTimeInAMPM(date) {
+
+    if (date != null) {
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+
+        var newFormat = hours >= 12 ? "PM" : "AM";
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        hours = hours < 10 ? "0" + hours : hours;
+
+
+        return hours + ":" + minutes + " " + newFormat;
+    } else {
+        return null;
+    }
+
+}
