@@ -24,12 +24,26 @@
                 @{
                     foreach (var project in Model.projects)
                     {
-                        <div class="row">
-                            <div class="col-md-12">
-                                <input type="checkbox" id="@project.id" name="@project.id" value="@project.id" onchange="filterLogsByProject(value)" />
-                                <label for="@project.id">@project.name</label>
+
+                        if (project.id == 0)
+                        {
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <input type="checkbox" id="@project.id" name="@project.id" value="@project.id" checked onchange="filterLogsByProject(value)" class="projects-select-item" />
+                                    <label for="@project.id">@project.name</label>
+                                </div>
                             </div>
-                        </div>
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <input type="checkbox" id="@project.id" name="@project.id" value="@project.id" onchange="filterLogsByProject(value)" class="projects-select-item" />
+                                    <label for="@project.id">@project.name</label>
+                                </div>
+                            </div>
+                        }
+
                     }
                 }
             </div>
@@ -40,7 +54,23 @@
                         <h5>Time Sheet</h5>
                     </div>
                 </div>
-                @foreach (var record in Model.workLogs.Take(Model.numberOfItems))
+
+                <script>
+                    function clearWorkRecords() {
+                        var list = document.getElementsByClassName("alert-item");
+                        if (list.length > 0) {
+                            for (var i = 0; i < list.length; i++) {
+                                list[i].remove();
+                            }
+                        }
+                        console.log(list);
+                    }
+                    clearWorkRecords();
+                </script>
+                @{ 
+                    var workLogs = Model.workLogs.Take(Model.numberOfItems);
+                }
+                @foreach (var record in workLogs)
                 {
 
                     string startTime = record.startDate.ToString("hh:mm tt");
@@ -91,18 +121,20 @@
 
     function changeNumber(number) {
         console.log(number);
+        var selectedProjects = getSelectedProjects()
+
+
         var currentModel = @Html.Raw(Json.Encode(Model));
         var queryItems = {
-            numberOfitem: number,
-            myActivity: currentModel
+            selectedItems: selectedProjects,
+            numberOfItems: number
         }
-        console.log(queryItems)
         console.log(JSON.stringify(queryItems))
 
         var queryItems = JSON.stringify(queryItems)
         $.ajax({
             type: "post",
-            url: '@Url.Action("stuff", "Activity")',
+            url: '@Url.Action("MyTimeSheet", "Activity")',
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({ queryItems: queryItems}),
             dataType: "json",
@@ -120,4 +152,20 @@
 
 
     }
+
+    function getSelectedProjects() {
+        var selecteditems = [];
+
+        var itemsAvailable = document.getElementsByClassName("projects-select-item");
+        for (var i = 0; i < itemsAvailable.length; i++) {
+            if (itemsAvailable[i].checked) {
+                selecteditems.push(itemsAvailable[i].value);
+            }
+        }
+
+        return selecteditems;
+    }
+
+
+
 </script>

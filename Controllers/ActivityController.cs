@@ -9,10 +9,12 @@ using System.Web.Mvc;
 
 namespace mytimmings.Controllers
 {
+    
     public class ActivityController : Controller
     {
         // GET: Activity
         private readonly DBContext.DBModel db = new DBContext.DBModel();
+        [HttpGet]
         public ActionResult MyTimeSheet()
         {
             Models.Security.User user = (Models.Security.User)Session["User"];
@@ -115,27 +117,32 @@ namespace mytimmings.Controllers
             //myActivity.workLogs = workLogs;
             //myActivity.leaves = leaves;
 
-
-
+            //Add values to session for further use when the user change the number of records to show
+            SetMyStatSession(myActivity);
+            Session.Timeout = 120;
 
             return View(myActivity);
         }
 
-        [HttpPost]
-        public JsonResult stuff(string queryItems)
+        
+        public ActionResult MyTimeSheet(string queryItems)
         {
+            //get the myActivity from the Session
+            var myActivity = getMyActivityFromSession();
+
+
             var custom = new
             {
-                numberOfitem = "",
-                myActivity = new Models.Activity.MyActivity()
+                selectedItems = new List<string>(),
+                numberOfItems = ""
 
             };
-
-            var model = JsonConvert.DeserializeObject(queryItems);
             var item = JsonConvert.DeserializeAnonymousType(queryItems, custom);
+            myActivity.numberOfItems = Int32.Parse(item.numberOfItems);
 
 
-            return Json(new { abc = "as" }, JsonRequestBehavior.AllowGet);
+
+            return PartialView("TimeSheet", myActivity);
         }
 
 
@@ -146,6 +153,19 @@ namespace mytimmings.Controllers
         private Models.Security.User GetUserFromSession()
         {
             return (Models.Security.User)Session["User"];
+        }
+
+
+        private void SetMyStatSession(Models.Activity.MyActivity myActivity)
+        {
+            Session["myActivity"] = myActivity;
+            Session.Timeout = 120;
+
+        }
+
+        private Models.Activity.MyActivity getMyActivityFromSession()
+        {
+            return (Models.Activity.MyActivity)Session["myActivity"];
         }
     }
 }
