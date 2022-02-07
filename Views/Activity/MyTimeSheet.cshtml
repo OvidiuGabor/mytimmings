@@ -33,16 +33,21 @@
             </div>
         </div>
 
+        @Html.Partial("_CreateTaskModal")
+        @*For Edit Modal, thinking if it will be top or still from the side*@
+
+        @Html.Partial("_EditTaskModalRight")
+        @Html.Partial("_EditTaskModalTop")
 
 
         <hr />
     </div>
     <div class="w3-container conainer-padding" style="padding-top: 10px">
         <div style="display:block" id="timesheet">
-            @{Html.RenderPartial("TimeSheet");};
+            @{Html.RenderPartial("TimeSheet");}
         </div>
         <div style="display: none" id="leave">
-            @{Html.RenderPartial("View");};
+            @{Html.RenderPartial("View");}
         </div>
     </div>
 </div>

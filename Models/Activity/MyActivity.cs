@@ -5,7 +5,7 @@ using System.Web;
 
 namespace mytimmings.Models.Activity
 {
-    public class MyActivity
+    public class MyActivity : ICloneable
     {
         public List<Portal.WorkRecord> workLogs = new List<Portal.WorkRecord>();
         public List<Portal.Project> projects = new List<Portal.Project>();
@@ -20,9 +20,23 @@ namespace mytimmings.Models.Activity
             this.projects = projects;
             numberOfItems = 5;
         }
+
+        protected MyActivity(Models.Activity.MyActivity myActivity)
+        {
+            this.workLogs = myActivity.workLogs;
+            this.projects = myActivity.projects;
+            this.leaves = myActivity.leaves;
+            this.numberOfItems = myActivity.numberOfItems;
+        }
+
         public MyActivity()
         {
 
+        }
+
+        public object Clone()
+        {
+            return new MyActivity(this);
         }
     }
 }

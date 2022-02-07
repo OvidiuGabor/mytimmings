@@ -662,6 +662,9 @@
     <Content Include="Views\Activity\MyTimeSheet.cshtml" />
     <Content Include="Views\Activity\TimeSheet.cshtml" />
     <Content Include="Views\Activity\View.cshtml" />
+    <Content Include="Views\Activity\_CreateTaskModal.cshtml" />
+    <Content Include="Views\Activity\_EditTaskModalTop.cshtml" />
+    <Content Include="Views\Activity\_EditTaskModalRight.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

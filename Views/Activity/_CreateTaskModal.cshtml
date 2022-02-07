@@ -1,0 +1,61 @@
+﻿
+<div id="modal-right" class="modal fade" data-backdrop="true">
+    <div class="modal-dialog modal-right w-xl">
+        <div class="modal-content h-100 no-radius">
+            <div class="modal-header">
+                <div class="modal-title text-md">Create new Task</div> <button class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="p-4 text-center">
+                    <form>
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="dateinput">Date</label>
+                                <input type="date" class="form-control" id="dateTnput" placeholder="Task Date" style="text-align: center">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="starttime">Start Time</label>
+                                <input type="time" class="form-control" id="startTime" placeholder="Start Time">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="endTime">End Time</label>
+                                <input type="time" class="form-control" id="endTime" placeholder="End Time">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="title">Task Title</label>
+                                <input type="text" class="form-control" id="title" placeholder="Title">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="project">Project</label>
+                                <select id="project" class="form-control">
+                                    <option selected value="1">MyTimmings</option>
+                                    <option value="0">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="tags">Tags</label>
+                                <input type="text" class="form-control" id="tags" placeholder="Tags">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="details">Details</label>
+                                <textarea id="details" cols="55" rows="15"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-light" data-dismiss="modal">Close</button> <button type="button" class="btn btn-primary" data-dismiss="modal">Save Details</button></div>
+        </div>
+    </div>
+</div>

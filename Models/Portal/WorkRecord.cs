@@ -18,6 +18,7 @@ namespace mytimmings.Models.Portal
         public string title { get; set; }
         public string description { get; set; }
         public List<string> tags { get; set; }
+        public List<string> tagsColors { get; set; }
 
 
 
@@ -33,11 +34,13 @@ namespace mytimmings.Models.Portal
             endDate = record.Status_End_Time;
             status = record.Status;
             projectId = record.Project_ID.HasValue == true ? (int)record.Project_ID.Value : 0;
-            projectName = record.Project_Name;
-            title = record.Title;
+            projectName = record.Project_Name == null ? getProjectName(projectId) : record.Project_Name;
+            title = record.Title == null ? "No Title" : record.Title;
             description = record.Description;
-            CreateTagsList(record.Tags);
 
+            CreateTagsList(record.Tags);
+            CreateTagsColorList(record.TagsColors);
+            checkForTagsAndColors();
 
         }
 
@@ -58,17 +61,95 @@ namespace mytimmings.Models.Portal
                     tempTags = tag.Split('#').ToList();
                 }
 
-                foreach(string item in tempTags)
+                foreach (string item in tempTags)
                 {
                     if (!item.Contains('#') && !String.IsNullOrWhiteSpace(item))
                     {
-                        tags.Add( "#" + item);
+                        tags.Add("#" + item);
                     }
                 }
             }
-           
-          
-            
+
+
+
         }
+
+        private void CreateTagsColorList(string colors)
+        {
+            tagsColors = new List<string>();
+
+            if (!String.IsNullOrEmpty(colors))
+            {
+                var tempList = colors.Split(';');
+                foreach (var color in tempList)
+                {
+                    var newColor = color.Trim();
+                    //we check for '#' becasue it is mandatory in setting the CSS color
+                    if (!color.Contains("#"))
+                    {
+                        newColor = "#" + newColor;
+
+                    }
+
+                    tagsColors.Add(newColor);
+
+                }
+            }
+
+        }
+
+
+
+        private string getProjectName(int projectId)
+        {
+            string projectName = "";
+            DBContext.DBModel db = new DBContext.DBModel();
+            projectName = db.Projects.Where(x => x.Id == projectId).Select(x => x.Name).FirstOrDefault();
+            if (projectName == null)
+                projectName = "Other";
+
+
+
+            return projectName;
+
+        }
+
+        //here we check that the number of items in tags list and in tagColors list to be fine
+        //if they are the same we leave them 
+        //if there are less tags rather the colors, it is ok also
+        //if there are more tags then colors, then we get the differece of tags from the params table
+        private void checkForTagsAndColors()
+        {
+            int tagsCount = tags.Count();
+            int colorsCount = tagsColors.Count();
+
+            if (tagsCount >  colorsCount)
+            {
+                int limit = tagsCount - colorsCount;
+                DBContext.DBModel db = new DBContext.DBModel();
+                string defaultColors = db.Params.Where(x => x.Identifier == "Colors").Select(x => x.Param1).FirstOrDefault();
+                if (!String.IsNullOrEmpty(defaultColors))
+                {
+                    var colorList = defaultColors.Split(';');
+                    int counter = 0;
+                    foreach(var color in colorList)
+                    {
+                        if (counter >= limit)
+                            break;
+
+                        if (!tagsColors.Contains(color))
+                        {
+                            tagsColors.Add(color);
+                        }
+                        counter++;
+                    }
+                }
+
+            }
+
+
+
+
+        }   
     }
 }

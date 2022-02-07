@@ -5,8 +5,8 @@
         <div class="row" style= "margin-left: 0px">
             <div class="col-md-3">
                 <div class="list-el-tile">
-                    <div class="timesheet-title" style="margin-bottom: 20px;">
-                        <h5>Projects</h5>
+                    <div class="timesheet-title" style="margin-bottom: 20px; padding-right: 0;">
+                        <h4>Projects</h4>
                     </div>
                     <div class="user-choice">
                         <label for="chageItems">Items</label>
@@ -49,9 +49,13 @@
             </div>
 
             <div class="col-md-9" id="worklogs-container">
-                <div class="list-el-tile">
-                    <div class="timesheet-title">
-                        <h5>Time Sheet</h5>
+
+                <div class=" row list-el-tile">
+                    <div class="timesheet-title col-md-11">
+                        <h4>Time Sheet</h4>
+                    </div>
+                    <div class="new-task-btn-container col-md-1">
+                        <button type="button" class="btn btn-primary new-task-style-btn" id="new-taks-btn" data-toggle="modal" data-target="#modal-right" data-toggle-class="modal-open-aside">New Task</button>
                     </div>
                 </div>
                 @{ 
@@ -63,31 +67,50 @@
                     string startTime = record.startDate.ToLocalTime().ToString("hh:mm tt");
                     string endTime = record.endDate.ToLocalTime().ToString("hh:mm tt");
                     string date = record.startDate.ToLocalTime().ToString("dd MMM yyyy");
-
+                    int i = 0;
 
 
                     <div class="row w3-white alert-item small-box-shadow-cord round-corners-left-15 round-corners-right-15 work-record-container">
                         <div class="col-md-12">
                             <div class="row work-record-top-section">
-                                <div class="col-md-11">
-                                    <p class="work-record-time" style="display: inline-flex">@startTime - @endTime</p>
-                                    <p class="work-record-date" style="display: inline-flex">@date</p>
-                                    <p class="work-record-title" style="display: inline-flex">@record.title</p>
-                                    <p class="work-record-project" style="display: inline-flex">@record.projectName</p>
+                                <div class="col-md-11" style="padding-left: 0px;">
+                                    <p class="work-record-time" style="display: inline-flex; padding-left: 0px; padding-right: 5%;">@startTime - @endTime</p>
+                                    <p class="work-record-date" style="display: inline-flex; padding-left: 0px; padding-right: 5%;">@date</p>
+                                    <p class="work-record-title" style="display: inline-flex; padding-left: 0px; padding-right: 5%;">@record.title</p>
+                                    <p class="work-record-project" style="display: inline-flex; padding-left: 0px; padding-right: 5%;">@record.projectName</p>
                                 </div>
-                                <div class="col-md-1">
-                                    <button class="btn btn-primary">Edit</button>
+                                <div class="col-md-1" style="padding-right: 0px; text-align: right; padding-left: 20px;">
+                                    <button class="btn btn-primary edit-work-btn" data-toggle="modal" data-target="#exampleModal">Edit</button>
                                 </div>
                             </div>
                             <div class="row work-record-middle-section">
                                 @foreach (var tag in record.tags)
                                 {
-                                    <p>@tag</p>
+
+                                    //Default a background color, in case something happen with assigning the colors!.
+                                    var backgroundColor = "rbga(167, 58, 232, 0.1)";
+                                    var color = "rbga(167, 58, 232, 1)";
+
+                                    if (!String.IsNullOrEmpty(record.tagsColors[i]))
+                                    {
+                                        backgroundColor = record.tagsColors[i].Replace(",1)", ",0.1)");
+                                        color = record.tagsColors[i];
+                                        <p style="color: @color; padding: 7px; margin: 12px; border-radius: 50px; font-size: 12px; background-color: @backgroundColor; margin-left: 0px;">@tag</p>
+
+                                    }
+                                    else
+                                    {
+                                        
+                                        <p style="color:@color; padding: 7px; margin: 12px; border-radius: 50px;  font-size: 12px; background-color: @backgroundColor">@tag</p>
+                                    }
+
+                                    i++;
+
                                 }
 
                             </div>
                             <div class="row work-record-bottom-section">
-                                <p>@record.description</p>
+                                <p style="margin-top: 5px; margin-left: 0px; margin-bottom: 15px; padding: 0px;">@record.description</p>
                             </div>
                         </div>
 
@@ -103,22 +126,55 @@
 
 <script>
     function filterLogsByProject(projectId) {
-        console.log(projectId);
+        var numberOfItems = getNumberOfItems();
+
+        var queryItems = {
+            selectedItems: getSelectedProjects(),
+            numberOfItems: numberOfItems
+        }
+
+        console.log(queryItems);
+
+
+
+        sendjsonRequest(queryItems)
+
+/*         var queryItems = JSON.stringify(queryItems)*/
+        @*$.ajax({
+            type: "post",
+            url: '@Url.Action("TimeSheet", "Activity")',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({ queryItems: queryItems}),
+            dataType: "json",
+            success: function (data) {
+               //console.log(data.data)
+                if (data.status == "success") {
+                    generateWorkLogsByNumber(data.data.workLogs, data.data.numberOfItems)
+                } else if (data.status == "error") {
+                    notif.error(data.message, "Error");
+                }
+
+
+            },
+            error: function (data) {
+             notif.error("Something happen! Please try again later!", "Error");
+            }
+
+        })*@
+
     }
 
     function changeNumber(number) {
         //console.log(number);
         var selectedProjects = getSelectedProjects()
 
-
-        var currentModel = @Html.Raw(Json.Encode(Model));
         var queryItems = {
             selectedItems: selectedProjects,
             numberOfItems: number
         }
         //console.log(JSON.stringify(queryItems))
-
-        var queryItems = JSON.stringify(queryItems)
+        sendjsonRequest(queryItems)
+        @*var queryItems = JSON.stringify(queryItems)
         $.ajax({
             type: "post",
             url: '@Url.Action("TimeSheet", "Activity")',
@@ -139,7 +195,40 @@
              notif.error("Something happen! Please try again later!", "Error");
             }
 
-        })
+        })*@
+
+
+
+    }
+
+    function sendjsonRequest(data) {
+        var notif = new Notifier();
+        if (data) {
+            var queryItems = JSON.stringify(data)
+            $.ajax({
+                type: "post",
+                url: '@Url.Action("TimeSheet", "Activity")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ queryItems: queryItems }),
+                dataType: "json",
+                success: function (data) {
+                    //console.log(data.data)
+                    if (data.status == "success") {
+                        generateWorkLogsByNumber(data.data.workLogs, data.data.numberOfItems)
+                    } else if (data.status == "error") {
+                        notif.error(data.message, "Error");
+                    }
+
+
+                },
+                error: function (data) {
+                    notif.error("Something happen! Please try again later!", "Error");
+                }
+
+            })
+        } else {
+            notif.error("Something happen! No Data was selected!", "Error");
+        }
 
 
 
@@ -158,6 +247,19 @@
         return selecteditems;
     }
 
+    function getNumberOfItems() {
+        //default number of items
+        var numberOfItems = 5;
+
+        var selectlist = document.getElementById("changeItems")
+
+        if (selectlist)
+            numberOfItems = selectlist.value;
+
+
+
+        return numberOfItems;
+    }
 
     function generateWorkLogsByNumber(workLogs, counter) {
 
@@ -188,7 +290,7 @@
             colEl.classList.add("col-md-12");
             colEl.innerHTML = "<div style='text-align: center'>"
                 + "<h2 style = 'padding: 35px; font-size: 20px'> No records!</h2>"
-            mainContainer.appendChild(colEl);
+            mainContainer.appendChild(colEl)
 
             addElementToContainer(document.getElementById("worklogs-container"), mainContainer)
         }
@@ -207,7 +309,6 @@
         }
 
     }
-
 
     //this is a template for create a worklog element on the view
     function createWorklogElement(worklog) {
@@ -252,25 +353,52 @@
         //top section of the worklog
         let topSectionEl = document.createElement("div");
         topSectionEl.classList.add("row", "work-record-top-section")
-        topSectionEl.innerHTML = "<div class='col-md-11'>"
-        + "<p class='work-record-time' style='display: inline-flex'>" + startDateTime + " - " + endDateTime + "</p>" 
-        + "<p class='work-record-date' style='display: inline-flex'>" + recordDate + "</p>"
-        + "<p class='work-record-title' style='display: inline-flex'>" + title + "</p>"
-        + "<p class='work-record-project' style='display: inline-flex'>" + projectName + "</p></div>"
+        topSectionEl.innerHTML = "<div class='col-md-11' style='padding-left: 0px;'>"
+            + "<p class='work-record-time' style='display: inline-flex; padding-left: 0px; padding-right: 5%;'>" + startDateTime + " - " + endDateTime + "</p>"
+            + "<p class='work-record-date' style='display: inline-flex; padding-left: 0px; padding-right: 5%;'>" + recordDate + "</p>"
+            + "<p class='work-record-title' style='display: inline-flex; padding-left: 0px; padding-right: 5%;'>" + title + "</p>"
+            + "<p class='work-record-project' style='display: inline-flex; padding-left: 0px; padding-right: 5%;'>" + projectName + "</p></div>"
 
-        + "<div class='col-md-1'><button class='btn btn-primary'>Edit</button></div>"
+            + "<div class='col-md-1' 'style='padding-right: 0px; text-align: right; padding-left: 20px;'><button class='btn btn-primary edit-work-btn'>Edit</button></div>"
 
         //middle section of the worklog
         let middleSectionEl = document.createElement("div");
+
+        var backgroundColor = "rbga(167, 58, 232, 0.1)";
+        var color = "rbga(167, 58, 232, 1)";
+
+
         middleSectionEl.classList.add("row", "work-record-middle-section")
         for (var i = 0; i < worklog.tags.length; i++) {
-            middleSectionEl.innerHTML += "<p>" + worklog.tags[i] + "</p>"
+
+            if (worklog.tagsColors[i] != null || worklog.tagsColors[i] != "") {
+                backgroundColor = worklog.tagsColors[i].replace(",1)", ",0.1)");
+                color = worklog.tagsColors[i];
+            }
+
+
+            middleSectionEl.innerHTML += "<p style= 'padding: 7px; margin: 12px; border-radius: 50px; font-size: 12px; margin-left: 0px; color: " + color + "; background-color: " + backgroundColor + "'>" + worklog.tags[i] + "</p>"
+            
         }
         //bottom section of the worklog
         let bottomSectionEl = document.createElement("div");
         bottomSectionEl.classList.add("row", "work-record-bottom-section")
-        bottomSectionEl.innerHTML = "<p>"  + description + "</p>"
+        bottomSectionEl.innerHTML = "<p style='margin-top: 5px; margin-left: 0px; margin-bottom: 15px; padding: 0px;'>"  + description + "</p>"
 
+
+
+         @*if (!String.IsNullOrEmpty(record.tagsColors[i]))
+                                    {
+                                        backgroundColor = record.tagsColors[i].Replace(",1)", ",0.1)");
+                                        color = record.tagsColors[i];
+                                        <p style="color: @color; padding: 7px; margin: 12px; border-radius: 50px; font-size: 12px; background-color: @backgroundColor; margin-left: 0px;">@tag</p>
+
+                                    }
+                                    else
+                                    {
+
+                                        <p style="color:@color; padding: 7px; margin: 12px; border-radius: 50px;  font-size: 12px; background-color: @backgroundColor">@tag</p>
+                                    }*@
 
 
         //Append the section of the worklog

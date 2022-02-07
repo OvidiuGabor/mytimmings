@@ -129,6 +129,9 @@ namespace mytimmings.Controllers
 
             //get the myActivity from the Session
             var myActivity = getMyActivityFromSession();
+            Models.Activity.MyActivity tempData = new Models.Activity.MyActivity();
+            tempData = (Models.Activity.MyActivity)myActivity.Clone();
+
             const int numberOfItems = 5;
             var custom = new
             {
@@ -150,9 +153,9 @@ namespace mytimmings.Controllers
 
             //Set a default if no value provided in the Json
             if (String.IsNullOrEmpty(convertedJson.numberOfItems))
-                myActivity.numberOfItems = numberOfItems;
+                tempData.numberOfItems = numberOfItems;
             else
-                myActivity.numberOfItems = Int32.Parse(convertedJson.numberOfItems);
+                tempData.numberOfItems = Int32.Parse(convertedJson.numberOfItems);
 
 
             if (!convertedJson.selectedItems.Contains("0"))
@@ -162,15 +165,15 @@ namespace mytimmings.Controllers
                 foreach(var projectId in convertedJson.selectedItems)
                 {
                     int projectIdAsInt = Int32.Parse(projectId);
-                    workLogsFiltered.AddRange(myActivity.workLogs.Where(x => x.projectId == projectIdAsInt).ToList());
+                    workLogsFiltered.AddRange(tempData.workLogs.Where(x => x.projectId == projectIdAsInt).ToList());
                 }
-                myActivity.workLogs = workLogsFiltered.OrderByDescending(x => x.startDate).ToList();
+                tempData.workLogs = workLogsFiltered.OrderByDescending(x => x.startDate).ToList();
             }
 
 
 
             IncreaseSessionTimout();
-            return Json(new { status = "success", data = myActivity }, JsonRequestBehavior.AllowGet);
+            return Json(new { status = "success", data = tempData }, JsonRequestBehavior.AllowGet);
         }
 
 
