@@ -176,6 +176,40 @@ namespace mytimmings.Controllers
             return Json(new { status = "success", data = tempData }, JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult AddTask(FormCollection formCollection)
+        {
+
+            var tags = formCollection["tags"];
+
+
+
+
+            return Json(new { status = "success" }, JsonRequestBehavior.AllowGet);
+
+        }
+
+
+
+
+        public JsonResult GetColors()
+        {
+            List<string> colors = new List<string>();
+
+            var colorsFromDb = db.Params.Where(x => x.Identifier == "Colors" && x.Active == true).FirstOrDefault();
+            if(colorsFromDb != null)
+            {
+                var tempColors = colorsFromDb.Param1.Split(';').ToList();
+                if(tempColors.Count == 0)
+                    return Json(new { status = "error", data = colors }, JsonRequestBehavior.AllowGet);
+
+                colors.AddRange(tempColors);
+            }
+
+
+
+            return Json(new { status = "success", data = colors }, JsonRequestBehavior.AllowGet);
+        }
+
 
 
 

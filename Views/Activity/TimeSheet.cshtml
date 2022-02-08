@@ -55,7 +55,7 @@
                         <h4>Time Sheet</h4>
                     </div>
                     <div class="new-task-btn-container col-md-1">
-                        <button type="button" class="btn btn-primary new-task-style-btn" id="new-taks-btn" data-toggle="modal" data-target="#modal-right" data-toggle-class="modal-open-aside">New Task</button>
+                        <button type="button" class="btn btn-primary new-task-style-btn" id="new-taks-btn" data-toggle="modal" data-target="#modal-right" data-toggle-class="modal-open-aside" onclick="getColors()">New Task</button>
                     </div>
                 </div>
                 @{ 
@@ -125,6 +125,10 @@
 </div>
 
 <script>
+
+    var colors = [];
+    const defaultColors = ["rgba(74,125,255,1)", "rgba(82,206,44,1)", "rgba(255,136,0,1)", "rgba(249,57,57,1)", "rgba(101,107,123,1)"]
+
     function filterLogsByProject(projectId) {
         var numberOfItems = getNumberOfItems();
 
@@ -378,7 +382,7 @@
 
 
             middleSectionEl.innerHTML += "<p style= 'padding: 7px; margin: 12px; border-radius: 50px; font-size: 12px; margin-left: 0px; color: " + color + "; background-color: " + backgroundColor + "'>" + worklog.tags[i] + "</p>"
-            
+
         }
         //bottom section of the worklog
         let bottomSectionEl = document.createElement("div");
@@ -424,8 +428,32 @@
 
     }
 
+    //Function that sends an Ajax request and gets the list of of colors
+    function getColors(){
+        $.ajax({
+            type: 'post',
+            url: '@Url.Action("GetColors", "Activity")',
+            success: function (data) {
+                //console.log(data.data)
+                if (data.status == "success") {
+                    var tempcolors = data.data;
+                    if (tempcolors.length > 0) {
+                        colors = tempcolors
+                    } else {
+                        colors = defaultColors;
+                    }
+
+                } else if (data.status == "error") {
+                    notif.error(data.message, "Error");
+                }
 
 
+            },
+            error: function (data) {
+                notif.error("Something happen! Please try again later!", "Error");
+            }
+        })
+    }
 
 
 </script>

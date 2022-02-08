@@ -98,8 +98,6 @@ namespace mytimmings.Models.Portal
 
         }
 
-
-
         private string getProjectName(int projectId)
         {
             string projectName = "";
