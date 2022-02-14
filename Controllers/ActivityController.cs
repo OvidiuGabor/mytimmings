@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -178,13 +179,195 @@ namespace mytimmings.Controllers
 
         public JsonResult AddTask(FormCollection formCollection)
         {
+            Dictionary<string, string> erroredItems = new Dictionary<string, string>();
+            bool errored = false;
+            Models.Portal.WorkRecord record = new Models.Portal.WorkRecord();
+            Models.Portal.WorkRecord insertedRecord = null;
+            Models.Security.User user = GetUserFromSession();
 
-            var tags = formCollection["tags"];
+
+            //get the records fromt the session
+            var myActivityFromSession = getMyActivityFromSession();
+            var records = myActivityFromSession.workLogs;
+
+            //get data from the formCollection
+            var recordDateFm = formCollection["currentDate"]; //2022/02/09
+            var startTimeFm = formCollection["startDate"]; //20:00
+            var endTimeFm = formCollection["endDate"]; //21:00
+            var statusFm = formCollection["status"];
+            var projectIdFm = formCollection["projectId"];
+            var descriptionFm = formCollection["description"];
+            var titleFm = formCollection["title"];
+            var tagsFm = formCollection["tags"];
+            var tagsColorFm = formCollection["tagsColors"];
+
+            DateTime recordDate = DateTime.UtcNow;
+            DateTime startTime = DateTime.UtcNow;
+            DateTime endTime = DateTime.UtcNow;
+            string tags = null;
+            string tagsColor = null;
+
+
+            //validate Form Data
+            //Validate recordDateFm
+            if (!String.IsNullOrEmpty(recordDateFm))
+            {
+                string[] dateFormats = new[] { "yyyy/MM/dd", "yyyy-MM-dd" };
+                CultureInfo provider = new CultureInfo("en-US");
+                var success = DateTime.TryParseExact(recordDateFm, dateFormats, provider, DateTimeStyles.AssumeUniversal, out recordDate);
+                if (!success)
+                {
+                    errored = true;
+                    erroredItems.Add("currentDate", "Task Date is not valid!");
+                }
+            }
+            else
+            {
+                errored = true;
+                erroredItems.Add("currentDate", "Task Date is not valid!");
+            }
+
+            //validate startTimeFm
+            if(!String.IsNullOrEmpty(startTimeFm))
+            {
+                string[] dateFormats = new[] { "HH:mm", "HH:mm:ss" };
+                CultureInfo provider = new CultureInfo("en-US");
+                try
+                {
+                    var tempStartTime = DateTime.ParseExact(startTimeFm, "HH:mm", CultureInfo.InvariantCulture);
+                    startTime = (recordDate.Date + tempStartTime.TimeOfDay).ToUniversalTime();
+                }
+                catch (Exception ex)
+                {
+
+                    errored = true;
+                    erroredItems.Add("startDate", "Start Time is not valid!");
+                }
+              
+            }
+            else
+            {
+                errored = true;
+                erroredItems.Add("startDate", "Start Time is not valid!");
+            }
+
+            //validate endTimeFm
+            if (!String.IsNullOrEmpty(endTimeFm))
+            {
+                string[] dateFormats = new[] { "HH:mm", "HH:mm:ss" };
+                CultureInfo provider = new CultureInfo("en-US");
+                try
+                {
+                   var  tempEndTime = DateTime.ParseExact(endTimeFm, "HH:mm", CultureInfo.InvariantCulture);
+                    endTime = (recordDate.Date + tempEndTime.TimeOfDay).ToUniversalTime();
+                }
+                catch (Exception ex)
+                {
+
+                    errored = true;
+                    erroredItems.Add("endDate", "End Time is not valid!");
+                }
+
+            }
+            else
+            {
+                errored = true;
+                erroredItems.Add("endDate", "End Time is not valid!");
+            }
+
+            //Validate Status
+            if (String.IsNullOrEmpty(statusFm))
+            {
+                errored = true;
+                erroredItems.Add("status", "Task Status is not valid!");
+            }
+            //Validate project Id
+            if (String.IsNullOrEmpty(projectIdFm))
+            {
+                errored = true;
+                erroredItems.Add("projectId", "Selected Project is not valid!");
+            }
+            //Validate Description
+            if (String.IsNullOrEmpty(descriptionFm))
+            {
+                errored = true;
+                erroredItems.Add("description", "Please add a short description!");
+            }
+            //Validate Title
+            if (String.IsNullOrEmpty(titleFm))
+            {
+                errored = true;
+                erroredItems.Add("title", "Please add a title to the task!");
+            }
+
+            if (!string.IsNullOrEmpty(tagsFm))
+            {
+                tags = tagsFm.Replace(',', ' ');
+            }
+            if (!string.IsNullOrEmpty(tagsColorFm))
+            {
+                tagsColor = tagsColorFm.Replace("),", ");").Replace("0.1)", "1)").Replace(" ", "");
+            }
+
+
+            record = new Models.Portal.WorkRecord(recordDate, startTime, endTime, statusFm, Int32.Parse(projectIdFm), titleFm, descriptionFm, tags, tagsColor);
+            int position = 1;
+            Dictionary<string,string> validationErrors = CheckTaskForPotentialIssues(record, user);
+         
+            if (!errored)
+            {
+                if (validationErrors.Count > 0)
+                {
+                    foreach (var error in validationErrors)
+                    {
+                        erroredItems.Add(error.Key, error.Value);
+                    }
+                    return Json(new { status = "failed", errors = erroredItems }, JsonRequestBehavior.AllowGet);
+                }
+
+                try
+                {
+                   
+                    //here we get the ID of the new record inserted, in  order to get the record from the database
+                    //we need to do this because we need the date in UTC format
+                    //and cannot figure a way to do it without extracting the new record from the database
+                    //apperently when you return the JSOn with a datetime that is createad in the controller it gets the date in pc timezone, and we need it in UTC Time.
+                    int id =  record.InsertRecordIntoDb(user);
+                    insertedRecord = new Models.Portal.WorkRecord(db.Main_Data.Find(id));
+                    
+                    //checking the position of the new task so that we can place correctly in the view.
+                    foreach(var item in records)
+                    {
+                        if (item.startDate < insertedRecord.startDate)
+                        {
+                            records.Insert(position-1, insertedRecord);
+                            myActivityFromSession.workLogs = records;
+                            SetMyStatSession(myActivityFromSession);
+                            break;
+                        }
+                            
+
+                        position++;
+                    }
+
+
+                }
+                catch (Exception ex)
+                {
+                    //log exception
+                    erroredItems.Add("Insert", "There is an issue with the data. Try again or contact Administrator!");
+                    return Json(new { status = "failed", errors = erroredItems }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                return Json(new { status = "failed", errors = erroredItems }, JsonRequestBehavior.AllowGet);
+            }
 
 
 
 
-            return Json(new { status = "success" }, JsonRequestBehavior.AllowGet);
+            return Json(new { status = "success", recordAdded = insertedRecord, position = position }, JsonRequestBehavior.AllowGet);
 
         }
 
@@ -213,6 +396,65 @@ namespace mytimmings.Controllers
 
 
 
+
+
+        private Dictionary<string,string> CheckTaskForPotentialIssues(Models.Portal.WorkRecord task, Models.Security.User user)
+        {
+            Dictionary<string, string> issues = new Dictionary<string, string>();
+            DBContext.DBModel db = new DBContext.DBModel();
+
+            if (user == null)
+                user = GetUserFromSession();
+
+
+
+            if(task == null)
+            {
+                issues.Add("Missing Data","The Task was not submited successfully");
+            }
+            else
+            {
+
+                //Check that the start time should not be  grater then the end time
+                if (task.startDate > task.endDate)
+                    issues.Add("Invalid Time","Start time cannot be higher then end time!");
+
+                //Check if it is Sunday or Saturday
+                if(task.currentDate.DayOfWeek == DayOfWeek.Saturday || task.currentDate.DayOfWeek == DayOfWeek.Sunday)
+                    issues.Add("Wrong Day", "Cannot add task on: " + task.currentDate.DayOfWeek);
+
+                //check if it is bank holiday
+                var isBankHoliday = db.Public_Holidays.Where(x => x.Holiday_date == task.currentDate.Date).FirstOrDefault();
+                if(isBankHoliday != null)
+                    issues.Add("Bank Holiday", "On: " + task.currentDate.ToString("dd/MM/yyyy") + " is Public Holyday: " + isBankHoliday.Holiday_name);
+                //check if it is on leave already
+                var leaves = db.Leaves.Where(x => x.StartDate <= task.currentDate.Date && x.EndDate >= task.currentDate.Date).FirstOrDefault();
+                if (leaves != null)
+                    issues.Add("Leave", "Cannot add Task on Leave Day!");
+
+                var requestedLeaves = db.Leave_Requests.Where(x => x.RequestStartDate <= task.currentDate.Date && x.RequestEndDate >= task.currentDate.Date).FirstOrDefault();
+                if (requestedLeaves != null)
+                    issues.Add("Requested Leave", "Leave requested for the day!");
+
+
+                //get a list of records for the task day.
+                var taskDate = task.currentDate.Date;
+                var existingRecords = db.Main_Data.Where(x => x.CurrentDate.Day == taskDate.Day && x.CurrentDate.Month == taskDate.Month && x.CurrentDate.Year == taskDate.Year && x.User_ID == user.ID).ToList();
+
+                var overlapingRecord = existingRecords.Where(x => x.Status_Start_Time <= task.startDate && x.Status_End_Time >= task.startDate).FirstOrDefault();
+                if (overlapingRecord != null)
+                    issues.Add("Wrong Start Time", "Interval already existing with Title: " + overlapingRecord.Title);
+
+                overlapingRecord = db.Main_Data.Where(x => x.Status_Start_Time <= task.endDate && x.Status_Start_Time >= task.startDate).FirstOrDefault();
+                if (overlapingRecord != null)
+                    issues.Add("Wrong End Time", "Interval already existing with Title: " + overlapingRecord.Title);
+
+                
+            }
+
+
+            return issues;
+        }
 
 
         private Models.Security.User GetUserFromSession()

@@ -66,7 +66,7 @@
 
                     string startTime = record.startDate.ToLocalTime().ToString("hh:mm tt");
                     string endTime = record.endDate.ToLocalTime().ToString("hh:mm tt");
-                    string date = record.startDate.ToLocalTime().ToString("dd MMM yyyy");
+                    string date = record.currentDate.ToLocalTime().ToString("dd MMM yyyy");
                     int i = 0;
 
 
@@ -137,7 +137,7 @@
             numberOfItems: numberOfItems
         }
 
-        console.log(queryItems);
+        //console.log(queryItems);
 
 
 
@@ -269,18 +269,18 @@
 
         var container = document.getElementById("worklogs-container");
         removeExistingWorklogs(container)
-
+        //console.log(workLogs.length)
 
         if (workLogs.length >  0) {
             if (workLogs.length >= counter) {
                 //console.log("aaa")
                 for (var i = 0; i < counter; i++) {
-                    createWorklogElement(workLogs[i]);
+                    createWorklogElement(workLogs[i], 0);
                 }
             } else if (workLogs.length < counter) {
                // console.log("bbb")
                 for (var i = 0; i  < workLogs.length; i++) {
-                    createWorklogElement(workLogs[i]);
+                    createWorklogElement(workLogs[i],0);
                 }
             }
 
@@ -296,7 +296,7 @@
                 + "<h2 style = 'padding: 35px; font-size: 20px'> No records!</h2>"
             mainContainer.appendChild(colEl)
 
-            addElementToContainer(document.getElementById("worklogs-container"), mainContainer)
+            addElementToContainer(document.getElementById("worklogs-container"), mainContainer, 1)
         }
 
     }
@@ -315,7 +315,7 @@
     }
 
     //this is a template for create a worklog element on the view
-    function createWorklogElement(worklog) {
+    function createWorklogElement(worklog, position) {
 
         const options = {
             hour: 'numeric',
@@ -334,7 +334,9 @@
         if (worklog.startDate != null || worklog.startDate != "")
             //startDateTime = ConvertJsonDate(worklog.startDate).toLocaleTimeString("en-US", options);
             startDateTime = formatTimeInAMPM(ConvertJsonDate(worklog.startDate))
-            recordDate = ConvertJsonDate(worklog.startDate).toIndianFormat();
+
+        //console.log(startDateTime);
+        recordDate = ConvertJsonDate(worklog.startDate).toIndianFormat();
 
         if (worklog.endDate != null || worklog.endDate != "")
             endDateTime = ConvertJsonDate(worklog.endDate).toLocaleTimeString("en-US", options);
@@ -413,15 +415,30 @@
         //append the worklog to the container of it.
         mainContainer.appendChild(colEl);
 
-        addElementToContainer(document.getElementById("worklogs-container"), mainContainer)
+        addElementToContainer(document.getElementById("worklogs-container"), mainContainer, position)
     }
 
-    //Append an Html element to the container
-    function addElementToContainer(container, element) {
+    //Append an Html element to the container on a specific position
+    //if is 0, then we do it be default
+    //if it is any other number then we add the element on stat specific location
+    //1 -> first element
+    //2- > second
+    //....
+    function addElementToContainer(container, element, position) {
 
-
+        
         if (container != null && element != null) {
-            container.appendChild(element);
+            if (position == 0) {
+                container.appendChild(element);
+            } else {
+                //inserts an element at a specific position
+                var childrenCount = container.childElementCount;
+
+                if(childrenCount >= position)
+                    container.insertBefore(element, container.children[position])
+
+            }
+            
         } else {
             notif.error("Something happen! Please try again later!", "Error")
         }

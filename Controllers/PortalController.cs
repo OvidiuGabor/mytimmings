@@ -43,7 +43,7 @@ namespace mytimmings.Controllers
 
             //Get the stats for today;
 
-            var todayRecords = db.Main_Data.Where(x => x.Status_Start_Time.Day == todayDate.Day && x.Status_Start_Time.Month == todayDate.Month && x.Status_Start_Time.Year == todayDate.Year && x.User_ID == user.ID).ToList();
+            var todayRecords = db.Main_Data.Where(x => x.CurrentDate.Day == todayDate.Day && x.CurrentDate.Month == todayDate.Month && x.CurrentDate.Year == todayDate.Year && x.User_ID == user.ID).ToList();
             List<Models.Portal.WorkRecord> todayRecordsModel = new List<Models.Portal.WorkRecord>();
             foreach(var record in todayRecords)
             {
@@ -70,7 +70,7 @@ namespace mytimmings.Controllers
             //calculate work time for the current month;
             int currentMonth = todayDate.Month;
 
-            var monthlyRecords = db.Main_Data.Where(x => x.Status_Start_Time.Day >= 1 && x.Status_Start_Time.Month == currentMonth && x.Status_Start_Time.Year == todayDate.Year && x.Status_Start_Time.Day <= 31 && x.User_ID == user.ID).ToList();
+            var monthlyRecords = db.Main_Data.Where(x => x.CurrentDate.Day >= 1 && x.CurrentDate.Month == currentMonth && x.CurrentDate.Year == todayDate.Year && x.CurrentDate.Day <= 31 && x.User_ID == user.ID).ToList();
             var recordsModel = new List<Models.Portal.WorkRecord>();
             foreach (var record in monthlyRecords)
             {

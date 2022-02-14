@@ -38,7 +38,7 @@ namespace DBContext
         [StringLength(50)]
         public string Tags { get; set; }
 
-        [StringLength(50)]
+        [StringLength(200)]
         public string TagsColors { get; set; }
     }
 }

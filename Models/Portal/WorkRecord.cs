@@ -17,6 +17,8 @@ namespace mytimmings.Models.Portal
         public string projectName { get; set; }
         public string title { get; set; }
         public string description { get; set; }
+        public string tagsforDb { get; set; }
+        public string tagsColorforDb { get; set; }
         public List<string> tags { get; set; }
         public List<string> tagsColors { get; set; }
 
@@ -47,6 +49,67 @@ namespace mytimmings.Models.Portal
         public WorkRecord()
         {
 
+        }
+        public WorkRecord(DateTime recordDate, DateTime startTime, DateTime endTime, string status, int projectId, string title, string description, string tags, string tagsColor)
+        {
+            currentDate = recordDate;
+            startDate = startTime;
+            endDate = endTime;
+            this.status = status;
+            this.projectId = projectId;
+            this.title = title;
+            this.description = description;
+            tagsforDb = tags;
+            tagsColorforDb = tagsColor;
+            getProjectNameFromId();
+
+            CreateTagsList(tags);
+            CreateTagsColorList(tagsColor);
+            checkForTagsAndColors();
+        }
+
+
+
+        public int InsertRecordIntoDb(Models.Security.User user)
+        {
+
+            if(user != null)
+            {
+               return  InsertRecord(GenerateDbRecord(user));
+            }
+            else
+            {
+                throw new ArgumentNullException("User argument is null!");
+            }
+        }
+
+        private DBContext.Main_Data GenerateDbRecord(Models.Security.User user)
+        {
+            return new DBContext.Main_Data
+            {
+                User_ID = user.ID,
+                CurrentDate = this.currentDate,
+                Status_Start_Time = startDate,
+                Status_End_Time = endDate,
+                Status = status,
+                Project_ID = projectId,
+                Project_Name = projectName,
+                Title = title,
+                Description = description,
+                Tags = tagsforDb,
+                TagsColors = tagsColorforDb
+
+            };
+        }
+        private int InsertRecord(DBContext.Main_Data record)
+        {
+       
+            DBContext.DBModel db = new DBContext.DBModel();
+           
+            db.Main_Data.Add(record);
+            db.SaveChanges();
+            int id = (int)record.ID;
+            return id;
         }
 
         private void CreateTagsList(string tag)
@@ -80,20 +143,17 @@ namespace mytimmings.Models.Portal
 
             if (!String.IsNullOrEmpty(colors))
             {
-                var tempList = colors.Split(';');
-                foreach (var color in tempList)
+                List<string> tempList = new List<string>();
+                if (colors.Contains(";"))
                 {
-                    var newColor = color.Trim();
-                    //we check for '#' becasue it is mandatory in setting the CSS color
-                    if (!color.Contains("#"))
-                    {
-                        newColor = "#" + newColor;
-
-                    }
-
-                    tagsColors.Add(newColor);
-
+                    tempList = colors.Split(';').ToList();
                 }
+                else
+                {
+                    tempList.Add(colors);
+                }
+                    
+                tagsColors.AddRange(tempList);
             }
 
         }
@@ -149,5 +209,15 @@ namespace mytimmings.Models.Portal
 
 
         }   
+        private void getProjectNameFromId()
+        {
+            DBContext.DBModel db = new DBContext.DBModel();
+            var projectName = db.User_Assigned_Projects.Where(x => x.ProjectId == this.projectId).Select(x => x.ProjectName).FirstOrDefault();
+            if (string.IsNullOrEmpty(projectName))
+                throw new ArgumentException("You are not assign to the project!");
+
+
+            this.projectName = projectName;
+        }
     }
 }

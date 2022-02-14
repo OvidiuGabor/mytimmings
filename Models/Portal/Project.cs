@@ -18,7 +18,7 @@ namespace mytimmings.Models.Portal
             if (project == null)
                 throw new ArgumentNullException("project argument cannot be null.");
 
-            id = (int)project.Id;
+            id = (int)project.ProjectId;
             name = project.ProjectName;
             userId = project.UserID;
             active = project.Active ?? false;

@@ -7,47 +7,65 @@
             </div>
             <div class="modal-body">
                 <div class="p-4 text-center">
-                    <form id="create-task">
+                    <form id="create-task" class="needs-validation" novalidate>
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <label for="dateInput">Date</label>
-                                <input type="date" class="form-control" id="dateInput" placeholder="Task Date" style="text-align: center">
+                                <input type="date" class="form-control" id="dateInput" placeholder="Task Date" style="text-align: center" required>
+                                <div class="invalid-feedback">
+                                  Please select a date!
+                                </div>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6">
                                 <label for="starttime">Start Time</label>
-                                <input type="time" class="form-control" id="startTime" placeholder="Start Time">
+                                <input type="time" class="form-control" id="startTime" placeholder="Start Time" required>
+                                <div class="invalid-feedback">
+                                    Please select Start Time!
+                                </div>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="endTime">End Time</label>
-                                <input type="time" class="form-control" id="endTime" placeholder="End Time">
+                                <input type="time" class="form-control" id="endTime" placeholder="End Time" required>
+                                <div class="invalid-feedback">
+                                    Please select End Time!
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <label for="title">Task Title</label>
-                                <input type="text" class="form-control" id="title" placeholder="Title">
+                                <input type="text" class="form-control" id="title" placeholder="Title" required>
+                                <div class="invalid-feedback">
+                                    Please add Title!
+                                </div>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <label for="project">Project</label>
-                                <select id="project" class="form-control">
+                                <select id="project" class="form-control" required>
                                     <option selected value="1">MyTimmings</option>
-                                    <option value="0">Other</option>
+                                    <option value="2">Other</option>
                                 </select>
+                                <div class="invalid-feedback">
+                                    Please select an Project!
+                                </div>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <label for="status">Status</label>
-                                <select id="status" class="form-control">
+                                <select id="status" class="form-control" required>
                                     <option selected value="On Duty">On Duty</option>
                                     <option value="Break">Break</option>
                                     <option value="Overtime">Overtime</option>
                                 </select>
+                                <div class="invalid-feedback">
+                                    Please select an Status!
+                                </div>
                             </div>
                         </div>
                         <div class="form-row">
@@ -62,13 +80,16 @@
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <label for="details">Details</label>
-                                <textarea id="details" cols="55" rows="15"></textarea>
+                                <textarea id="details" cols="55" rows="15" required></textarea>
+                                <div class="invalid-feedback">
+                                    Please Add a short Description!
+                                </div>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
-            <div class="modal-footer"><button type="button" class="btn btn-light" data-dismiss="modal">Close</button> <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="submitData()">Save Details</button></div>
+            <div class="modal-footer"><button type="button" class="btn btn-light" data-dismiss="modal">Close</button> <button type="button" class="btn btn-primary"  onclick="submitData()">Save Details</button></div>
         </div>
     </div>
 </div>
@@ -160,6 +181,7 @@
     }
 
     function submitData() {
+        var notif = new Notifier();
         let formData = new FormData();
         let tags = [];
         let tagsColor = [];
@@ -183,34 +205,84 @@
         }
         formData.append("tags", tags);
         formData.append("tagsColors", tagsColor);
+        if (validateForm()) {
+             $.ajax({
+                type: "post",
+                url: '@Url.Action("AddTask", "Activity")',
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: function (data) {
+                    console.log(data)
+                    if (data.status == "success") {
+                        $('#modal-right').modal('hide')
+                        notif.success("New Task Created successfully", "Success");
+                        //console.log(data.recordAdded)
+                        createWorklogElement(data.recordAdded, data.position);
+                        //reset the form
+                        resetForm();
 
-        console.log(tags)
-        console.log(tagsColor)
+                    } else if (data.status == "failed") {
+                        notif.error(parseErrorMessage(data.errors), "Error");
+                    }
 
-        $.ajax({
-            type: "post",
-            url: '@Url.Action("AddTask", "Activity")',
-            contentType: false,
-            processData: false,
-            data: formData,
-            success: function (data) {
-                //console.log(data.data)
-                if (data.status == "success") {
 
-                } else if (data.status == "error") {
-                    notif.error(data.message, "Error");
+                },
+                error: function (data) {
+                    notif.error("Something happen! Please try again later!", "Error");
                 }
-
-
-            },
-            error: function (data) {
-                notif.error("Something happen! Please try again later!", "Error");
-            }
         })
 
-        console.log(formData)
+        } else {
+
+        }
+
+        //console.log(formData)
     }
 
+    function parseErrorMessage(errors) {
+        var errorMessage = ""
 
+        for (const [key, value] of Object.entries(errors)) {
+            temp = value + "</br>";
+            errorMessage += temp;
+        }
+        return errorMessage
+    }
+
+    function validateForm() {
+
+        var formValid = true;
+
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function (form) {
+            form.classList.add('was-validated');
+            if (form.checkValidity() === false) {
+                formValid = false;
+            }
+        });
+
+
+        return formValid
+    }
+
+    function resetForm() {
+        //Reset the input
+        //since we have validation, when reseting the input, the fields that are requried will be with red.
+        //Need to investigate this further
+        $('form').get(0).reset();
+
+
+        //remove all tags
+        var tags = document.getElementsByClassName("tag-item");
+        if (tags != null) {
+            for (var i = 0; i < tags.length; i++) {
+                tags[i].remove();
+            }
+
+        }
+
+
+    }
 
 </script>
