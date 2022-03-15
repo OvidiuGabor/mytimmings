@@ -223,5 +223,10 @@ namespace mytimmings.Models.Portal
 
             this.projectName = projectName;
         }
+
+        public int getId()
+        {
+            return recordId;
+        }
     }
 }

@@ -84,7 +84,7 @@
                                     <p class="work-record-project" style="display: inline-flex; padding-left: 0px; padding-right: 5%;">@record.projectName</p>
                                 </div>
                                 <div class="col-md-1" style="padding-right: 0px; text-align: right; padding-left: 20px;">
-                                    <button class="btn btn-primary edit-work-btn" data-toggle="modal" data-target="#modal-right-edit" data-toggle-class="modal-open-aside" onclick="getColors();">Edit</button>
+                                    <button class="btn btn-primary edit-work-btn" data-toggle="modal" data-target="#modal-right-edit" data-toggle-class="modal-open-aside" onclick="getColors(); getTask('@record.getId()')">Edit</button>
                                 </div>
                             </div>
                             <div class="row work-record-middle-section">
@@ -476,6 +476,17 @@
                 notif.error("Something happen! Please try again later!", "Error");
             }
         })
+    }
+
+
+    //send an json and get the information about the task from the db
+    function getTaskDetailsById(id) {
+
+    }
+
+    //populate the input boxes from the edit modal with the info from the db
+    function populateTheInputBoxes(task) {
+
     }
 
 </script>
