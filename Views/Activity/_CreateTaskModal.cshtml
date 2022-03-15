@@ -3,7 +3,9 @@
     <div class="modal-dialog modal-right w-xl">
         <div class="modal-content h-100 no-radius" style="overflow: auto">
             <div class="modal-header">
-                <div class="modal-title text-md">Create new Task</div> <button class="close" data-dismiss="modal">&times;</button>
+
+                <div class="modal-title text-md" id="modal-title">Create new Task</div>
+                <button class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="p-4 text-center">
@@ -89,7 +91,9 @@
                     </form>
                 </div>
             </div>
-            <div class="modal-footer"><button type="button" class="btn btn-light" data-dismiss="modal">Close</button> <button type="button" class="btn btn-primary"  onclick="submitData()">Save Details</button></div>
+            
+            <div class="modal-footer"><button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary"  onclick="submitData()">Save Details</button></div>
         </div>
     </div>
 </div>

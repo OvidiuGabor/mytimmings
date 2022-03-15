@@ -8,6 +8,16 @@
     }
 }
 
+function ConvertJsonDateWithoutUTC(date) {
+
+    if (typeof date !== 'undefined' && date.length > 0) {
+        var num = date.match(/\d+/g); //regex to extract numbers 
+        var date = new Date(parseFloat(num)); //converting to date
+        //console.log(date)
+        return date;
+    }
+}
+
 
 function mothsList(index) {
     if (index > 0 && index < 12) {
@@ -32,7 +42,7 @@ function mothsList(index) {
 
 function ConvertFromUTC(date) {
 
-    var newDate = new Date(date.getTime() + +date.getTimezoneOffset() * 60 * 1000)
+    var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000)
 
     var offset = date.getTimezoneOffset() / 60;
     var hours = date.getHours();

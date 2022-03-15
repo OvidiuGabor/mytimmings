@@ -16,6 +16,8 @@ namespace DBContext
         [StringLength(10)]
         public string User_ID { get; set; }
 
+        [StringLength(100)]
+        public string User_Time_Zone { get; set; }
         public DateTime CurrentDate { get; set; }
 
         public DateTime Status_Start_Time { get; set; }

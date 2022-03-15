@@ -210,11 +210,16 @@ namespace mytimmings.Controllers
 
             //validate Form Data
             //Validate recordDateFm
+            // set the culture provider tu US
+            CultureInfo provider = new CultureInfo("en-US");
+
+    
+         
             if (!String.IsNullOrEmpty(recordDateFm))
             {
+
                 string[] dateFormats = new[] { "yyyy/MM/dd", "yyyy-MM-dd" };
-                CultureInfo provider = new CultureInfo("en-US");
-                var success = DateTime.TryParseExact(recordDateFm, dateFormats, provider, DateTimeStyles.AssumeUniversal, out recordDate);
+                var success = DateTime.TryParseExact(recordDateFm, dateFormats, provider, DateTimeStyles.AdjustToUniversal, out recordDate);
                 if (!success)
                 {
                     errored = true;
@@ -230,12 +235,12 @@ namespace mytimmings.Controllers
             //validate startTimeFm
             if(!String.IsNullOrEmpty(startTimeFm))
             {
-                string[] dateFormats = new[] { "HH:mm", "HH:mm:ss" };
-                CultureInfo provider = new CultureInfo("en-US");
+                //string[] dateFormats = new[] { "HH:mm", "HH:mm:ss" };
                 try
                 {
-                    var tempStartTime = DateTime.ParseExact(startTimeFm, "HH:mm", CultureInfo.InvariantCulture);
-                    startTime = (recordDate.Date + tempStartTime.TimeOfDay).ToUniversalTime();
+                    //var tempStartTime = DateTime.ParseExact(startTimeFm, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
+                    TimeSpan ts = TimeSpan.Parse(startTimeFm);
+                    startTime = recordDate.Date.Add(ts).ToUniversalTime();
                 }
                 catch (Exception ex)
                 {
@@ -254,12 +259,14 @@ namespace mytimmings.Controllers
             //validate endTimeFm
             if (!String.IsNullOrEmpty(endTimeFm))
             {
-                string[] dateFormats = new[] { "HH:mm", "HH:mm:ss" };
-                CultureInfo provider = new CultureInfo("en-US");
+                //string[] dateFormats = new[] { "HH:mm", "HH:mm:ss" };
                 try
                 {
-                   var  tempEndTime = DateTime.ParseExact(endTimeFm, "HH:mm", CultureInfo.InvariantCulture);
-                    endTime = (recordDate.Date + tempEndTime.TimeOfDay).ToUniversalTime();
+                    //var  tempEndTime = DateTime.ParseExact(endTimeFm, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
+                    //endTime = (recordDate.Date + tempEndTime.TimeOfDay).ToUniversalTime();
+                    TimeSpan ts = TimeSpan.Parse(endTimeFm);
+                    endTime = recordDate.Date.Add(ts).ToUniversalTime();
+
                 }
                 catch (Exception ex)
                 {
@@ -309,8 +316,8 @@ namespace mytimmings.Controllers
                 tagsColor = tagsColorFm.Replace("),", ");").Replace("0.1)", "1)").Replace(" ", "");
             }
 
-
-            record = new Models.Portal.WorkRecord(recordDate, startTime, endTime, statusFm, Int32.Parse(projectIdFm), titleFm, descriptionFm, tags, tagsColor);
+            string timezone = GetUserAuthState().TimeZone;
+            record = new Models.Portal.WorkRecord(recordDate, startTime, endTime, statusFm, Int32.Parse(projectIdFm), titleFm, descriptionFm, tags, tagsColor, timezone);
             int position = 1;
             Dictionary<string,string> validationErrors = CheckTaskForPotentialIssues(record, user);
          
@@ -462,6 +469,10 @@ namespace mytimmings.Controllers
             return (Models.Security.User)Session["User"];
         }
 
+        private Models.Security.AuthState GetUserAuthState()
+        {
+            return (Models.Security.AuthState)Session["AuthState"];
+        }
 
         private void SetMyStatSession(Models.Activity.MyActivity myActivity)
         {

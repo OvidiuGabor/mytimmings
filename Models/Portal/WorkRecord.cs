@@ -9,6 +9,7 @@ namespace mytimmings.Models.Portal
     {
         private int recordId { get; }
         private string userId { get; }
+        public string timeZone { get; set; }
         public DateTime currentDate { get; set; }
         public DateTime startDate { get; set; }
         public DateTime endDate { get; set; }
@@ -50,7 +51,7 @@ namespace mytimmings.Models.Portal
         {
 
         }
-        public WorkRecord(DateTime recordDate, DateTime startTime, DateTime endTime, string status, int projectId, string title, string description, string tags, string tagsColor)
+        public WorkRecord(DateTime recordDate, DateTime startTime, DateTime endTime, string status, int projectId, string title, string description, string tags, string tagsColor, string timeZone)
         {
             currentDate = recordDate;
             startDate = startTime;
@@ -61,6 +62,7 @@ namespace mytimmings.Models.Portal
             this.description = description;
             tagsforDb = tags;
             tagsColorforDb = tagsColor;
+            this.timeZone = timeZone;
             getProjectNameFromId();
 
             CreateTagsList(tags);
@@ -97,7 +99,9 @@ namespace mytimmings.Models.Portal
                 Title = title,
                 Description = description,
                 Tags = tagsforDb,
-                TagsColors = tagsColorforDb
+                TagsColors = tagsColorforDb,
+                User_Time_Zone = timeZone
+                
 
             };
         }

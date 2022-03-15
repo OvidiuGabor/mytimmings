@@ -55,7 +55,7 @@
                         <h4>Time Sheet</h4>
                     </div>
                     <div class="new-task-btn-container col-md-1">
-                        <button type="button" class="btn btn-primary new-task-style-btn" id="new-taks-btn" data-toggle="modal" data-target="#modal-right" data-toggle-class="modal-open-aside" onclick="getColors()">New Task</button>
+                        <button type="button" class="btn btn-primary new-task-style-btn" id="new-taks-btn" data-toggle="modal" data-target="#modal-right" data-toggle-class="modal-open-aside" onclick="getColors();">New Task</button>
                     </div>
                 </div>
                 @{ 
@@ -64,9 +64,13 @@
                 @foreach (var record in workLogs)
                 {
 
-                    string startTime = record.startDate.ToLocalTime().ToString("hh:mm tt");
-                    string endTime = record.endDate.ToLocalTime().ToString("hh:mm tt");
-                    string date = record.currentDate.ToLocalTime().ToString("dd MMM yyyy");
+                    var timezone = TimeZoneInfo.Local;
+
+
+                    string startTime = TimeZoneInfo.ConvertTimeFromUtc( record.startDate, timezone).ToString("hh:mm tt");
+
+                    string endTime = TimeZoneInfo.ConvertTimeFromUtc(record.endDate, timezone).ToString("hh:mm tt");
+                    string date = record.currentDate.ToString("dd MMM yyyy");
                     int i = 0;
 
 
@@ -80,7 +84,7 @@
                                     <p class="work-record-project" style="display: inline-flex; padding-left: 0px; padding-right: 5%;">@record.projectName</p>
                                 </div>
                                 <div class="col-md-1" style="padding-right: 0px; text-align: right; padding-left: 20px;">
-                                    <button class="btn btn-primary edit-work-btn" data-toggle="modal" data-target="#exampleModal">Edit</button>
+                                    <button class="btn btn-primary edit-work-btn" data-toggle="modal" data-target="#modal-right-edit" data-toggle-class="modal-open-aside" onclick="getColors();">Edit</button>
                                 </div>
                             </div>
                             <div class="row work-record-middle-section">
@@ -332,14 +336,16 @@
         var description = "";
 
         if (worklog.startDate != null || worklog.startDate != "")
-            //startDateTime = ConvertJsonDate(worklog.startDate).toLocaleTimeString("en-US", options);
-            startDateTime = formatTimeInAMPM(ConvertJsonDate(worklog.startDate))
+            //startDateTime = ConvertJsonDateWithoutUTC(worklog.startDate).toLocaleTimeString("en-US", options);
+            startDateTime = formatTimeInAMPM(ConvertJsonDateWithoutUTC(worklog.startDate))
 
         //console.log(startDateTime);
-        recordDate = ConvertJsonDate(worklog.startDate).toIndianFormat();
+        recordDate = ConvertJsonDateWithoutUTC(worklog.currentDate).toIndianFormat();
 
         if (worklog.endDate != null || worklog.endDate != "")
-            endDateTime = ConvertJsonDate(worklog.endDate).toLocaleTimeString("en-US", options);
+            //endDateTime = ConvertJsonDateWithoutUTC(worklog.endDate).toLocaleTimeString("en-US", options);
+            endDateTime = formatTimeInAMPM(ConvertJsonDateWithoutUTC(worklog.endDate))
+
 
         if (worklog.title != null)
             title = worklog.title;
@@ -471,6 +477,5 @@
             }
         })
     }
-
 
 </script>
